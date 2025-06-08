@@ -1,0 +1,37 @@
+<template>
+  <TMenu
+    v-show="!loading"
+    :theme="isDark ? 'dark' : 'light'"
+    v-model:value="activeKey"
+    v-model:expanded="expandedKeys"
+    :width="220"
+    @change="(key) => onMenuSelect(key as string)"
+  >
+    <TMenuItem value="/index">
+      <template #icon>
+        <TIcon name="dashboard-1" />
+        工作台
+      </template>
+    </TMenuItem>
+    <MenuItem v-for="item in menuItems" :key="item.key" :item="item" />
+  </TMenu>
+</template>
+
+<script setup lang="ts">
+import useAppStore from '@/stores/app'
+import useUserStore from '@/stores/user'
+import useMenu from './use-menu'
+import MenuItem from './menu-item.vue'
+
+const userStore = useUserStore()
+
+const { isDark } = storeToRefs(useAppStore())
+
+const loading = ref(true)
+
+const { menuItems, generateMenu, onMenuSelect, activeKey, expandedKeys } = useMenu()
+
+menuItems.value = generateMenu(userStore.routerMap!)
+
+loading.value = false
+</script>

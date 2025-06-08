@@ -1,0 +1,19 @@
+import 'tdesign-vue-next/dist/reset.css'
+import 'tdesign-vue-next/es/style/index.css'
+import '@/assets/css/index.scss'
+import 'virtual:uno.css'
+
+import App from './app.tsx'
+import router from './router'
+import './router/guard'
+
+import registerComponents from './plugins/register.ts'
+
+const app = createApp(App)
+
+app.use(createPinia())
+app.use(router)
+
+registerComponents(app)
+
+app.mount('#app')

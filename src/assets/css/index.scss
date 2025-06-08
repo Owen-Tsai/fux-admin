@@ -1,0 +1,30 @@
+@import './theme.css';
+// @import './var.css';
+
+:root,
+:root[theme-mode='light'] {
+  --bg-color-blur: rgba(255, 255, 255, 0.8);
+}
+
+:root,
+:root[theme-mode='dark'] {
+  --bg-color-blur: rgba(0, 0, 0, 0.8);
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.scrollbar__thumb {
+  background-color: var(--td-scrollbar-hover-color) !important;
+}
+
+.view {
+  @apply p-4 lg:px-6 lg:pb-10;
+}
