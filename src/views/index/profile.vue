@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import useUserStore from '@/stores/user'
 import { getDeptSimpleList } from '@/api/system/dept'
-import { getIndexData } from '@/api/index'
+import { getIndexData, type StatisticVO } from '@/api/index'
 
 const { user } = storeToRefs(useUserStore())
 
@@ -9,11 +9,13 @@ const { data: depts } = useRequest(getDeptSimpleList, {
   immediate: true,
 })
 
-const { data: stats, pending } = useRequest(getIndexData, {
-  immediate: true,
-})
-
-const statistics = ref([{ label: '' }])
+const statistics = ref<StatisticVO[]>([
+  { title: '审核进度', value: 90.72, suffix: '%' },
+  { title: '待审核', value: 56 },
+  { title: '开放的业务', value: 12 },
+  { title: '申报总量', value: 9287 },
+  { title: '本月人才入库', value: 863, trend: 'increase' },
+])
 </script>
 
 <template>
@@ -29,7 +31,7 @@ const statistics = ref([{ label: '' }])
             </div>
           </div>
         </div>
-        <div class="mt-4">
+        <div class="mt-6">
           <div class="grid grid-cols-2 text-secondary gap-2">
             <div class="flex items-center gap-2">
               <TIcon name="houses-1" />
@@ -60,14 +62,38 @@ const statistics = ref([{ label: '' }])
         <TTooltip content="编辑个人信息">
           <TButton variant="text" shape="square" theme="primary" class="!absolute right-4 top-0">
             <template #icon>
-              <TIcon name="edit-2" />
+              <TIcon name="setting" />
             </template>
           </TButton>
         </TTooltip>
       </div>
 
-      <div class="w-13/24 border-l-solid border-l-1 border-l-[var(--td-border-level-1-color)]">
-        <div class="grid grid-cols-3"></div>
+      <div
+        class="w-13/24 pl-6 border-l-solid border-l-1 border-l-[var(--td-border-level-1-color)] relative"
+      >
+        <div class="grid grid-cols-3 gap-4">
+          <TStatistic
+            v-for="(item, i) in statistics"
+            :key="i"
+            :title="item.title"
+            :value="item.value"
+            :suffix="item.suffix"
+            :trend="item.trend"
+            :color="
+              item.trend === 'increase' ? 'green' : item.trend === 'decrease' ? 'red' : undefined
+            "
+            :animation="{ duration: 2000, valueFrom: 0 }"
+            animation-start
+          />
+        </div>
+
+        <TTooltip content="设置指标展示">
+          <TButton variant="text" shape="square" theme="primary" class="!absolute right-0 bottom-0">
+            <template #icon>
+              <TIcon name="data-display" />
+            </template>
+          </TButton>
+        </TTooltip>
       </div>
     </div>
   </TCard>
