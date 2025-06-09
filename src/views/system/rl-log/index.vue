@@ -27,7 +27,7 @@
             <AFormItem label="操作类型" name="type">
               <ASelect
                 v-model:value="queryParams.type"
-                :options="systemOperateType"
+                :options="filteredSystemOperateType"
                 placeholder="请选择操作类型"
               />
             </AFormItem>
@@ -59,7 +59,7 @@
       </AForm>
     </ACard>
 
-    <ACard title="操作日志">
+    <ACard title="相关业务日志">
       <template #extra>
         <AFlex :gap="8">
           <ATooltip v-if="permission.has('system:login-log:export')" title="导出">
@@ -123,13 +123,20 @@ import { permission } from '@/hooks/use-permission'
 import { columns, useTable } from './use-table'
 import DetailPanel from './detail.vue'
 import type { FormInstance } from 'ant-design-vue'
-import type { OperateLogVO } from '@/api/system/operate-log'
+import type { OperateLogVO } from '@/api/system/bf-log'
 
 const filterForm = ref<FormInstance>()
 
 const [filterExpanded, toggle] = useToggle(false)
 
 const [systemOperateType] = useDict('system_operate_type')
+
+// 计算属性过滤，只保留新增和修改
+const filteredSystemOperateType = computed(() => {
+  return systemOperateType.value.filter((item) => {
+    return item.label === '新增' || item.label === '修改'
+  })
+})
 
 const { data, pending, execute, queryParams, onFilter, onChange, onFilterReset, pagination } =
   useTable(filterForm)
@@ -142,5 +149,5 @@ const openDetail = (row: OperateLogVO) => {
   visible.value = true
 }
 
-defineOptions({ name: 'SystemOperateLog' })
+defineOptions({ name: 'SystemRlLog' })
 </script>
