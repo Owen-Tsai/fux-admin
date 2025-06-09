@@ -200,6 +200,7 @@ const open = (type: 'create' | 'update', id?: number) => {
   if (type === 'create' && id) {
     // add sub menu
     formData.value.parentId = id
+    formData.value.id = undefined
   }
 
   if (type === 'update') {
