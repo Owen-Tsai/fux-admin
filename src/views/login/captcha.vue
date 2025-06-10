@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { getCaptcha } from '@/api/auth'
-import useRequest from '@/utils/use-request'
+import useRequest from '@/hooks/use-request'
 import useMouseDrag from './use-mouse'
 import useValidation from './use-validation'
 

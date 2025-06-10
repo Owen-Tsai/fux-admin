@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import useUserStore from '@/stores/user'
 import { getDeptSimpleList } from '@/api/system/dept'
-import { getIndexData, type StatisticVO } from '@/api/index'
+import { getIndexData, type StatisticsVO } from '@/api/index'
 
 const { user } = storeToRefs(useUserStore())
 
@@ -9,7 +9,7 @@ const { data: depts } = useRequest(getDeptSimpleList, {
   immediate: true,
 })
 
-const statistics = ref<StatisticVO[]>([
+const statistics = ref<StatisticsVO>([
   { title: '审核进度', value: 90.72, suffix: '%' },
   { title: '待审核', value: 56 },
   { title: '开放的业务', value: 12 },
@@ -20,12 +20,12 @@ const statistics = ref<StatisticVO[]>([
 
 <template>
   <TCard>
-    <div class="flex">
-      <div class="w-11/24 relative">
+    <div class="flex flex-col lg:flex-row">
+      <div class="w-full lg:w-11/24 relative pb-6 lg:pb-0">
         <div class="flex items-center gap-2 lg:gap-6 overflow-hidden">
           <TAvatar :image="user?.avatar" size="68px" class="flex-none" />
           <div class="text-truncate">
-            <div class="text-xl lg:text-2xl text-truncate">欢迎回来，{{ user?.nickname }}</div>
+            <div class="text-xl lg:text-2xl text-truncate">你好，{{ user?.nickname }}</div>
             <div class="mt-2 flex items-center gap-4">
               <TTag theme="primary" variant="light-outline">超级管理员</TTag>
             </div>
@@ -69,7 +69,7 @@ const statistics = ref<StatisticVO[]>([
       </div>
 
       <div
-        class="w-13/24 pl-6 border-l-solid border-l-1 border-l-[var(--td-border-level-1-color)] relative"
+        class="w-full lg:w-13/24 lg:pl-6 pt-6 lg:pt-0 border-t-solid border-t-1 lg:border-t-0 lg:border-l-solid lg:border-l-1 border-[var(--td-border-level-1-color)] relative"
       >
         <div class="grid grid-cols-3 gap-4">
           <TStatistic

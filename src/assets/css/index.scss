@@ -28,3 +28,14 @@ body,
 .view {
   @apply p-4 lg:px-6 lg:pb-10;
 }
+
+a.has-tag .t-tag {
+  pointer-events: none;
+}
+
+.echart-tooltip {
+  background-color: rgba(#{var(--td-bg-color-container)}, 0.8) !important;
+  backdrop-filter: blur(8px);
+  border-color: var(--td-border-level-1-color) !important;
+  border-radius: 8px !important;
+}

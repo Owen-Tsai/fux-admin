@@ -8,8 +8,9 @@
         variant="text"
         shape="square"
         :icon="() => h(MenuFoldIcon)"
+        @click="emit('click:drawer')"
       />
-      <Logo type="full" class="h-10" />
+      <Logo :type="bps.smallerOrEqual('md').value ? 'simple' : 'full'" class="h-8 lg:h-10" />
     </div>
 
     <!-- actions -->
@@ -59,6 +60,8 @@ const { isDark } = storeToRefs(useAppStore())
 const { user } = storeToRefs(useUserStore())
 
 const { push } = useRouter()
+
+const emit = defineEmits(['click:drawer'])
 
 const userDropdownOpts: DropdownProps['options'] = [
   { content: '个人设置', value: '/me', divider: true },

@@ -3,22 +3,30 @@
     <template #actions>
       <TLink theme="primary">自定义</TLink>
     </template>
-    <TCalendar
-      :controller-config="{ weekend: { visible: false }, mode: { visible: false } }"
-      mode="year"
-    >
-      <template #cellAppend="data: CalendarCell">
-        <div v-if="data.date && calendarData[data.date?.getMonth()]" class="flex gap-2 flex-wrap">
-          <TTag
-            v-for="(item, i) in calendarData[data.date.getMonth()]"
-            :key="i"
-            variant="light-outline"
-          >
-            {{ item.title }}
-          </TTag>
-        </div>
-      </template>
-    </TCalendar>
+
+    <div class="overflow-x-auto">
+      <TLoading :loading="pending">
+        <TCalendar
+          :controller-config="{ weekend: { visible: false }, mode: { visible: false } }"
+          mode="year"
+        >
+          <template #cellAppend="data: CalendarCell">
+            <div
+              v-if="data.date && calendarData[data.date?.getMonth()]"
+              class="flex gap-2 flex-wrap"
+            >
+              <TTag
+                v-for="(item, i) in calendarData[data.date.getMonth()]"
+                :key="i"
+                variant="light-outline"
+              >
+                {{ item.title }}
+              </TTag>
+            </div>
+          </template>
+        </TCalendar>
+      </TLoading>
+    </div>
   </TCard>
 </template>
 
@@ -37,5 +45,9 @@ const calendarData = ref<CalendarDataVO>({
   9: [{ title: '高层次人才认定' }],
 })
 
-const visible = (data: CalendarCell) => {}
+const [pending, setPending] = useToggle(true)
+
+setTimeout(() => {
+  setPending(false)
+}, 1500)
 </script>

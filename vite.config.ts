@@ -23,7 +23,7 @@ export default defineConfig({
           resolveIcons: true,
         }),
       ],
-      dirs: ['./src/utils'],
+      dirs: ['./src/hooks'],
     }),
     unocss({ hmrTopLevelAwait: false }),
     components({

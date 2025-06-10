@@ -4,7 +4,7 @@
     :theme="isDark ? 'dark' : 'light'"
     v-model:value="activeKey"
     v-model:expanded="expandedKeys"
-    :width="220"
+    :width="width"
     @change="(key) => onMenuSelect(key as string)"
   >
     <TMenuItem value="/index">
@@ -22,6 +22,10 @@ import useAppStore from '@/stores/app'
 import useUserStore from '@/stores/user'
 import useMenu from './use-menu'
 import MenuItem from './menu-item.vue'
+
+const { width = 220 } = defineProps<{
+  width?: number | string
+}>()
 
 const userStore = useUserStore()
 
