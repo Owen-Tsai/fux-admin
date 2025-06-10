@@ -57,7 +57,7 @@
         <ASelect
           v-model:value="scope.record.dictType"
           :options="dictList"
-          :field-names="{ label: 'name', value: 'id' }"
+          :field-names="{ label: 'name', value: 'type' }"
           placeholder="请选择..."
           class="w-full"
         />
