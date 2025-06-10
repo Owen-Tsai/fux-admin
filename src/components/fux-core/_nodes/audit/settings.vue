@@ -84,7 +84,6 @@
 
 <script setup lang="ts">
 import { getSimpleAuditList } from '@/api/system/role'
-import useRequest from '@/hooks/use-request'
 import { NodeTaskStrategy } from '../../_utils/const'
 import { filterOption } from '@fusionx/utils'
 import type { SegmentedProps } from 'ant-design-vue'

@@ -1,7 +1,3 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { useDark, useTitle } from '@vueuse/core'
-
 type Theme = 'light' | 'dark'
 
 const isDark = useDark({ storageKey: 'milestoneTheme' })

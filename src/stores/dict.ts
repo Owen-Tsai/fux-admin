@@ -1,5 +1,3 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
 import type { DictDataEntry } from '@/api/system/dict/data'
 
 export default defineStore('dict', () => {

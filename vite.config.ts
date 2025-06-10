@@ -16,9 +16,12 @@ export default defineConfig(({ mode }) => {
     plugins: [
       vue(),
       vueJsx(),
-      unoCss(),
+      unoCss({
+        hmrTopLevelAwait: false,
+      }),
       autoImport({
         imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
+        dirs: ['src/hooks'],
       }),
       devTools(),
     ],

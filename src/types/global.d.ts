@@ -806,3 +806,8 @@ declare module 'vue' {
     ZoomOutOutlined: (typeof import('@ant-design/icons-vue'))['ZoomOutOutlined']
   }
 }
+
+declare global {
+  const useRequest: typeof import('@/hooks/use-request').default
+  const useDict: typeof import('@/hooks/use-dict').default
+}
