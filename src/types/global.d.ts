@@ -10,4 +10,6 @@ declare module 'vue' {
 declare global {
   const useRequest: typeof import('@/hooks/use-request').default
   const useDict: typeof import('@/hooks/use-dict').default
+  const usePermission: typeof import('@/hooks/use-permission').default
+  const useMessage: typeof import('@/hooks/use-message').default
 }

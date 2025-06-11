@@ -1,10 +1,25 @@
-type PaginatedList<T> = {
-  total: number
-  list: Array<T>
-}
+export {}
 
-type CommonQueryParams = {
-  pageSize?: number
-  pageNo?: number
-  createTime?: [string, string] | [Dayjs, Dayjs]
+import type { TableProps } from 'tdesign-vue-next'
+
+declare global {
+  type PaginatedList<T> = {
+    total: number
+    list: Array<T>
+  }
+
+  type CommonQueryParams = {
+    pageSize?: number
+    pageNo?: number
+    createTime?: string[] | number[] | Date[]
+  }
+
+  type TableScope<T> = {
+    row: {
+      [x in keyof T]: T[x]
+    }
+    col: undefined | Exclude<TableProps['columns'], undefined>[number]
+    rowIndex: number
+    colIndex: number
+  }
 }

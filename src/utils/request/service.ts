@@ -128,7 +128,8 @@ service.interceptors.response.use(
         // 使用刷新令牌请求新的令牌
         try {
           const r = await refreshToken()
-          setToken(r.data.token)
+          console.log(r)
+          setToken(r.data.data)
           config.headers.Authorization = `Bearer ${getToken()}`
           // 释放请求队列
           requestQueue.forEach((fn) => fn())

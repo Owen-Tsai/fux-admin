@@ -31,7 +31,7 @@ export type SimpleUserListVO = Array<{
   nickname: string
 }>
 
-const prefix = '/admin-api/system/user'
+const prefix = '/system/user'
 
 export function getUsers(params?: ListQueryParams) {
   return request.get<PaginatedList<UserVO>>({

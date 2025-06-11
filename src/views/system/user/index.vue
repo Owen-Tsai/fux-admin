@@ -1,0 +1,154 @@
+<script setup lang="ts">
+import { h } from 'vue'
+import { SearchIcon } from 'tdesign-icons-vue-next'
+import useDeptTree from './use-dept-tree'
+import { columns, useUserTable } from './use-user-table'
+import dayjs from 'dayjs'
+import PasswordForm from './password-form.vue'
+import type { FormInstanceFunctions, TreeProps } from 'tdesign-vue-next'
+import type { UserVO } from '@/api/system/user'
+
+const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
+
+const { deptLoading, deptTree, filterText, filter, activeNodes } = useDeptTree()
+const { data, query, onPageChange, onQueryChange, pagination, pending } = useUserTable(formRef)
+
+const wrapper = useTemplateRef('wrapper')
+const parentElement = useParentElement(wrapper)
+const { height } = useElementSize(parentElement)
+
+const [expanded, toggleExpanded] = useToggle(false)
+const [commonStatus] = useDict('common_status')
+
+const currentDeptName = ref('全部')
+
+const onDeptActive: TreeProps['onActive'] = (_, ctx) => {
+  currentDeptName.value = activeNodes.value[0] ? ctx.node.data.name : '全部'
+  query.value.deptId = activeNodes.value[0] || undefined
+  onQueryChange()
+}
+</script>
+
+<template>
+  <div ref="wrapper" class="view">
+    <div class="flex items-start flex-row-reverse lg:flex-row gap-4 max-h-full h-auto">
+      <div class="w-full lg:w-5/24 flex-none !sticky left-0 top-0">
+        <TCard class="card" :style="{ height: height ? `${height}px` : '100%' }">
+          <TInput
+            v-model:value="filterText"
+            placeholder="输入名称进行过滤"
+            clearable
+            class="flex-none"
+            :prefix-icon="() => h(SearchIcon)"
+          />
+          <TLoading :loading="deptLoading" class="flex-1 min-h-0 mt-4">
+            <TTree
+              v-model:actived="activeNodes"
+              :keys="{ label: 'name', value: 'id' }"
+              :data="deptTree"
+              :filter="filter"
+              expand-all
+              activable
+              height="100%"
+              @active="onDeptActive"
+            />
+          </TLoading>
+        </TCard>
+      </div>
+      <div class="w-full lg:w-19/24">
+        <TCard class="query-form">
+          <TForm
+            ref="formRef"
+            :data="query"
+            layout="inline"
+            class="flex flex-wrap gap-y-4"
+            label-width="64px"
+            @submit="onQueryChange()"
+            @reset="onQueryChange(true)"
+          >
+            <TFormItem label="用户账号" name="username" class="col">
+              <TInput v-model:value="query.username" placeholder="请输入用户账号" />
+            </TFormItem>
+            <TFormItem label="用户名称" name="nickname" class="col">
+              <TInput v-model:value="query.nickname" placeholder="请输入用户名称" />
+            </TFormItem>
+            <TFormItem v-show="expanded" label="手机号码" name="mobile" class="col">
+              <TInput v-model:value="query.mobile" placeholder="请输入用户绑定的手机号码" />
+            </TFormItem>
+            <TFormItem v-show="expanded" label="注册时间" name="createTime" class="col">
+              <TDateRangePicker v-model:value="query.createTime" value-type="YYYY-MM-DD" />
+            </TFormItem>
+            <TFormItem v-show="expanded" label="账号状态" name="status" class="col">
+              <TSelect
+                v-model:value="query.status"
+                :options="commonStatus"
+                placeholder="请选择账号状态"
+              />
+            </TFormItem>
+            <div class="col inline-flex items-center justify-end gap-2">
+              <TButton theme="primary" type="submit">查 询</TButton>
+              <TButton theme="default" type="reset">重 置</TButton>
+              <TLink theme="primary" @click="() => toggleExpanded()">
+                <TIcon name="chevron-down" :class="{ 'rotate-180': expanded }" />
+                {{ expanded ? '收起' : '展开' }}
+              </TLink>
+            </div>
+          </TForm>
+        </TCard>
+
+        <TCard :title="`${currentDeptName}用户列表`" bordered class="!mt-4">
+          <TTable
+            :data="data?.list"
+            row-key="id"
+            :columns="columns"
+            :pagination="pagination"
+            :loading="pending"
+            @page-change="onPageChange"
+          >
+            <template #status="{ row }: TableScope<UserVO>">
+              <TSwitch
+                v-model:value="row.status"
+                :custom-value="[0, 1]"
+                :label="['启用', '停用']"
+              />
+            </template>
+            <template #createTime="{ row }: TableScope<UserVO>">
+              {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+            </template>
+            <template #actions="{ row }: TableScope<UserVO>">
+              <div class="flex gap-2">
+                <TTooltip content="编辑">
+                  <TButton shape="square" theme="primary" variant="text">
+                    <template #icon>
+                      <TIcon name="edit-2" />
+                    </template>
+                  </TButton>
+                </TTooltip>
+                <TDropdown>
+                  <TButton shape="square" theme="primary" variant="text">
+                    <template #icon>
+                      <TIcon name="unfold-more" />
+                    </template>
+                  </TButton>
+                  <TDropdownMenu>
+                    <TDropdownItem>设置角色</TDropdownItem>
+                    <TDropdownItem divider @click="">重置密码</TDropdownItem>
+                    <TDropdownItem theme="error">删除用户</TDropdownItem>
+                  </TDropdownMenu>
+                </TDropdown>
+              </div>
+            </template>
+          </TTable>
+        </TCard>
+      </div>
+    </div>
+
+    <PasswordForm ref="passwordForm" />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.card :deep(.t-card__body) {
+  @apply h-full flex flex-col;
+}
+</style>

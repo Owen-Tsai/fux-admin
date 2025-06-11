@@ -11,12 +11,14 @@
       >
         <Menu />
       </TAside>
-      <TContent class="flex-1 w-full overflow-x-hidden relative">
-        <TabsView />
+      <TContent class="flex-1 w-full overflow-x-hidden relative flex flex-col">
+        <TabsView class="flex-none" />
         <RouterView v-if="routerAlive">
           <template #default="{ Component, route }">
             <KeepAlive :include="[...keepsList]">
-              <component :is="Component" :key="route.fullPath" />
+              <div class="min-h-0 flex-grow-1 p-4 lg:p-6 overflow-y-auto">
+                <component :is="Component" :key="route.fullPath" />
+              </div>
             </KeepAlive>
           </template>
         </RouterView>

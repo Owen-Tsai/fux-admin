@@ -6,7 +6,6 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import autoImport from 'unplugin-auto-import/vite'
 import unocss from 'unocss/vite'
-import { TDesignResolver } from 'unplugin-vue-components/resolvers'
 import components from 'unplugin-vue-components/vite'
 
 // https://vite.dev/config/
@@ -17,22 +16,12 @@ export default defineConfig({
     vueDevTools(),
     autoImport({
       imports: ['vue', 'vue-router', 'pinia', '@vueuse/core', '@vueuse/math'],
-      resolvers: [
-        TDesignResolver({
-          library: 'vue-next',
-          resolveIcons: true,
-        }),
-      ],
       dirs: ['./src/hooks'],
     }),
     unocss({ hmrTopLevelAwait: false }),
     components({
-      resolvers: [
-        TDesignResolver({
-          library: 'vue-next',
-          resolveIcons: true,
-        }),
-      ],
+      dirs: ['./src/components/_internal'],
+      extensions: ['vue', 'tsx'],
     }),
   ],
   resolve: {
