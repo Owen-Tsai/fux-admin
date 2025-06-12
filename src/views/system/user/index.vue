@@ -15,6 +15,8 @@ const passwordForm = useTemplateRef<InstanceType<typeof PasswordForm>>('password
 const roleForm = useTemplateRef<InstanceType<typeof RoleForm>>('roleForm')
 const form = useTemplateRef('form')
 
+const { permission } = usePermission()
+
 const { deptLoading, deptTree, filterText, filter, activeNodes } = useDeptTree()
 const {
   data,
@@ -122,7 +124,22 @@ const onAdd = () => {
 
         <TCard :title="`${currentDeptName}用户列表`" bordered class="!mt-4">
           <template #actions>
-            <ListActions @add="onAdd()" @refresh="execute()" />
+            <div class="flex items-center gap-2">
+              <TButton v-if="permission.has('system:user:create')" theme="primary" @click="onAdd()">
+                <template #icon>
+                  <TIcon name="add" />
+                </template>
+                新增
+              </TButton>
+
+              <TTooltip content="重新载入">
+                <TButton shape="square" variant="text" @click="execute()">
+                  <template #icon>
+                    <TIcon name="refresh" />
+                  </template>
+                </TButton>
+              </TTooltip>
+            </div>
           </template>
 
           <TTable
