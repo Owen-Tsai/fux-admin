@@ -95,6 +95,7 @@ const loadData = async (id: number) => {
 const open = (id?: number) => {
   formRef.value?.resetFields()
   mode.value = 'create'
+  formData.value.id = undefined
 
   if (id) {
     mode.value = 'update'
