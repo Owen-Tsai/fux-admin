@@ -54,3 +54,7 @@ a.has-tag .t-tag {
     font-weight: 600;
   }
 }
+
+.t-form:not(.t-form-inline) .t-form__item:last-of-type {
+  margin-bottom: var(--td-comp-margin-xxl) !important;
+}

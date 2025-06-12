@@ -1,4 +1,4 @@
-import { getUsers, type ListQueryParams } from '@/api/system/user'
+import { getUsers, deleteUser, updateUserStatus, type ListQueryParams } from '@/api/system/user'
 import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
@@ -13,6 +13,11 @@ export const columns: TableProps['columns'] = [
 ]
 
 export const useUserTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const dialog = useDialog()
+  const message = useMessage()
+  // only used in dialog button
+  const loading = ref(false)
+
   const query = ref<ListQueryParams>({
     createTime: [],
   })
@@ -43,12 +48,42 @@ export const useUserTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     execute()
   }
 
+  const onDelete = async (id: number) => {
+    const instance = dialog.confirm({
+      theme: 'danger',
+      showOverlay: true,
+      header: '删除用户',
+      body: '确定要删除用户吗？删除的用户将无法登录和访问系统。',
+      confirmLoading: loading.value,
+      async onConfirm() {
+        loading.value = true
+        await deleteUser(id)
+        loading.value = false
+        instance.destroy()
+        message.success('删除成功')
+        execute()
+      },
+    })
+  }
+
+  const onSetStatus = async (id: number, status: number) => {
+    try {
+      await updateUserStatus(id, status)
+      message.success('操作成功')
+    } finally {
+      execute()
+    }
+  }
+
   return {
     data,
     query,
     pending,
+    execute,
     pagination,
     onPageChange,
     onQueryChange,
+    onDelete,
+    onSetStatus,
   }
 }

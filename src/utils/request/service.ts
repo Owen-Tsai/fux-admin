@@ -4,7 +4,6 @@ import qs from 'qs'
 import { getToken, setToken, getRefreshToken } from '@/utils/auth'
 import useUserStore from '@/stores/user'
 import errorCode from './error-code'
-import { dialog } from '../dialog'
 
 const whiteList = ['/login', '/refresh-token']
 const ignoredErrorMsgs = ['无效的刷新令牌', '刷新令牌已过期']
@@ -40,8 +39,9 @@ const redirectForAuth = () => {
 
     reloginHint.show = true
 
-    const instance = dialog({
-      type: 'confirm',
+    const dialog = useDialog()
+
+    const instance = dialog.confirm({
       header: '登录超时',
       body: '登陆状态已过期。您可以留在当前页面，或重新进行登录。',
       confirmBtn: {
@@ -122,25 +122,22 @@ service.interceptors.response.use(
         isTokenRefresh = true
         if (!getRefreshToken()) {
           // 没有可用的刷新令牌时，强制重新登录
-          console.log('no refresh token')
           return redirectForAuth()
         }
         // 使用刷新令牌请求新的令牌
         try {
           const r = await refreshToken()
-          console.log(r)
           setToken(r.data.data)
           config.headers.Authorization = `Bearer ${getToken()}`
           // 释放请求队列
           requestQueue.forEach((fn) => fn())
           requestQueue.length = 0
           // 重试当前请求
-          return request(config)
+          return service(config)
         } catch (error) {
+          console.log(error)
           // 刷新令牌失败，强制重新登录
           requestQueue.forEach((fn) => fn())
-          requestQueue.length = 0
-          console.log('response interceptor')
           return redirectForAuth()
         } finally {
           isTokenRefresh = false

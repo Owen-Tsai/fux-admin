@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export type UserVO = {
   nickname?: string
-  deptId?: number
+  deptId?: string | number
   deptName?: string
   mobile?: string
   email?: string

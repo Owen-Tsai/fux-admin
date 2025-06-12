@@ -12,4 +12,6 @@ declare global {
   const useDict: typeof import('@/hooks/use-dict').default
   const usePermission: typeof import('@/hooks/use-permission').default
   const useMessage: typeof import('@/hooks/use-message').default
+  const useDialog: typeof import('@/hooks/use-dialog').default
+  const closeAllDialogs: typeof import('@/hooks/use-dialog').closeAllDialogs
 }

@@ -4,7 +4,7 @@ import type { TreeProps } from 'tdesign-vue-next'
 const useDeptTree = () => {
   const filterText = ref('')
   const filter = ref<TreeProps['filter']>()
-  const activeNodes = ref<string[]>([])
+  const activeNodes = ref<number[]>([])
 
   const { data, pending } = useRequest(getDeptTree, { immediate: true })
 

@@ -5,13 +5,28 @@ import useDeptTree from './use-dept-tree'
 import { columns, useUserTable } from './use-user-table'
 import dayjs from 'dayjs'
 import PasswordForm from './password-form.vue'
+import RoleForm from './role-form.vue'
+import Form from './form.vue'
 import type { FormInstanceFunctions, TreeProps } from 'tdesign-vue-next'
 import type { UserVO } from '@/api/system/user'
 
-const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const passwordForm = useTemplateRef<InstanceType<typeof PasswordForm>>('passwordForm')
+const roleForm = useTemplateRef<InstanceType<typeof RoleForm>>('roleForm')
+const form = useTemplateRef('form')
 
 const { deptLoading, deptTree, filterText, filter, activeNodes } = useDeptTree()
-const { data, query, onPageChange, onQueryChange, pagination, pending } = useUserTable(formRef)
+const {
+  data,
+  query,
+  onPageChange,
+  onQueryChange,
+  onDelete,
+  onSetStatus,
+  pagination,
+  pending,
+  execute,
+} = useUserTable(queryForm)
 
 const wrapper = useTemplateRef('wrapper')
 const parentElement = useParentElement(wrapper)
@@ -27,12 +42,21 @@ const onDeptActive: TreeProps['onActive'] = (_, ctx) => {
   query.value.deptId = activeNodes.value[0] || undefined
   onQueryChange()
 }
+
+const onAdd = () => {
+  form.value?.open()
+  nextTick(() => {
+    if (query.value.deptId) {
+      form.value?.setDept(query.value.deptId)
+    }
+  })
+}
 </script>
 
 <template>
   <div ref="wrapper" class="view">
-    <div class="flex items-start flex-row-reverse lg:flex-row gap-4 max-h-full h-auto">
-      <div class="w-full lg:w-5/24 flex-none !sticky left-0 top-0">
+    <div class="flex items-start flex-row-reverse lg:flex-row max-h-full h-auto">
+      <div class="w-full lg:w-5/24 flex-none !sticky left-0 top-0 lg:pr-2">
         <TCard class="card" :style="{ height: height ? `${height}px` : '100%' }">
           <TInput
             v-model:value="filterText"
@@ -55,10 +79,10 @@ const onDeptActive: TreeProps['onActive'] = (_, ctx) => {
           </TLoading>
         </TCard>
       </div>
-      <div class="w-full lg:w-19/24">
+      <div class="w-full lg:w-19/24 lg:pl-2">
         <TCard class="query-form">
           <TForm
-            ref="formRef"
+            ref="queryForm"
             :data="query"
             layout="inline"
             class="flex flex-wrap gap-y-4"
@@ -97,6 +121,10 @@ const onDeptActive: TreeProps['onActive'] = (_, ctx) => {
         </TCard>
 
         <TCard :title="`${currentDeptName}用户列表`" bordered class="!mt-4">
+          <template #actions>
+            <ListActions @add="onAdd()" @refresh="execute()" />
+          </template>
+
           <TTable
             :data="data?.list"
             row-key="id"
@@ -110,6 +138,7 @@ const onDeptActive: TreeProps['onActive'] = (_, ctx) => {
                 v-model:value="row.status"
                 :custom-value="[0, 1]"
                 :label="['启用', '停用']"
+                @change="(v) => onSetStatus(row.id!, v as number)"
               />
             </template>
             <template #createTime="{ row }: TableScope<UserVO>">
@@ -118,7 +147,12 @@ const onDeptActive: TreeProps['onActive'] = (_, ctx) => {
             <template #actions="{ row }: TableScope<UserVO>">
               <div class="flex gap-2">
                 <TTooltip content="编辑">
-                  <TButton shape="square" theme="primary" variant="text">
+                  <TButton
+                    shape="square"
+                    theme="primary"
+                    variant="text"
+                    @click="form?.open(row.id)"
+                  >
                     <template #icon>
                       <TIcon name="edit-2" />
                     </template>
@@ -131,9 +165,9 @@ const onDeptActive: TreeProps['onActive'] = (_, ctx) => {
                     </template>
                   </TButton>
                   <TDropdownMenu>
-                    <TDropdownItem>设置角色</TDropdownItem>
-                    <TDropdownItem divider @click="">重置密码</TDropdownItem>
-                    <TDropdownItem theme="error">删除用户</TDropdownItem>
+                    <TDropdownItem @click="roleForm?.open(row)">设置角色</TDropdownItem>
+                    <TDropdownItem divider @click="passwordForm?.open(row)">重置密码</TDropdownItem>
+                    <TDropdownItem theme="error" @click="onDelete(row.id!)">删除用户</TDropdownItem>
                   </TDropdownMenu>
                 </TDropdown>
               </div>
@@ -143,7 +177,9 @@ const onDeptActive: TreeProps['onActive'] = (_, ctx) => {
       </div>
     </div>
 
-    <PasswordForm ref="passwordForm" />
+    <PasswordForm ref="passwordForm" @success="execute()" />
+    <RoleForm ref="roleForm" @success="execute()" />
+    <Form ref="form" @success="execute()" />
   </div>
 </template>
 

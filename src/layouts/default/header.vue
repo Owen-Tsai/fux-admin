@@ -53,13 +53,13 @@ import bps from '@/utils/breakpoints'
 import useAppStore from '@/stores/app'
 import useUserStore from '@/stores/user'
 import { useRouter } from 'vue-router'
-import { dialog } from '@/utils/dialog'
 import type { DropdownProps } from 'tdesign-vue-next'
 
 const { isDark } = storeToRefs(useAppStore())
 const { user } = storeToRefs(useUserStore())
 
 const { push } = useRouter()
+const dialog = useDialog()
 
 const emit = defineEmits(['click:drawer'])
 
@@ -77,8 +77,7 @@ const onDropdownClick = (value?: string) => {
 
   // handle commands
   if (value === 'logout') {
-    dialog({
-      type: 'confirm',
+    dialog.confirm({
       theme: 'warning',
       showOverlay: true,
       header: '注销登录',
