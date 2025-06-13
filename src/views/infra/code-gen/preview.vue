@@ -1,7 +1,7 @@
 <template>
   <AModal v-model:open="isOpen" title="代码预览" wrap-class-name="fullscreen-modal" width="100%">
     <template #footer>
-      <AButton type="primary">关闭</AButton>
+      <AButton type="primary" @click="emit('update:open', false)">关闭</AButton>
     </template>
     <div class="modal-content-wrapper">
       <ARow :gutter="40" class="h-full">
