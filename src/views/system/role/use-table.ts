@@ -15,6 +15,7 @@ export const columns: TableProps['columns'] = [
 export const useTable = (filterFormRef: Ref<FormInstanceFunctions | null>) => {
   const loading = ref(false)
   const message = useMessage()
+  const dialog = useDialog()
 
   const query = ref<ListQueryParams>({
     createTime: [],
@@ -49,13 +50,24 @@ export const useTable = (filterFormRef: Ref<FormInstanceFunctions | null>) => {
 
   const onDelete = async (id: number) => {
     loading.value = true
-    try {
-      await deleteRole(id)
-      message.success('删除成功')
-    } catch (e) {
-    } finally {
-      loading.value = false
-    }
+    const instance = dialog.confirm({
+      theme: 'danger',
+      showOverlay: true,
+      header: '删除角色',
+      body: '确定要删除角色吗？已经具有被分配该角色的用户使用系统时可能受影响',
+      confirmLoading: loading.value,
+      async onConfirm() {
+        try {
+          await deleteRole(id)
+          instance.destroy()
+          execute()
+          message.success('删除成功')
+        } catch (e) {
+        } finally {
+          loading.value = false
+        }
+      },
+    })
   }
 
   return {

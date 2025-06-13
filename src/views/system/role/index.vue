@@ -113,7 +113,7 @@ const expanded = ref(false)
                   @click="dataForm?.open(row)"
                   >数据权限</TDropdownItem
                 >
-                <TDropdownItem theme="error" @click="onDelete(row.id!)">删除用户</TDropdownItem>
+                <TDropdownItem theme="error" @click="onDelete(row.id!)">删除角色</TDropdownItem>
               </TDropdownMenu>
             </TDropdown>
           </div>

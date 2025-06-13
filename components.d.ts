@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     CurrentUser: typeof import('./src/components/_internal/current-user.vue')['default']
     DictTag: typeof import('./src/components/_internal/dict-tag.vue')['default']
+    IconSelect: typeof import('./src/components/_internal/icon-select.vue')['default']
     ListActions: typeof import('./src/components/_internal/list-actions.vue')['default']
     Logo: typeof import('./src/components/_internal/logo.vue')['default']
     QueryActions: typeof import('./src/components/_internal/query-actions.vue')['default']
