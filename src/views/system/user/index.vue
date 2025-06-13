@@ -34,7 +34,7 @@ const wrapper = useTemplateRef('wrapper')
 const parentElement = useParentElement(wrapper)
 const { height } = useElementSize(parentElement)
 
-const [expanded, toggleExpanded] = useToggle(false)
+const expanded = ref(false)
 const [commonStatus] = useDict('common_status')
 
 const currentDeptName = ref('全部')
@@ -82,7 +82,7 @@ const onAdd = () => {
         </TCard>
       </div>
       <div class="w-full lg:w-19/24 lg:pl-2">
-        <TCard class="query-form">
+        <TCard v-if="permission.has('system:user:query')" class="query-form !mb-4">
           <TForm
             ref="queryForm"
             :data="query"
@@ -111,18 +111,11 @@ const onAdd = () => {
                 placeholder="请选择账号状态"
               />
             </TFormItem>
-            <div class="col inline-flex items-center justify-end gap-2">
-              <TButton theme="primary" type="submit">查 询</TButton>
-              <TButton theme="default" type="reset">重 置</TButton>
-              <TLink theme="primary" @click="() => toggleExpanded()">
-                <TIcon name="chevron-down" :class="{ 'rotate-180': expanded }" />
-                {{ expanded ? '收起' : '展开' }}
-              </TLink>
-            </div>
+            <QueryActions v-model:expanded="expanded" class="col" />
           </TForm>
         </TCard>
 
-        <TCard :title="`${currentDeptName}用户列表`" bordered class="!mt-4">
+        <TCard :title="`${currentDeptName}用户列表`" bordred>
           <template #actions>
             <div class="flex items-center gap-2">
               <TButton v-if="permission.has('system:user:create')" theme="primary" @click="onAdd()">

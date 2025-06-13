@@ -20,6 +20,8 @@ export const useUserTable = (formRef: Ref<FormInstanceFunctions | null>) => {
 
   const query = ref<ListQueryParams>({
     createTime: [],
+    pageNo: 1,
+    pageSize: 10,
   })
 
   const { data, pending, execute } = useRequest(() => getUsers(query.value), {
@@ -30,7 +32,6 @@ export const useUserTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     pageSize: query.value.pageSize,
     current: query.value.pageNo,
     total: data.value?.total,
-    showPageSize: true,
   }))
 
   const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
@@ -57,11 +58,15 @@ export const useUserTable = (formRef: Ref<FormInstanceFunctions | null>) => {
       confirmLoading: loading.value,
       async onConfirm() {
         loading.value = true
-        await deleteUser(id)
-        loading.value = false
-        instance.destroy()
-        message.success('删除成功')
-        execute()
+        try {
+          await deleteUser(id)
+          instance.destroy()
+          message.success('删除成功')
+          execute()
+        } catch (e) {
+        } finally {
+          loading.value = false
+        }
       },
     })
   }

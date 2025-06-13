@@ -82,7 +82,7 @@ defineExpose({ open, setDept })
     @confirm="submit"
   >
     <TLoading :loading="loading">
-      <TForm ref="formRef" :data="formData" :rules="rules" layout="vertical">
+      <TForm ref="formRef" :data="formData" :rules="rules">
         <TRow :gutter="16" class="w-full">
           <TCol :span="12" :lg="mode === 'create' ? 6 : 12">
             <TFormItem label="用户账号" name="username">

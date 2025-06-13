@@ -12,6 +12,7 @@ declare module 'vue' {
     DictTag: typeof import('./src/components/_internal/dict-tag.vue')['default']
     ListActions: typeof import('./src/components/_internal/list-actions.vue')['default']
     Logo: typeof import('./src/components/_internal/logo.vue')['default']
+    QueryActions: typeof import('./src/components/_internal/query-actions.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ThemeToggle: typeof import('./src/components/_internal/theme-toggle.vue')['default']
