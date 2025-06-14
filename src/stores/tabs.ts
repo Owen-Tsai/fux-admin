@@ -16,7 +16,9 @@ export default defineStore('tabs', () => {
 
   const redirect = (to?: string) => {
     if (to) {
+      console.log('to is', to)
       replace(to)
+      return
     }
     const latestTab = last(history.value)
     if (latestTab) {
@@ -52,10 +54,15 @@ export default defineStore('tabs', () => {
    * @param to [optional] custom redirect path (instead of the path of last active tab)
    */
   const removeTab = (fullpath: string, to?: string) => {
+    let flag = false
+    if (fullpath === currentRoute.value.fullPath) {
+      flag = true
+    }
+
     tabsMap.value.delete(fullpath)
     removeTabHistory(fullpath)
 
-    if (fullpath === currentRoute.value.fullPath) {
+    if (flag) {
       redirect(to)
     }
   }

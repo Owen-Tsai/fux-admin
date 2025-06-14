@@ -53,7 +53,9 @@ const loadData = async (id: number) => {
 }
 
 const open = (id?: number) => {
-  formRef.value?.reset()
+  formRef.value?.reset({ type: 'initial' })
+  formData.value.id = undefined
+  formData.value.createTime = undefined
   mode.value = 'create'
 
   if (id) {
@@ -72,12 +74,13 @@ defineExpose({ open })
     v-model:visible="visible"
     :header="mode === 'create' ? '新增角色' : '编辑角色'"
     :confirm-loading="loading"
+    width="500px"
     @confirm="submit"
   >
     <TLoading :loading="loading">
       <TForm ref="formRef" :data="formData" :rules="rules" :label-width="88">
-        <TRow :gutter="16" class="w-full">
-          <TCol :span="12">
+        <TRow class="w-full">
+          <TCol :gutter="8" :span="12">
             <TFormItem label="角色名称" name="name">
               <TInput v-model:value="formData.name" />
             </TFormItem>
@@ -94,7 +97,11 @@ defineExpose({ open })
           </TCol>
           <TCol :span="12" :lg="6">
             <TFormItem label="状态" name="status">
-              <TSelect v-model:value="formData.status" :options="statusOpts" />
+              <TRadioGroup v-model:value="formData.status">
+                <TRadioButton v-for="opt in statusOpts" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </TRadioButton>
+              </TRadioGroup>
             </TFormItem>
           </TCol>
           <TCol :span="12">

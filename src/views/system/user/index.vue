@@ -53,6 +53,8 @@ const onAdd = () => {
     }
   })
 }
+
+defineOptions({ name: 'SystemUser' })
 </script>
 
 <template>

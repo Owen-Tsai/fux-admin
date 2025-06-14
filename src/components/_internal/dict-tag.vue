@@ -23,10 +23,8 @@ const theme = computed<TagProps['theme'] | undefined>(() => {
   switch (dictEntry.value?.colorType) {
     case 'processing':
       return 'primary'
-    case 'success':
-      return 'success'
-    case 'warning':
-      return 'warning'
+    case 'danger':
+      return 'error'
     default:
       return THEME_KEYS.includes(dictEntry.value?.colorType as any)
         ? (dictEntry.value?.colorType as any)

@@ -82,11 +82,11 @@ defineExpose({ open })
     v-model:visible="visible"
     :header="mode === 'create' ? '新增部门' : '编辑部门'"
     :confirm-loading="loading"
-    width="680px"
+    width="500px"
     @confirm="submit"
   >
     <TLoading :loading="loading">
-      <TForm ref="formRef" :data="formData" :rules="rules" :label-width="110">
+      <TForm ref="formRef" :data="formData" :rules="rules" :label-width="88">
         <TFormItem
           v-show="formData.parentId !== 0 || mode === 'create'"
           label="上级部门"
@@ -120,12 +120,16 @@ defineExpose({ open })
         <TRow>
           <TCol :span="12" :lg="6">
             <TFormItem label="显示顺序" name="sort">
-              <TInputNumber v-model:value="formData.sort" class="w-full" />
+              <TInputNumber v-model:value="formData.sort" theme="column" />
             </TFormItem>
           </TCol>
           <TCol :span="12" :lg="6">
             <TFormItem label="状态" name="status">
-              <TSelect v-model:value="formData.status" :options="commonStatus" />
+              <TRadioGroup v-model:value="formData.status">
+                <TRadioButton v-for="opt in commonStatus" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </TRadioButton>
+              </TRadioGroup>
             </TFormItem>
           </TCol>
         </TRow>

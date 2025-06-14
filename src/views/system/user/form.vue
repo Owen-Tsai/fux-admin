@@ -20,7 +20,7 @@ const mode = ref<'create' | 'update'>('create')
 const visible = ref(false)
 const loading = ref(false)
 const formData = ref<UserVO>({
-  id: undefined,
+  status: 0,
 })
 
 const [sexOpts, statusOpts] = useDict('system_user_sex', 'common_status')
@@ -55,7 +55,9 @@ const loadData = async (id: number) => {
 }
 
 const open = (id?: number) => {
-  formRef.value?.reset()
+  formRef.value?.reset({ type: 'initial' })
+  formData.value.id = undefined
+  formData.value.createTime = undefined
   mode.value = 'create'
 
   if (id) {
@@ -127,7 +129,11 @@ defineExpose({ open, setDept })
           </TCol>
           <TCol :span="12" :lg="6">
             <TFormItem label="状态" name="status">
-              <TSelect v-model:value="formData.status" :options="statusOpts" />
+              <TRadioGroup v-model:value="formData.status">
+                <TRadioButton v-for="opt in statusOpts" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </TRadioButton>
+              </TRadioGroup>
             </TFormItem>
           </TCol>
           <TCol :span="12">

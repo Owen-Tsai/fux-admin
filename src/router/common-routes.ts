@@ -27,6 +27,16 @@ const commonRoutes: RouteRecordRaw[] = [
           keepAlive: true,
         },
       },
+      {
+        path: '/system/dict/data/:type',
+        name: 'DictData',
+        component: () => import('@/views/system/dict/dict-data/index.vue'),
+        meta: {
+          title: '字典数据',
+          activeMenuKey: '/system/dict',
+          keepAlive: true,
+        },
+      },
     ],
   },
 ]

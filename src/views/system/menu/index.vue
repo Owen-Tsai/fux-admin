@@ -24,6 +24,8 @@ const toggleTableExpanded = () => {
     tableRef.value?.foldAll()
   }
 }
+
+defineOptions({ name: 'SystemMenu' })
 </script>
 
 <template>

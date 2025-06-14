@@ -76,7 +76,6 @@ const open = (type: 'create' | 'update', id?: number) => {
   mode.value = type
 
   if (type === 'create') {
-    console.log(id)
     // add sub menu
     formData.value.id = undefined
     if (id !== undefined) {
@@ -169,11 +168,11 @@ defineExpose({ open })
           </TCol>
           <TCol :span="12" :lg="6">
             <TFormItem label="启用状态" name="status">
-              <TRadioGroup
-                v-model:value="formData.status"
-                :options="statusOpts"
-                option-type="button"
-              />
+              <TRadioGroup v-model:value="formData.status">
+                <TRadioButton v-for="opt in statusOpts" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </TRadioButton>
+              </TRadioGroup>
             </TFormItem>
           </TCol>
           <TCol :span="12" :lg="6" v-if="formData.type === 2">
