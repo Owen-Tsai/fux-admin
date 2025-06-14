@@ -19,6 +19,7 @@
     "@vueuse/integrations": "^13.3.0",
     "@vueuse/math": "^13.3.0",
     "axios": "^1.9.0",
+    "classnames": "^2.5.1",
     "crypto-js": "^4.2.0",
     "custom-vue-scrollbar": "^0.0.8",
     "dayjs": "^1.11.13",
