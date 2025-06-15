@@ -33,9 +33,9 @@ export type ListQueryParams = CommonQueryParams & {
   channelId?: number
   templateCode?: string
   sendStatus?: number
-  sendTime?: [string, string]
+  sendTime?: string[]
   receiveStatus?: number
-  receiveTime?: [string, string]
+  receiveTime?: string[]
 }
 
 export const getList = (params?: ListQueryParams) => {
