@@ -56,6 +56,7 @@ defineOptions({ name: 'SystemMenu' })
           <TButton
             v-if="permission.has('system:menu:create')"
             theme="primary"
+            :loading="pending"
             @click="formRef?.open('create')"
           >
             <template #icon>
@@ -65,7 +66,12 @@ defineOptions({ name: 'SystemMenu' })
           </TButton>
 
           <TTooltip content="全部展开/折叠">
-            <TButton shape="square" variant="text" @click="toggleTableExpanded()">
+            <TButton
+              shape="square"
+              variant="text"
+              :loading="pending"
+              @click="toggleTableExpanded()"
+            >
               <template #icon>
                 <TIcon name="unfold-less" />
               </template>
@@ -73,7 +79,7 @@ defineOptions({ name: 'SystemMenu' })
           </TTooltip>
 
           <TTooltip content="重新载入">
-            <TButton shape="square" variant="text" @click="execute()">
+            <TButton shape="square" variant="text" :loading="pending" @click="execute()">
               <template #icon>
                 <TIcon name="refresh" />
               </template>
@@ -81,7 +87,7 @@ defineOptions({ name: 'SystemMenu' })
           </TTooltip>
 
           <TTooltip content="清除菜单缓存">
-            <TButton shape="square" variant="text" @click="onClearCache()">
+            <TButton shape="square" variant="text" :loading="pending" @click="onClearCache()">
               <template #icon>
                 <TIcon name="delete-time" />
               </template>
