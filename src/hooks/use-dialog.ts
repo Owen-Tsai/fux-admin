@@ -6,15 +6,30 @@ const useDialog = () => {
   // create dialog
   const dialog = {
     confirm: (options: DialogOptions) => {
-      const instance = DialogPlugin.confirm(options)
+      const instance = DialogPlugin.confirm({
+        ...options,
+        onClosed() {
+          instance?.destroy()
+        },
+      })
       return instantiate(instance)
     },
     alert: (options: DialogOptions) => {
-      const instance = DialogPlugin.alert(options)
+      const instance = DialogPlugin.alert({
+        ...options,
+        onClosed() {
+          instance?.destroy()
+        },
+      })
       return instantiate(instance)
     },
     info: (options: DialogOptions) => {
-      const instance = DialogPlugin(options)
+      const instance = DialogPlugin({
+        ...options,
+        onClosed() {
+          instance?.destroy()
+        },
+      })
       return instantiate(instance)
     },
   }
