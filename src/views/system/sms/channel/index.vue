@@ -12,6 +12,8 @@ const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
 
 const { query, data, pending, execute, pagination, onPageChange, onQueryChange, onDelete } =
   useTable(queryForm)
+
+defineOptions({ name: 'SystemSmsChannel' })
 </script>
 
 <template>

@@ -24,6 +24,8 @@ const { data: channelList } = useRequest(getSimpleChannelList, {
 
 const { query, data, pending, execute, pagination, onPageChange, onQueryChange, onDelete } =
   useTable(queryForm)
+
+defineOptions({ name: 'SystemSmsTemplate' })
 </script>
 
 <template>
