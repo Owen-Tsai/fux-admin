@@ -20,9 +20,10 @@ const props = defineProps({
 
 const dictEntry = computed(() => {
   return props.dictObject.find((e) => {
-    if (typeof props.value === 'boolean') {
-      return e.value === `${props.value}`
-    }
+    // commented due to the refactor of `useDict` with `useString` options
+    // if (typeof props.value === 'boolean') {
+    //   return `${e.value}` === `${props.value}`
+    // }
 
     return e.value == props.value
   })
