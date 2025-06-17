@@ -27,6 +27,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@fux': fileURLToPath(new URL('./src/components/_fux-core', import.meta.url)),
     },
   },
 })

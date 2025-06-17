@@ -49,7 +49,6 @@ import ColumnsConfig from './columns.vue'
 import GenerationConfig from './generation.vue'
 import { getCodeGenConfigDetail, updateCodeGenConfig } from '@/api/infra/code-gen'
 import { getFirstErrorMessage } from '@/utils/validate'
-import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
 const { removeTab } = useTabsStore()
 const { query, fullPath } = useRoute()
