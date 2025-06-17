@@ -37,6 +37,15 @@ const commonRoutes: RouteRecordRaw[] = [
           keepAlive: true,
         },
       },
+      {
+        path: '/infra/code-gen/edit',
+        name: 'CodeGenEdit',
+        component: () => import('@/views/infra/code-gen/config/index.vue'),
+        meta: {
+          title: '代码生成配置',
+          activeMenuKey: '/infra/code-gen',
+        },
+      },
     ],
   },
 ]

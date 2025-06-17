@@ -12,7 +12,7 @@ const { permission } = usePermission()
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
 
-const { query, data, pending, execute, pagination, onPageChange, onQueryChange, onDelete } =
+const { query, data, pending, execute, pagination, onPageChange, onQueryChange, onDelete, onEdit } =
   useTable(queryForm)
 const { data: dataSourceList } = useRequest(getDataSourceList, { immediate: true })
 
@@ -96,6 +96,7 @@ defineOptions({ name: 'InfraCodeGen' })
                 theme="primary"
                 variant="text"
                 :disabled="permission.hasNone('infra:code-gen:update')"
+                @click="onEdit(row.id)"
               >
                 <template #icon>
                   <TIcon name="edit-2" />

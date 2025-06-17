@@ -26,6 +26,7 @@ export const columns: TableProps['columns'] = [
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   const message = useMessage()
   const dialog = useDialog()
+  const { push } = useRouter()
 
   const query = ref<ListQueryParams>({
     pageNo: 1,
@@ -71,6 +72,10 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     })
   }
 
+  const onEdit = (id?: number) => {
+    push(`/infra/code-gen/edit?id=${id}`)
+  }
+
   return {
     query,
     execute,
@@ -80,5 +85,6 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     onPageChange,
     onQueryChange,
     onDelete,
+    onEdit,
   }
 }

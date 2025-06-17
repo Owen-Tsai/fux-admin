@@ -16,7 +16,10 @@
         <RouterView v-if="routerAlive">
           <template #default="{ Component, route }">
             <KeepAlive :include="[...keepsList]">
-              <div class="min-h-0 flex-grow-1 p-4 lg:p-6 overflow-y-auto">
+              <div
+                class="min-h-0 flex-grow-1 p-4 lg:p-6 overflow-y-auto"
+                id="fux-app-scroll-container"
+              >
                 <component :is="Component" :key="route.fullPath" />
               </div>
             </KeepAlive>
