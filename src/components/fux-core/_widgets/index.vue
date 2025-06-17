@@ -17,7 +17,7 @@
     :wrapper-col="wrapperCol"
     :rules="rules"
   >
-    <component :is="widgetToRenderer" :config="widgetConfig" />
+    <component :is="widgetToRenderer" :config="widgetConfig" :key="renderKey" />
   </AFormItem>
 </template>
 
@@ -50,7 +50,7 @@ const widgetConfig = computed({
 const components = import.meta.glob('./**/index.vue', { eager: true, import: 'default' })
 
 // might be modified later by emitted events
-const { visible } = useSignals(widgetConfig)
+const { visible, renderKey } = useSignals(widgetConfig)
 
 const widgetToRenderer = computed(() => {
   const type = config.type
