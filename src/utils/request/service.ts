@@ -1,4 +1,8 @@
-import axios from 'axios'
+import axios, {
+  type AxiosInstance,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios'
 import { MessagePlugin } from 'tdesign-vue-next'
 import qs from 'qs'
 import { getToken, setToken, getRefreshToken } from '@/utils/auth'
@@ -65,6 +69,43 @@ const redirectForAuth = () => {
   return Promise.reject('登录超时')
 }
 
+const handleInvalidToken = async (config: InternalAxiosRequestConfig, service: AxiosInstance) => {
+  if (!isTokenRefresh) {
+    // 当前没有在刷新令牌
+    isTokenRefresh = true
+    if (!getRefreshToken()) {
+      // 没有可用的刷新令牌时，强制重新登录
+      return redirectForAuth()
+    }
+    // 使用刷新令牌请求新的令牌
+    try {
+      const r = await refreshToken()
+      setToken(r.data.data)
+      config.headers.Authorization = `Bearer ${getToken()}`
+      // 释放请求队列
+      requestQueue.forEach((fn) => fn())
+      requestQueue.length = 0
+      // 重试当前请求
+      return service(config)
+    } catch (error) {
+      console.log(error)
+      // 刷新令牌失败，强制重新登录
+      requestQueue.forEach((fn) => fn())
+      return redirectForAuth()
+    } finally {
+      isTokenRefresh = false
+    }
+  } else {
+    // 当前正在刷新令牌，将当前请求添加到请求队列中
+    return new Promise((resolve) => {
+      requestQueue.push(() => {
+        config.headers.Authorization = `Bearer ${getToken()}`
+        resolve(service(config))
+      })
+    })
+  }
+}
+
 // 请求拦截器
 service.interceptors.request.use(
   (config) => {
@@ -117,40 +158,7 @@ service.interceptors.response.use(
       return Promise.reject(msg)
     } else if (code === 401) {
       // 不合法的令牌
-      if (!isTokenRefresh) {
-        // 当前没有在刷新令牌
-        isTokenRefresh = true
-        if (!getRefreshToken()) {
-          // 没有可用的刷新令牌时，强制重新登录
-          return redirectForAuth()
-        }
-        // 使用刷新令牌请求新的令牌
-        try {
-          const r = await refreshToken()
-          setToken(r.data.data)
-          config.headers.Authorization = `Bearer ${getToken()}`
-          // 释放请求队列
-          requestQueue.forEach((fn) => fn())
-          requestQueue.length = 0
-          // 重试当前请求
-          return service(config)
-        } catch (error) {
-          console.log(error)
-          // 刷新令牌失败，强制重新登录
-          requestQueue.forEach((fn) => fn())
-          return redirectForAuth()
-        } finally {
-          isTokenRefresh = false
-        }
-      } else {
-        // 当前正在刷新令牌，将当前请求添加到请求队列中
-        return new Promise((resolve) => {
-          requestQueue.push(() => {
-            config.headers.Authorization = `Bearer ${getToken()}`
-            resolve(service(config))
-          })
-        })
-      }
+      handleInvalidToken(config, service)
     } else if (code !== 200) {
       if (msg === '无效的刷新令牌') {
         console.log(msg)
@@ -165,14 +173,25 @@ service.interceptors.response.use(
   },
   (error) => {
     console.error(error)
-    let { message: msg } = error
+    const { message, response, status, config } = error
 
-    if (msg === 'Network Error') {
+    let msg = ''
+
+    if (status === 401) {
+      handleInvalidToken(config, service)
+      return
+    }
+
+    if (message === 'Network Error') {
       msg = '网络连接异常'
-    } else if (msg.includes('timeout')) {
+    } else if (message.includes('timeout')) {
       msg = '服务器响应超时'
-    } else if (msg.includes('Request failed with status code')) {
-      msg = '系统接口' + msg.substr(msg.length - 3) + '异常'
+    } else if (message.includes('Request failed with status code')) {
+      if (response.data.msg) {
+        msg = response.data.msg
+      } else {
+        msg = '系统接口' + msg.substring(msg.length - 3) + '异常'
+      }
     }
 
     MessagePlugin.error(msg)
