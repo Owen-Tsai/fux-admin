@@ -1,4 +1,4 @@
-import axios, { type Axios, type AxiosInstance } from 'axios'
+import axios, { type Axios, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import { Modal, message } from 'ant-design-vue'
 import qs from 'qs'
 import { getFormattedToken, getTenantId, getRefreshToken, getToken, setToken } from '@/utils/auth'
@@ -48,6 +48,40 @@ const redirectForAuth = () => {
     })
   }
   return Promise.reject('登录超时')
+}
+
+const handleTokenRefresh = async (config: InternalAxiosRequestConfig, service: AxiosInstance) => {
+  if (!isTokenRefresh) {
+    isTokenRefresh = true
+    if (!getRefreshToken()) {
+      return redirectForAuth()
+    }
+
+    try {
+      const refreshTokenRes = await refreshToken()
+      setToken(refreshTokenRes.data.data)
+      config.headers.Authorization = `Bearer ${getToken()}`
+      requestQueue.forEach((fn) => fn())
+      requestQueue = []
+      return service(config)
+    } catch (e) {
+      // refreshToken api reports error
+      // release requests of the queue
+      requestQueue.forEach((fn) => fn())
+      return redirectForAuth()
+    } finally {
+      requestQueue = []
+      isTokenRefresh = false
+    }
+  } else {
+    // token is refreshing, queue the request
+    return new Promise((resolve) => {
+      requestQueue.push(() => {
+        config.headers.Authorization = getFormattedToken()
+        resolve(service(config))
+      })
+    })
+  }
 }
 
 export const buildReqInterceptors = (service?: AxiosInstance): ReqInterceptors => {
@@ -125,37 +159,7 @@ export const buildRespInterceptors = (service?: AxiosInstance): RespInterceptors
         return Promise.reject(msg)
       } else if (code === 401) {
         // invalid token
-        if (!isTokenRefresh) {
-          isTokenRefresh = true
-          if (!getRefreshToken()) {
-            return redirectForAuth()
-          }
-
-          try {
-            const refreshTokenRes = await refreshToken()
-            setToken(refreshTokenRes.data.data)
-            config.headers.Authorization = `Bearer ${getToken()}`
-            requestQueue.forEach((fn) => fn())
-            requestQueue = []
-            return service(config)
-          } catch (e) {
-            // refreshToken api reports error
-            // release requests of the queue
-            requestQueue.forEach((fn) => fn())
-            return redirectForAuth()
-          } finally {
-            requestQueue = []
-            isTokenRefresh = false
-          }
-        } else {
-          // token is refreshing, queue the request
-          return new Promise((resolve) => {
-            requestQueue.push(() => {
-              config.headers.Authorization = getFormattedToken()
-              resolve(service(config))
-            })
-          })
-        }
+        handleTokenRefresh(config, service)
       } else if (code !== 200) {
         // good job, now you are hard coding and successfully ignored
         // every good practice you should keep in mind since the day you
@@ -173,14 +177,26 @@ export const buildRespInterceptors = (service?: AxiosInstance): RespInterceptors
     },
     (error) => {
       console.error(error)
-      let { message: msg } = error
+      console.log(error)
+      const { message, response, config } = error
 
-      if (msg === 'Network Error') {
+      if (response.data.code === 401) {
+        handleTokenRefresh(config, service)
+        return
+      }
+
+      let msg = ''
+
+      if (message === 'Network Error') {
         msg = '网络连接异常'
-      } else if (msg.includes('timeout')) {
+      } else if (message.includes('timeout')) {
         msg = '服务器响应超时'
-      } else if (msg.includes('Request failed with status code')) {
-        msg = '系统接口' + msg.substr(msg.length - 3) + '异常'
+      } else if (message.includes('Request failed with status code')) {
+        if (response.data.msg) {
+          msg = response.data.msg
+        } else {
+          msg = '系统接口' + msg.substring(msg.length - 3) + '异常'
+        }
       }
 
       message.error(msg)
