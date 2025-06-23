@@ -1,6 +1,9 @@
 <template>
   <div class="icon-select w-full">
-    <TPopup :overlay-inner-style="{ width: `${width}px` }" trigger="click">
+    <TPopup
+      :overlay-inner-style="panelMatchInputWidth ? { width: `${width}px` } : undefined"
+      trigger="click"
+    >
       <TInput ref="el" v-model:value="value" clearable>
         <template #prefix-icon>
           <TIcon v-show="value" :name="value" />
@@ -39,6 +42,10 @@
 <script setup lang="ts">
 import { manifest } from 'tdesign-icons-vue-next'
 import { chunk } from 'lodash-es'
+
+const { panelMatchInputWidth = true } = defineProps<{
+  panelMatchInputWidth?: boolean
+}>()
 
 const PAGE_SIZE = 50
 
