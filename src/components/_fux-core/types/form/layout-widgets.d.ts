@@ -1,4 +1,5 @@
 import type { FormProps } from './misc'
+import type { Widget } from './widget'
 
 interface FieldProps {
   label?: string
@@ -84,4 +85,37 @@ export type WPropsTableColumn = {
    * @deprecated use `colKey` instead
    */
   dataIndex?: string
+}
+
+export type WPropsTablePagination = {
+  pageSize?: number
+  disabled?: boolean
+  small?: boolean // size=small
+  lite?: boolean // theme=simple
+}
+
+export interface WPropsDataTable extends WPropsCommon {
+  columns?: WPropsTableColumn[]
+  pagination?: WPropsTablePagination
+  dialogWidth?: string
+  /**
+   * @deprecated use `dialogWidth` instead
+   */
+  formWidth?: string
+  form?: Omit<FormProps, 'disabled'>
+  widgets: Widget[]
+  state: {
+    mode: 'table' | 'mode'
+  }
+  url?: string
+  min?: number
+  max?: number
+}
+
+export interface LayoutWidgetPropsMap {
+  grid: WPropsGrid
+  tabs: WPropsTabs
+  steps: WPropsSteps
+  subForm: WPropsSubForm
+  dataTable: WPropsDataTable
 }

@@ -15,7 +15,12 @@ export interface FormProps {
    * @deprecated
    */
   wrapperWidth?: string
-  layout?: 'horizontal' | 'vertical'
+  /**
+   * @deprecated
+   */
+  layout?: 'horizontal' | 'vertical' | 'inline'
+  readonly?: boolean
+  requiredMark?: 'left' | 'right' | false
 }
 
 export interface APIConfig {

@@ -1,6 +1,6 @@
-import type { TdCheckboxGroupProps, TdRadioGroupProps } from 'tdesign-vue-next'
+import type { TdCheckboxGroupProps, TdRadioGroupProps, FormRule } from 'tdesign-vue-next'
 
-export interface FieldProps {
+interface FieldProps {
   label?: string
   extra?: string
   labelAlign?: 'left' | 'right' | 'top'
@@ -19,6 +19,7 @@ export interface FieldProps {
   wrapperWidth?: string
   name?: string
   required?: boolean
+  validation?: Record<string, FormRule>
   rules?: string
   validateTrigger?: string[]
 }
@@ -45,7 +46,7 @@ export type AddonProps = {
 /**
  * 表单组件通用配置项
  */
-export interface WPropsCommon {
+interface WPropsCommon {
   disabled?: boolean
   readonly?: boolean
   hide?: boolean
@@ -58,22 +59,27 @@ export interface WPropsCommon {
  * @see https://tdesign.tencent.com/vue-next/components/input?tab=api
  */
 export interface WPropsInput extends WPropsCommon {
-  clearable?: boolean
+  allowClear?: boolean
   align?: 'left' | 'center' | 'right'
   defaultValue?: string
   maxlength?: number
   placeholder?: string
   showCount?: boolean
+  /**
+   * @deprecated use `prefixIcon` instead. TDesign doesn't support text prefix.
+   */
   prefix?: AddonProps
   suffix?: AddonProps
   tips?: string
+  prefixIcon?: string
 }
 
 /**
  * @see https://tdesign.tencent.com/vue-next/components/input-number?tab=api
  */
 export interface WPropsInputNumber extends WPropsCommon {
-  clearable?: boolean
+  allowClear?: boolean
+  align?: 'left' | 'center' | 'right'
   /**
    * `theme`
    * @deprecated use `controlsLayout` instead
@@ -95,7 +101,7 @@ export interface WPropsInputNumber extends WPropsCommon {
  * @see https://tdesign.tencent.com/vue-next/components/textarea?tab=api
  */
 export interface WPropsTextarea extends WPropsCommon {
-  clearable?: boolean
+  allowClear?: boolean
   defaultValue?: string
   autoResize?: boolean
   showCount?: boolean
@@ -113,7 +119,7 @@ export interface WPropsTextarea extends WPropsCommon {
  * @see https://tdesign.tencent.com/vue-next/components/select?tab=api
  */
 export interface WPropsSelect extends WPropsCommon {
-  clearable?: boolean
+  allowClear?: boolean
   defaultValue?: string | string[]
   fieldNames?: string
   multiple?: boolean
@@ -129,7 +135,7 @@ export interface WPropsSelect extends WPropsCommon {
 }
 
 export interface WPropsCascader extends WPropsCommon {
-  clearable?: boolean
+  allowClear?: boolean
   defaultValue?: string
   fieldNames?: string
   filterable?: boolean
@@ -164,7 +170,7 @@ export interface WPropsCheckbox extends WPropsCommon {
 }
 
 export interface WPropsTreeSelect extends WPropsCommon {
-  clearable?: boolean
+  allowClear?: boolean
   defaultValue?: string
   fieldNames?: string
   options?: JsonOption
@@ -194,7 +200,7 @@ export interface WPropsSlider extends WPropsCommon {
 }
 
 export interface WPropsRate extends WPropsCommon {
-  clearable?: boolean
+  allowClear?: boolean
   allowHalf?: boolean
   defaultValue?: number
   count?: number
