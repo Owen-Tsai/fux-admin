@@ -1,5 +1,5 @@
 import { DefaultLayout } from '@/layouts'
-// import MinimalLayout from '@/layouts/minimal/index.vue'
+import MinimalLayout from '@/layouts/minimal/index.vue'
 import type { RouteRecordRaw } from 'vue-router'
 
 const commonRoutes: RouteRecordRaw[] = [
@@ -44,6 +44,22 @@ const commonRoutes: RouteRecordRaw[] = [
         meta: {
           title: '代码生成配置',
           activeMenuKey: '/infra/code-gen',
+        },
+      },
+    ],
+  },
+  {
+    path: '/app-design',
+    name: 'AppDesignRoot',
+    component: MinimalLayout,
+    redirect: 'AppDesign',
+    children: [
+      {
+        path: '',
+        name: 'AppDesign',
+        component: () => import('@/views/fux/index.vue'),
+        meta: {
+          title: '应用设计',
         },
       },
     ],

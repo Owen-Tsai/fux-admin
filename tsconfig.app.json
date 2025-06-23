@@ -15,7 +15,7 @@
     "jsx": "preserve",
     "paths": {
       "@/*": ["./src/*"],
-      "@fux/*": ["./src/components/_fux-core/*"]
+      "@fusionx/core/*": ["./src/components/_fux-core/*"]
     }
   }
 }

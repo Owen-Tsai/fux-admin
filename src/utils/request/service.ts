@@ -1,8 +1,4 @@
-import axios, {
-  type AxiosInstance,
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from 'axios'
+import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import { MessagePlugin } from 'tdesign-vue-next'
 import qs from 'qs'
 import { getToken, setToken, getRefreshToken } from '@/utils/auth'
@@ -115,7 +111,6 @@ service.interceptors.request.use(
         ? false
         : (config.headers || {}).requireToken !== false
 
-    console.log(requireToken)
     const token = getToken()
     if (requireToken && token) {
       config.headers.Authorization = `Bearer ${token}`
