@@ -1,4 +1,4 @@
-export const tryParse = <T = any>(str?: string, fallbackValue?: T) => {
+export const tryParse = (str?: string, fallbackValue?: any) => {
   try {
     return str ? JSON.parse(str) : fallbackValue
   } catch {

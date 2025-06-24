@@ -1,4 +1,4 @@
-import { tryParse } from '../utils'
+import { tryParse } from '.'
 import type { FormRule } from 'tdesign-vue-next'
 import type { FormWidget } from '@fusionx/core/types'
 

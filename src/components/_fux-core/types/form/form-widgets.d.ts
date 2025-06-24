@@ -132,6 +132,8 @@ export interface WPropsSelect extends WPropsCommon {
   filterable?: boolean
   filter?: string
   creatable?: boolean
+  options: OptionOf<TdSelectProps['options']>
+  popupHeight?: string
 }
 
 export interface WPropsCascader extends WPropsCommon {
@@ -154,18 +156,18 @@ export interface WPropsCascader extends WPropsCommon {
 
 export interface WPropsRadio extends WPropsCommon {
   defaultValue?: string
-  options?: OptionOf<TdRadioGroupProps['options']>
+  options: OptionOf<TdRadioGroupProps['options']>
   /**
    * @deprecated use `variant` instead
    */
   type?: 'button' | 'default' | 'solid-button'
-  variant?: 'button' | 'default' | 'default-filled' | 'primary-filled'
+  variant?: 'radio' | 'outline' | 'default-filled' | 'primary-filled'
   allowUncheck?: boolean
 }
 
 export interface WPropsCheckbox extends WPropsCommon {
   defaultValue?: string[]
-  options?: OptionOf<TdCheckboxGroupProps['options']>
+  options: OptionOf<TdCheckboxGroupProps['options']>
   max?: number
 }
 

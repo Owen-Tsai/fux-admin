@@ -10,7 +10,7 @@
       </TTabPanel>
       <TTabPanel value="widget" label="组件配置" lazy class="h-full">
         <Scrollbar wrapper-class="!h-full" class="!h-full">
-          <div class="p-4 pb-20">
+          <div class="p-4 pr-5 pb-20">
             <widgetSetter />
           </div>
         </Scrollbar>
@@ -43,6 +43,11 @@ const activeTab = ref('form')
   }
   :deep(.t-tabs__content) {
     height: 100%;
+  }
+  :deep(.t-form-inline .t-form__item) {
+    margin-right: unset;
+    min-width: 0;
+    width: 100%;
   }
 }
 </style>

@@ -25,7 +25,7 @@ export const getDictTypeList = (params?: ListQueryParams) => {
   })
 }
 
-export const getPlainDictTypeList = () => {
+export const getSimpleDictTypeList = () => {
   return request.get<DictTypeVO[]>({
     url: `${prefix}/list-all-simple`,
   })

@@ -1,3 +1,3 @@
 export * from './use-context'
 export * from './use-model'
-export * from './use-validate'
+export * from './use-options'

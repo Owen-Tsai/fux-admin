@@ -72,7 +72,7 @@ const { widget } = defineProps<{
     }
     .action {
       opacity: 1;
-      z-index: 2;
+      z-index: 10;
     }
   }
 
@@ -91,7 +91,7 @@ const { widget } = defineProps<{
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1;
+    z-index: 9;
   }
 }
 

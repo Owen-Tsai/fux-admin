@@ -51,8 +51,8 @@
 </template>
 
 <script setup lang="ts">
-import { useDesignerCtxInject, validationOpts, validation } from '@fusionx/core/hooks'
-import { initialWidgetConfig } from '@fusionx/core/utils'
+import { useDesignerCtxInject } from '@fusionx/core/hooks'
+import { initialWidgetConfig, validationOpts, validation } from '@fusionx/core/utils'
 import { cloneDeep, kebabCase } from 'lodash-es'
 import { labelAlignOpts } from './options'
 import type { SelectProps } from 'tdesign-vue-next'

@@ -20,7 +20,7 @@ const { widget } = defineProps<{
     >
       <div>{{ widget.name }}</div>
       <div
-        class="text-[var(--td-text-color-secondary)] group-hover:text-[var(--td-brand-color)] leading-none"
+        class="text-[var(--td-text-color-secondary)] group-hover:text-[var(--td-brand-color)] leading-none scale-90"
       >
         {{ widget.type }}
       </div>

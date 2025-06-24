@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { getPlainDictTypeList } from '@/api/system/dict/type'
+import { getSimpleDictTypeList } from '@/api/system/dict/type'
 import type { ColumnVO, ConfigDetailVO } from '@/api/infra/code-gen'
 import type { TableProps } from 'tdesign-vue-next'
 
@@ -114,7 +114,7 @@ const htmlTypeOpts = [
 
 const model = defineModel<ConfigDetailVO['columns']>({ required: true })
 
-const { data: dictTypes, pending } = useRequest(getPlainDictTypeList, { immediate: true })
+const { data: dictTypes, pending } = useRequest(getSimpleDictTypeList, { immediate: true })
 
 const tableAffixProps = computed<TableProps['headerAffixedTop']>(() => ({
   container: '#fux-app-scroll-container',

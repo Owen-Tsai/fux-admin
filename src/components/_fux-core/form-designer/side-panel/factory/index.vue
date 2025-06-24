@@ -44,7 +44,7 @@ const cloneWidget = (widget: Widget) => {
         item-key="type"
         :clone="cloneWidget"
         :swap-threshold="0.5"
-        class="p-4 grid grid-cols-2 gap-2"
+        class="p-4 grid grid-cols-2 gap-4"
       >
         <template #item="{ element }: { element: Widget; index: number }">
           <Item :widget="element" />
