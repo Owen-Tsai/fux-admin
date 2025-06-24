@@ -85,4 +85,16 @@ export const initialWidgetConfig: Partial<WidgetMap> = {
     },
     icon: 'component-radio',
   },
+  textarea: {
+    class: 'form',
+    name: '文本域',
+    type: 'textarea',
+    uid: 'textarea',
+    props: {
+      field: {
+        label: '文本域',
+      },
+    },
+    icon: 'textbox',
+  },
 }
