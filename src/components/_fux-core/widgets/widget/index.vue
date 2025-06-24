@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { widgetToRender } from '@fusionx/core/utils/widget'
-import { tryParse } from '@fusionx/core/utils'
+import { validation } from '@fusionx/core/utils'
 import { useRendererCtxInject } from '@fusionx/core/hooks/use-context'
 import type { Widget, FormWidget, FieldControlOverride } from '@fusionx/core/types'
 
@@ -47,7 +47,7 @@ const cWidget = computed({
   set: (val) => emit('update:widget', val),
 })
 
-const rules = computed(() => tryParse((widget as FormWidget).props.field.rules))
+const rules = computed(() => validation.generateRules(widget as FormWidget))
 
 const interactivity = computed<FieldControlOverride['config'] | undefined>(() => {
   if (widget.props.field.name) {
