@@ -1,4 +1,10 @@
-import type { SelectProps, CheckboxGroupProps, RadioGroupProps } from 'tdesign-vue-next'
+import type {
+  SelectProps,
+  CheckboxGroupProps,
+  RadioGroupProps,
+  TreeSelectProps,
+  CascaderProps,
+} from 'tdesign-vue-next'
 import type { WidgetMap } from '@fusionx/core/types'
 import type { DictDataEntry } from '@/api/system/dict/data'
 import { tryParse, eventKeys, emitter } from '@fusionx/core/utils'
@@ -52,6 +58,33 @@ export const useRecordOptions = <
     },
     { immediate: true, deep: true },
   )
+
+  emitter.on(eventKeys.FORM_$STATE_CHANGE, () => {
+    if (optionsProp?.type === 'expression' && optionsProp.value && ctx && ctx.mode !== 'dev') {
+      options.value = ctx.$state.value[optionsProp.value]
+    }
+  })
+
+  return options
+}
+
+export const useTreeStructureOptions = <T extends WidgetMap['treeSelect'] | WidgetMap['cascader']>(
+  widget: T,
+) => {
+  const optionsProp = widget.props.options
+  // the final value that should be assigned to the `options` prop of the widget
+  const options =
+    ref<T extends WidgetMap['treeSelect'] ? TreeSelectProps['data'] : CascaderProps['options']>()
+
+  const ctx = useRendererCtxInject()
+
+  if (optionsProp?.type === 'static') {
+    options.value = tryParse(optionsProp.value, [])
+  } else if (optionsProp?.type === 'expression') {
+    if (optionsProp.value && ctx && ctx.mode !== 'dev') {
+      options.value = ctx.$state.value[optionsProp.value]
+    }
+  }
 
   emitter.on(eventKeys.FORM_$STATE_CHANGE, () => {
     if (optionsProp?.type === 'expression' && optionsProp.value && ctx && ctx.mode !== 'dev') {

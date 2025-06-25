@@ -97,4 +97,60 @@ export const initialWidgetConfig: Partial<WidgetMap> = {
     },
     icon: 'textbox',
   },
+  cascader: {
+    class: 'form',
+    name: '级联选择器',
+    type: 'cascader',
+    uid: 'cascader',
+    props: {
+      field: {
+        label: '级联选择器',
+      },
+      options: {
+        type: 'static',
+        value: `[{"label":"山东省","value":"37","children":[{"label":"济南市","value":"3701","children":[{"label":"市中区","value":"370101"},{"label":"历下区","value":"370102"}]},{"label":"青岛市","value":"3702","children":[{"label":"市北区","value":"370203"},{"label":"市南区","value":"370202"}]}]},{"label":"北京市","value":"11","children":[{"label":"东城区","value":"110101"},{"label":"西城区","value":"110102"}]}]`,
+      },
+    },
+    icon: 'component-breadcrumb',
+  },
+  treeSelect: {
+    class: 'form',
+    type: 'treeSelect',
+    name: '树形选择器',
+    uid: 'treeSelect',
+    props: {
+      field: {
+        label: '树形选择器',
+      },
+      options: {
+        type: 'static',
+        value: `[{"label":"山东省","value":"37","children":[{"label":"济南市","value":"3701","children":[{"label":"市中区","value":"370101"},{"label":"历下区","value":"370102"}]},{"label":"青岛市","value":"3702","children":[{"label":"市北区","value":"370203"},{"label":"市南区","value":"370202"}]}]},{"label":"北京市","value":"11","children":[{"label":"东城区","value":"110101"},{"label":"西城区","value":"110102"}]}]`,
+      },
+    },
+    icon: 'tree-round-dot-vertical',
+  },
+  datePicker: {
+    class: 'form',
+    type: 'datePicker',
+    uid: 'datePicker',
+    name: '日期选择器',
+    props: {
+      field: {
+        label: '日期选择器',
+      },
+    },
+    icon: 'calendar',
+  },
+  dateRangePicker: {
+    class: 'form',
+    type: 'dateRangePicker',
+    uid: 'dateRangePicker',
+    name: '日期范围选择器',
+    props: {
+      field: {
+        label: '日期范围选择器',
+      },
+    },
+    icon: 'calendar',
+  },
 }

@@ -138,7 +138,7 @@ export interface WPropsSelect extends WPropsCommon {
 
 export interface WPropsCascader extends WPropsCommon {
   allowClear?: boolean
-  defaultValue?: string
+  defaultValue?: string | srting[]
   fieldNames?: string
   filterable?: boolean
   filter?: string
@@ -152,6 +152,8 @@ export interface WPropsCascader extends WPropsCommon {
   valueType?: 'single' | 'full'
   formatter?: string
   lazy?: boolean
+  checkStrictly?: boolean
+  options: JsonOption
 }
 
 export interface WPropsRadio extends WPropsCommon {
@@ -173,19 +175,20 @@ export interface WPropsCheckbox extends WPropsCommon {
 
 export interface WPropsTreeSelect extends WPropsCommon {
   allowClear?: boolean
-  defaultValue?: string
+  defaultValue?: string | string[]
   fieldNames?: string
-  options?: JsonOption
+  options: JsonOption
   filterable?: boolean
-  filter?: string
   placeholder?: string
   tips?: string
   multiple?: boolean
   max?: number
   minCollapsedNum?: number
-  showAllLevels?: boolean
   valueType?: 'value' | 'object'
+  valueMode?: 'onlyLeaf' | 'parentFirst' | 'all'
   formatter?: string
+  lazy?: boolean
+  checkStrictly?: boolean
 }
 
 export interface WPropsSlider extends WPropsCommon {
@@ -227,7 +230,7 @@ export interface WPropsSwitch extends WPropsCommon {
 interface WPropsDatePickerCommon extends WPropsCommon {
   allowInput?: boolean
   allowClear?: boolean
-  disableDate?: string
+  disableDate?: string[]
   enableTimePicker?: string
   format?: string
   mode?: 'year' | 'quarter' | 'month' | 'week' | 'date'
@@ -249,10 +252,12 @@ interface WPropsDatePickerCommon extends WPropsCommon {
 export interface WPropsDatePicker extends WPropsDatePickerCommon {
   multiple?: boolean
   defaultValue?: string | string[]
+  placeholder?: string
 }
 
 export interface WPropsDateRangePicker extends WPropsDatePickerCommon {
   defaultValue?: string[]
+  placeholder?: string
 }
 
 export interface WPropsUpload extends WPropsCommon {
