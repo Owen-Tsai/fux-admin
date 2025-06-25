@@ -36,6 +36,15 @@
             <a-select-option :value="1">是</a-select-option>
           </ASelect>
         </AFormItem>
+        <AFormItem label="低代码设计表单" name="isLowCode">
+          <a-radio-group v-model:value="formData.isLowCode" name="isLowCode">
+            <a-radio :value="true"> 是 </a-radio>
+            <a-radio :value="false"> 否 </a-radio>
+          </a-radio-group>
+        </AFormItem>
+        <AFormItem label="表单地址" name="formAddress" v-if="!formData.isLowCode">
+          <AInput v-model:value="formData.formAddress" placeholder="如：/app/form" />
+        </AFormItem>
         <AFormItem label="主管部门" name="dept">
           <ATreeSelect
             v-model:value="formData.dept"
@@ -104,6 +113,8 @@ const rules: FormProps['rules'] = {
   type: [{ required: true, message: '请选择应用类型' }],
   userType: [{ required: true, message: '请选择用户类型' }],
   comopen: [{ required: true, trigger: 'change', validator: validateComOpen }],
+  isLowCode: [{ required: true, message: '请选择是和否' }],
+  formAddress: [{ required: true, message: '请填写表单地址' }],
 }
 
 const props = defineProps({
@@ -121,6 +132,7 @@ const loading = ref(false)
 const open = ref(true)
 const formData = ref<Partial<ApplicationVO>>({
   published: 0,
+  isLowCode: true,
 })
 const deptOpts = ref<DeptTreeVO>()
 

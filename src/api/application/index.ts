@@ -17,6 +17,8 @@ export type ApplicationVO = {
   processIds?: string
   userType?: string
   comopen?: number
+  isLowCode?: boolean
+  formAddress?: string
 }
 
 export type ListQueryParams = {
