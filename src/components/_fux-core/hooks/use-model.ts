@@ -10,7 +10,7 @@ export const useModel = (widget: FormWidget) => {
 
   const model = computed({
     get: () => {
-      if (!formData) return undefined
+      if (!formData) return widget.type === 'dateRangePicker' ? [] : undefined
       return get(formData, key)
     },
     set: (val) => {

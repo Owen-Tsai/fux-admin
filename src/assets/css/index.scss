@@ -60,7 +60,9 @@ a.has-tag .t-tag {
   margin-bottom: var(--td-comp-margin-xxl) !important;
 }
 
-.t-input-number {
+.t-input-number,
+.t-date-picker,
+.t-date-range-picker {
   width: 100% !important;
 }
 

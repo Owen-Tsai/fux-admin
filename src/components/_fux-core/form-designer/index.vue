@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-full bg-[var(--td-bg-color-secondarycontainer)]">
-    <div class="flex-none w-240px">
+    <div class="flex-none w-280px">
       <SidePanel />
     </div>
     <div class="flex-1 min-w-0 min-h-0">
