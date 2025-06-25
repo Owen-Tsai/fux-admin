@@ -1,16 +1,16 @@
 <template>
-  <TTabs v-model:value="current" :theme="type">
-    <TTabPanel v-for="(pane, i) in widget.props.children" :key="i" :label="pane.title" :value="i">
+  <TSteps v-model:current="current">
+    <TStepItem v-for="(step, i) in widget.props.children" :key="i" :content="step.desc">
       <template v-if="ctx && ctx.mode !== 'dev'">
-        <WidgetRenderer v-for="w in pane.widgets" :key="w.uid" :widget="w" />
+        <WidgetRenderer v-for="w in step.widgets" :key="w.uid" :widget="w" />
       </template>
       <template v-else>
-        <div class="draggable-area" :class="{ 'empty-slot': pane.widgets.length <= 0 }">
-          <NestedWidgets :widgets="pane.widgets" />
+        <div class="draggable-area" :class="{ 'empty-slot': step.widgets.length <= 0 }">
+          <NestedWidgets :widgets="step.widgets" />
         </div>
       </template>
-    </TTabPanel>
-  </TTabs>
+    </TStepItem>
+  </TSteps>
 </template>
 
 <script setup lang="ts">
@@ -20,12 +20,10 @@ import NestedWidgets from '@fusionx/core/form-designer/canvas/nested.vue'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const { widget } = defineProps<{
-  widget: WidgetMap['tabs']
+  widget: WidgetMap['steps']
 }>()
 
 const current = ref(0)
-
-const type = computed(() => (widget.props.type === 'line' ? 'normal' : widget.props.type))
 
 const ctx = useRendererCtxInject()
 </script>
