@@ -9,34 +9,38 @@
   </TFormItem>
   <div class="w-full">
     <template v-if="options.type === 'static'">
-      <div
-        v-for="(option, index) in options.value"
-        :key="index"
-        class="flex items-center gap-2 w-full mb-2"
-      >
-        <div class="flex-1 grid grid-cols-2 gap-2">
-          <TInput v-model:value="option.label" class="!w-full" />
-          <TInput v-model:value="option.value" class="!w-full" />
-        </div>
-        <TButton
-          variant="text"
-          theme="primary"
-          shape="square"
-          class="flex-none"
-          @click="removeOption(index)"
+      <template v-if="type === 'default'">
+        <div
+          v-for="(option, index) in options.value"
+          :key="index"
+          class="flex items-center gap-2 w-full mb-2"
         >
+          <div class="flex-1 grid grid-cols-2 gap-2">
+            <TInput v-model:value="option.label" class="!w-full" />
+            <TInput v-model:value="option.value" class="!w-full" />
+          </div>
+          <TButton
+            variant="text"
+            theme="primary"
+            shape="square"
+            class="flex-none"
+            @click="removeOption(index)"
+          >
+            <template #icon>
+              <TIcon name="close" />
+            </template>
+          </TButton>
+        </div>
+
+        <TButton block @click="addOption">
           <template #icon>
-            <TIcon name="close" />
+            <TIcon name="add" />
+            新增一项
           </template>
         </TButton>
-      </div>
+      </template>
 
-      <TButton block @click="addOption">
-        <template #icon>
-          <TIcon name="add" />
-          新增一项
-        </template>
-      </TButton>
+      <template v-else> </template>
     </template>
 
     <template v-if="options.type === 'dict'">
@@ -50,7 +54,7 @@
     </template>
 
     <template v-if="options.type === 'expression'">
-      <TInputAdornment prepend="{{$state" append="}}">
+      <TInputAdornment prepend="{{$state." append="}}">
         <TInput v-model:value="options.value" class="min-w-0" />
       </TInputAdornment>
     </template>
@@ -66,17 +70,22 @@ const { type = 'default' } = defineProps<{
   type?: 'default' | 'tree-data'
 }>()
 
+type ModelType<T> = T extends 'default'
+  ?
+      | WidgetMap['select']['props']['options']
+      | WidgetMap['checkbox']['props']['options']
+      | WidgetMap['radio']['props']['options']
+  : T extends 'tree-data'
+    ? WidgetMap['cascader']['props']['options'] | WidgetMap['treeSelect']['props']['options']
+    : never
+
 const optionOpts = [
   { label: '静态', value: 'static' },
   { label: '字典', value: 'dict' },
   { label: '表达式', value: 'expression' },
 ]
 
-const options = defineModel<
-  | WidgetMap['select']['props']['options']
-  | WidgetMap['checkbox']['props']['options']
-  | WidgetMap['radio']['props']['options']
->('options', { required: true })
+const options = defineModel<ModelType<typeof type>>('options', { required: true })
 
 const { dictTypes } = storeToRefs(useFuxDesignerStore())
 
