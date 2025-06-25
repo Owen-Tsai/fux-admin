@@ -37,19 +37,21 @@ const cloneWidget = (widget: Widget) => {
       />
     </div>
     <div class="flex-1 min-h-0 overflow-hidden">
-      <Draggable
-        :list="widgetList"
-        :group="{ name: 'fux', pull: 'clone', put: false }"
-        :sort="false"
-        item-key="type"
-        :clone="cloneWidget"
-        :swap-threshold="0.5"
-        class="p-4 grid grid-cols-2 gap-4"
-      >
-        <template #item="{ element }: { element: Widget; index: number }">
-          <Item :widget="element" />
-        </template>
-      </Draggable>
+      <Scrollbar wrapper-class="!h-full" class="h-full">
+        <Draggable
+          :list="widgetList"
+          :group="{ name: 'fux', pull: 'clone', put: false }"
+          :sort="false"
+          item-key="type"
+          :clone="cloneWidget"
+          :swap-threshold="0.5"
+          class="p-4 grid grid-cols-2 gap-4"
+        >
+          <template #item="{ element }: { element: Widget; index: number }">
+            <Item :widget="element" />
+          </template>
+        </Draggable>
+      </Scrollbar>
     </div>
   </div>
 </template>

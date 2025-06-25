@@ -153,4 +153,21 @@ export const initialWidgetConfig: Partial<WidgetMap> = {
     },
     icon: 'calendar',
   },
+  tabs: {
+    class: 'layout',
+    name: '标签页',
+    type: 'tabs',
+    uid: 'tabs',
+    props: {
+      field: {},
+      children: [
+        { widgets: [], title: '标签页1' },
+        { widgets: [], title: '标签页2' },
+      ],
+      state: {
+        current: 0,
+      },
+    },
+    icon: 'tab',
+  },
 }
