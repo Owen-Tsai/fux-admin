@@ -1,0 +1,18 @@
+.draggable-area.empty-slot {
+  min-height: 40px;
+  height: 100%;
+  background-color: var(--td-bg-color-container-active);
+  border-radius: var(--td-radius-medium);
+}
+
+.ghost {
+  position: relative;
+  background-color: transparent !important;
+  .text-wrapper,
+  .icon-wrapper {
+    display: none !important;
+  }
+  .drag-placeholder {
+    display: flex !important;
+  }
+}

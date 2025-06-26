@@ -170,4 +170,21 @@ export const initialWidgetConfig: Partial<WidgetMap> = {
     },
     icon: 'tab',
   },
+  steps: {
+    class: 'layout',
+    name: '步骤条',
+    type: 'steps',
+    uid: 'steps',
+    props: {
+      field: {},
+      children: [
+        { widgets: [], title: '步骤1' },
+        { widgets: [], title: '步骤2' },
+      ],
+      state: {
+        current: 0,
+      },
+    },
+    icon: 'component-steps',
+  },
 }

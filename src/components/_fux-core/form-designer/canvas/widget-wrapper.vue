@@ -20,7 +20,7 @@
       <TIcon v-if="widget.props.hide" name="browse-off-filled" />
     </div>
     <!-- actions -->
-    <div class="absolute bottom-0 right-0 flex gap-1">
+    <div class="actions absolute bottom-0 right-0 flex gap-1">
       <TTooltip content="复制" :show-arrow="false" placement="left">
         <div class="action cursor-pointer" @click.stop="copyWidget(widget)">
           <TIcon name="copy-filled" />
@@ -61,7 +61,7 @@ const { widget } = defineProps<{
   @apply p-4;
   padding-top: 20px;
   padding-bottom: 22px;
-  border-radius: var(--td-radius-md);
+  border-radius: var(--td-radius-medium);
   user-select: none;
 
   &.selected {
@@ -70,7 +70,8 @@ const { widget } = defineProps<{
     & > .caption {
       color: var(--td-brand-color);
     }
-    .action {
+    & > .actions > .action,
+    & > .drag-handle {
       opacity: 1;
       z-index: 10;
     }

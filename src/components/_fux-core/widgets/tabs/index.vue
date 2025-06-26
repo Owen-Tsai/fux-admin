@@ -5,7 +5,7 @@
         <WidgetRenderer v-for="w in pane.widgets" :key="w.uid" :widget="w" />
       </template>
       <template v-else>
-        <div class="draggable-area" :class="{ 'empty-slot': pane.widgets.length <= 0 }">
+        <div class="draggable-area mt-4 p-1" :class="{ 'empty-slot': pane.widgets.length <= 0 }">
           <NestedWidgets :widgets="pane.widgets" />
         </div>
       </template>
