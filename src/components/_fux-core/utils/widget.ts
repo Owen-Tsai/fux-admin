@@ -1,62 +1,6 @@
 import { cloneDeepWith, camelCase } from 'lodash-es'
 import { generateId } from './id'
-import type { FormSchema, Widget } from '@fusionx/core/types'
-
-type SchemaTreeNode = {
-  label: string
-  name?: string
-  key: string
-  children?: SchemaTreeNode[]
-}
-
-/**
- * 返回树形展示的表单结构。注意，仅返回 AppSchema['form'] 下的`widgets`
- * @param formSchema AppSchema['form']
- */
-export const schemaToTree = (formSchema: FormSchema): SchemaTreeNode[] => {
-  const widgets = formSchema.widgets
-  if (!widgets) return []
-
-  const tree: SchemaTreeNode[] = []
-
-  const visit = (ws: FormSchema['widgets'], branch: SchemaTreeNode[]) => {
-    ws.forEach((w) => {
-      const leaf: SchemaTreeNode = {
-        label: w.props.field.label || w.name,
-        key: w.uid,
-        name: w.props.field.name,
-      }
-
-      if (w.class === 'layout') {
-        leaf.children = []
-        if (w.type === 'steps' || w.type === 'tabs' || w.type === 'grid') {
-          if (w.props.children) {
-            w.props.children.forEach((child) => {
-              visit(child.widgets, leaf.children!)
-            })
-          }
-        } else if (w.type === 'subForm') {
-          visit(w.props.children, leaf.children)
-        } else if (w.type === 'dataTable') {
-          visit(w.props.widgets, leaf.children)
-        }
-      }
-
-      branch.push(leaf)
-    })
-  }
-
-  visit(formSchema.widgets, tree)
-
-  return [
-    {
-      label: '组件树',
-      name: '',
-      key: 'root',
-      children: tree,
-    },
-  ]
-}
+import type { Widget } from '@fusionx/core/types'
 
 /**
  * 从 widgets 中递归地删除指定 uid 的元素
@@ -86,6 +30,28 @@ export const deleteWidgetByUid = (widgets: Widget[], uid: string) => {
       }
     }
   }
+}
+
+export const findWidgetByUid = (widgets: Widget[], uid: string): Widget | null => {
+  for (let i = 0; i < widgets.length; i++) {
+    const w = widgets[i]
+    if (w.uid === uid) {
+      return w
+    }
+
+    if (w.class === 'layout') {
+      if (w.type === 'grid' || w.type === 'steps' || w.type === 'tabs') {
+        if (w.props.children) {
+          for (let j = 0; j < w.props.children.length; j++) {
+            const ret = findWidgetByUid(w.props.children[j].widgets, uid)
+            if (ret) return ret
+          }
+        }
+      }
+    }
+  }
+
+  return null
 }
 
 /**

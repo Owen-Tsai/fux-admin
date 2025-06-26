@@ -37,14 +37,16 @@
         </div>
       </div>
     </div>
-    <div class="flex-1">
+    <div class="flex-1 min-w-0">
       <Factory v-if="activeTab === 'factory'" />
+      <TreeView v-if="activeTab === 'tree'" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import Factory from './factory/index.vue'
+import TreeView from './tree-view/index.vue'
 
 const activeTab = ref<(typeof tabs)[number]['value']>('factory')
 

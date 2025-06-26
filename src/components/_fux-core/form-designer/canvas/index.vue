@@ -1,9 +1,10 @@
 <template>
-  <div class="h-full">
+  <div ref="wrapperEl" class="h-full">
     <Scrollbar
       wrapper-class="!h-full"
       class="p-4 h-full"
-      content-class="h-full bg-[var(--td-bg-color-container)]"
+      content-class="bg-[var(--td-bg-color-container)] min-h-full h-auto"
+      :throttle-wait="100"
     >
       <TForm
         :colon="appSchema.form.colon"
@@ -22,6 +23,7 @@
           handle=".drag-handle"
           :swap-threshold="0.1"
           id="canvas"
+          :style="{ minHeight: `${height - 48}px` }"
         >
           <template #item="{ element }: { element: Widget }">
             <WidgetWrapper :widget="element">
@@ -43,6 +45,9 @@ import type { Widget } from '@fusionx/core/types'
 
 const { appSchema } = useDesignerCtxInject()!
 const widgets = ref(appSchema.value.form.widgets)
+
+const wrapperEl = useTemplateRef('wrapperEl')
+const { height } = useElementSize(wrapperEl)
 </script>
 
 <style lang="scss" scoped>
