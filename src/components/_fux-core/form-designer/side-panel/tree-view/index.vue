@@ -34,7 +34,7 @@ const treeRef = useTemplateRef<TreeInstanceFunctions>('treeRef')
 const actived = computed<string[]>({
   get: () => (selectedWidget.value?.uid ? [selectedWidget.value.uid] : []),
   set: (val) => {
-    console.log('val is', val)
+    if (val[0] === 'root') return
     const widget = findWidgetByUid(appSchema.value.form.widgets, val[0])
     selectedWidget.value = widget || undefined
   },
