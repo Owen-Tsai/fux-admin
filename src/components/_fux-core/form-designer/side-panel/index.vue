@@ -20,17 +20,17 @@
 
         <div class="flex flex-col gap-2">
           <TTooltip content="管理 API" placement="right" :show-arrow="false">
-            <TButton shape="square" theme="default">
+            <TButton shape="square" theme="default" @click="showFuncModal('api')">
               <TIcon name="api" />
             </TButton>
           </TTooltip>
           <TTooltip content="管理函数" placement="right" :show-arrow="false">
-            <TButton shape="square" theme="default">
+            <TButton shape="square" theme="default" @click="showFuncModal('func')">
               <TIcon name="functions-1" />
             </TButton>
           </TTooltip>
           <TTooltip content="预览表单" placement="right" :show-arrow="false">
-            <TButton shape="square" theme="default">
+            <TButton shape="square" theme="default" @click="showFuncModal('preview')">
               <TIcon name="play" />
             </TButton>
           </TTooltip>
@@ -40,15 +40,22 @@
     <div class="flex-1 min-w-0">
       <Factory v-if="activeTab === 'factory'" />
       <TreeView v-if="activeTab === 'tree'" />
+      <JsonView v-if="activeTab === 'schema'" />
     </div>
   </div>
+
+  <FuncModal ref="funcModal" />
 </template>
 
 <script setup lang="ts">
 import Factory from './factory/index.vue'
 import TreeView from './tree-view/index.vue'
+import FuncModal from './modals/func.vue'
+import JsonView from './json-view/index.vue'
 
 const activeTab = ref<(typeof tabs)[number]['value']>('factory')
+
+const funcModal = ref<InstanceType<typeof FuncModal>>()
 
 const tabs = [
   { title: '组件库', value: 'factory', icon: 'control-platform' },
@@ -56,7 +63,11 @@ const tabs = [
   { title: 'JSON Schema', value: 'schema', icon: 'code' },
 ] as const
 
-const showFuncModal = () => {}
+const showFuncModal = (modal: 'func' | 'api' | 'preview') => {
+  if (modal === 'func') {
+    funcModal.value?.open()
+  }
+}
 
 defineExpose({ showFuncModal })
 </script>

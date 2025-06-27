@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CodeEditor: typeof import('./src/components/_internal/code-editor.vue')['default']
     CurrentUser: typeof import('./src/components/_internal/current-user.vue')['default']
     DictTag: typeof import('./src/components/_internal/dict-tag.vue')['default']
     IconSelect: typeof import('./src/components/_internal/icon-select.vue')['default']
