@@ -187,4 +187,25 @@ export const initialWidgetConfig: Partial<WidgetMap> = {
     },
     icon: 'component-steps',
   },
+  grid: {
+    class: 'layout',
+    name: '栅格布局',
+    type: 'grid',
+    uid: 'grid',
+    props: {
+      field: {},
+      gutter: 16,
+      children: [
+        {
+          span: 6,
+          widgets: [],
+        },
+        {
+          span: 6,
+          widgets: [],
+        },
+      ],
+    },
+    icon: 'component-divider-horizontal',
+  },
 }
