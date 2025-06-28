@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full bg-[var(--td-bg-color-secondarycontainer)]">
     <div class="flex-none w-280px">
-      <SidePanel />
+      <SidePanel ref="sidePanel" />
     </div>
     <div class="flex-1 min-w-0 min-h-0">
       <Canvas />
@@ -33,4 +33,15 @@ const cAppSchema = computed({
 })
 
 useDesignerCtxProvide(cAppSchema)
+</script>
+
+<script lang="ts">
+const CTX_KEY = Symbol('sidePanelCtx')
+const sidePanel = ref<InstanceType<typeof SidePanel>>()
+
+export const injectSidePanelCtx = () => {
+  return inject(CTX_KEY, {
+    showModal: sidePanel.value?.showFuncModal,
+  })
+}
 </script>

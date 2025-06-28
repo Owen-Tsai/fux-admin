@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import FormSetter from './form-setter.vue'
-import widgetSetter from './widget-setter.vue'
+import WidgetSetter from '@fusionx/core/widgets/widget/widget-setter.vue'
 
 const activeTab = ref('form')
 </script>

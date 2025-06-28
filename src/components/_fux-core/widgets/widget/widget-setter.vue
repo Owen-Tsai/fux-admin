@@ -27,38 +27,23 @@
 
     <component :is="compToRender" :props="selectedWidget.props" />
 
-    <template v-if="selectedWidget.class === 'form'">
-      <TFormItem label="是否必填" class="boolean-setter">
-        <TSwitch
-          v-model:value="selectedWidget.props.field.required"
-          @change="validation.toggleRule(selectedWidget, 'required')"
-        />
-      </TFormItem>
-      <TFormItem label="校验规则">
-        <TSelect
-          v-model:value="validateType"
-          :options="validationOpts"
-          clearable
-          @change="onValidationTypeChange"
-        />
-        <!-- TODO: insert code editor -->
-      </TFormItem>
-      <pre>{{ validation.generateRules(selectedWidget) }}</pre>
+    <ValidationSetter />
 
-      <!-- TODO: insert event handler -->
-    </template>
+    <ActionSetter />
   </TForm>
 </template>
 
 <script setup lang="ts">
 import { useDesignerCtxInject } from '@fusionx/core/hooks'
-import { initialWidgetConfig, validationOpts, validation } from '@fusionx/core/utils'
+import { initialWidgetConfig } from '@fusionx/core/utils'
 import { cloneDeep, kebabCase } from 'lodash-es'
-import { labelAlignOpts } from './options'
+import { labelAlignOpts } from '../../form-designer/setter-panel/options'
+import ValidationSetter from './validation-setter.vue'
 import type { SelectProps } from 'tdesign-vue-next'
-import type { WidgetMap, FormWidget } from '@fusionx/core/types'
+import type { WidgetMap } from '@fusionx/core/types'
+import ActionSetter from './action-setter.vue'
 
-const components = import.meta.glob('../../widgets/**/setter.vue', {
+const components = import.meta.glob('../**/setter.vue', {
   eager: true,
   import: 'default',
 })
@@ -66,13 +51,11 @@ const components = import.meta.glob('../../widgets/**/setter.vue', {
 const compToRender = computed(() => {
   if (!selectedWidget.value) return null
   const type = kebabCase(selectedWidget.value.type)
-  const frag = components[`../../widgets/${type}/setter.vue`]
+  const frag = components[`../${type}/setter.vue`]
   return frag
 })
 
 const { appSchema, selectedWidget } = useDesignerCtxInject()!
-
-const validateType = ref('')
 
 const widgetTypeOpts = Object.keys(initialWidgetConfig).map((type) => ({
   label: initialWidgetConfig[type as keyof typeof initialWidgetConfig]?.name,
@@ -92,14 +75,6 @@ const onWidgetTypeChange: SelectProps['onChange'] = (v) => {
       name: selectedWidget.value.props.field.name,
       label: selectedWidget.value.props.field.label,
     },
-  }
-}
-
-const onValidationTypeChange: SelectProps['onChange'] = (v) => {
-  if (v !== 'regexp' && v !== 'custom') {
-    validation.removeRulesAndAdd(selectedWidget.value as FormWidget, v as string)
-  } else {
-    validation.removeRulesAndAdd(selectedWidget.value as FormWidget)
   }
 }
 </script>

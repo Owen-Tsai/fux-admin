@@ -71,6 +71,7 @@ const visible = ref(false)
 
 const open = () => {
   visible.value = true
+  funcConfig.value = appSchema.value.form.function || {}
 }
 
 const save = () => {
