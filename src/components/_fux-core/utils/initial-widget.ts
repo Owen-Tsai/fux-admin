@@ -208,4 +208,22 @@ export const initialWidgetConfig: Partial<WidgetMap> = {
     },
     icon: 'component-divider-horizontal',
   },
+  dataTable: {
+    class: 'layout',
+    name: '数据表格',
+    type: 'dataTable',
+    uid: 'dataTable',
+    props: {
+      field: {},
+      form: {},
+      pagination: {
+        pageSize: 10,
+      },
+      state: {
+        mode: 'table',
+      },
+      widgets: [],
+    },
+    icon: 'table',
+  },
 }

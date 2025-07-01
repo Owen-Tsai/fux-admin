@@ -77,8 +77,8 @@ export type WPropsTableColumn = {
    * @deprecated use `colKey` instead
    */
   key?: string
-  formatter?: {
-    type: 'dict' | 'custom' | 'image' | null
+  formatter: {
+    type: 'dict' | 'custom' | 'image' | ''
     value: string
   }
   /**
@@ -96,16 +96,16 @@ export type WPropsTablePagination = {
 
 export interface WPropsDataTable extends WPropsCommon {
   columns?: WPropsTableColumn[]
-  pagination?: WPropsTablePagination
+  pagination: WPropsTablePagination
   dialogWidth?: string
   /**
    * @deprecated use `dialogWidth` instead
    */
   formWidth?: string
-  form?: Omit<FormProps, 'disabled'>
+  form: Omit<FormProps, 'disabled'>
   widgets: Widget[]
   state: {
-    mode: 'table' | 'mode'
+    mode: 'table' | 'form'
   }
   url?: string
   min?: number

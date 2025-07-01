@@ -1,7 +1,7 @@
 <template>
   <TEmpty v-if="appSchema.form.widgets.length <= 0" title="请添加组件进行配置" />
   <TEmpty v-else-if="selectedWidget === undefined" title="请选中组件进行配置" />
-  <TForm v-else :data="appSchema" label-align="top" layout="inline">
+  <TForm v-else :data="appSchema" label-align="top" layout="inline" class="!w-full">
     <TFormItem v-if="selectedWidget.class === 'form'" label="字段标签" name="label">
       <TInput v-model:value="selectedWidget.props.field.label" />
     </TFormItem>
@@ -37,7 +37,7 @@
 import { useDesignerCtxInject } from '@fusionx/core/hooks'
 import { initialWidgetConfig } from '@fusionx/core/utils'
 import { cloneDeep, kebabCase } from 'lodash-es'
-import { labelAlignOpts } from '../../form-designer/setter-panel/options'
+import { labelAlignOpts } from '../../utils/form-setter-opts'
 import ValidationSetter from './validation-setter.vue'
 import type { SelectProps } from 'tdesign-vue-next'
 import type { WidgetMap } from '@fusionx/core/types'
