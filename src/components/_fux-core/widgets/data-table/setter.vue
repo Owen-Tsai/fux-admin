@@ -7,7 +7,7 @@
   </TFormItem>
   <template v-if="props.state.mode === 'table'">
     <TFormItem label="列配置">
-      <TButton theme="default" block>编辑列</TButton>
+      <TButton theme="default" block @click="onEditColumns">编辑列</TButton>
     </TFormItem>
     <TFormItem label="禁用分页" class="boolean-setter">
       <TSwitch v-model:value="props.pagination.disabled" />
@@ -46,16 +46,24 @@
       <TSwitch v-model:value="props.form.colon" />
     </TFormItem>
   </template>
+  <TableColumnSetter ref="columnSetterRef" v-model:props="props" />
 </template>
 
 <script setup lang="ts">
 import { labelAlignOpts, requiredMarkOpts } from '@fusionx/core/utils/form-setter-opts'
+import TableColumnSetter from './table-column-setter.vue'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const props = defineModel<WidgetMap['dataTable']['props']>('props', { required: true })
+
+const columnSetterRef = useTemplateRef<InstanceType<typeof TableColumnSetter>>('columnSetterRef')
 
 const modeOpts = [
   { label: '配置表格', value: 'table' },
   { label: '配置表单', value: 'form' },
 ]
+
+const onEditColumns = () => {
+  columnSetterRef.value?.open()
+}
 </script>

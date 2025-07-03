@@ -44,7 +44,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <TDialog v-model:visible="visible" title="列渲染格式配置" @save="saveFormatterConfig">
+  <TDialog v-model:visible="visible" header="列渲染格式配置" @save="saveFormatterConfig">
     <TForm ref="formRef" :data="formatter">
       <TFormItem label="列渲染格式">
         <TSelect v-model:value="formatter.type" :options="formatterOpts" />

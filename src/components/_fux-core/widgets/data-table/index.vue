@@ -9,10 +9,12 @@
       </TButton>
     </div>
     <TTable
-      v-show="rendererCtx?.mode === 'dev' && widget.props.state.mode === 'table'"
+      v-show="!isProd && widget.props.state.mode === 'table'"
       :columns="widget.props.columns"
       :pagination="pagination"
       :data="states.data"
+      row-key="id"
+      class="!mt-4"
       @page-change="onPageChange"
     >
       <template v-for="(column, i) in widget.props.columns" :key="i" #[column.key]="{ row }">
@@ -57,7 +59,7 @@
       </template>
     </TTable>
 
-    <div v-if="rendererCtx?.mode === 'dev' && widget.props.state.mode === 'form'">
+    <div v-if="!isProd && widget.props.state.mode === 'form'">
       <div
         class="draggable-area mt-4 p-1"
         :class="{ 'empty-slot': widget.props.widgets.length <= 0 }"
@@ -97,6 +99,8 @@ const states = ref<{
 })
 
 const rendererCtx = useRendererCtxInject()
+
+const isProd = computed(() => rendererCtx && rendererCtx.mode !== 'dev')
 
 const loading = ref(false)
 

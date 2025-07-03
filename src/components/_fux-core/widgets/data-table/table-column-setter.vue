@@ -11,6 +11,11 @@ const visible = ref(false)
 
 const open = () => {
   visible.value = true
+  if (props.value.columns) {
+    columns.value = props.value.columns
+  } else {
+    columns.value = []
+  }
 }
 
 const columns = ref<Array<WPropsTableColumn & { idx?: number }>>([])
@@ -21,7 +26,26 @@ const alignOpts = [
   { label: '居中对齐', value: 'center' },
 ]
 
-const saveColumnsConfig = () => {}
+const saveColumnsConfig = () => {
+  props.value.columns = columns.value
+  visible.value = false
+}
+
+const addColumn = () => {
+  columns.value.push({
+    title: '',
+    key: '',
+    width: '',
+    formatter: {
+      type: '',
+      value: '',
+    },
+  })
+}
+
+const deleteColumn = (idx: number) => {
+  columns.value.splice(idx, 1)
+}
 
 const openColumnFormatSetter = (column: WPropsTableColumn) => {
   formatSetterRef.value?.open(column)
@@ -31,39 +55,46 @@ defineExpose({ open })
 </script>
 
 <template>
-  <TDialog v-model:visible="visible" header="列配置" width="1000px" @confirm="saveColumnsConfig">
-    <TForm :data="columns">
+  <TDialog v-model:visible="visible" header="列配置" width="1200px" @confirm="saveColumnsConfig">
+    <TForm :data="columns" label-width="80px" layout="inline" label-align="right">
       <div ref="dragWrapper">
-        <div v-for="(column, idx) in columns" :key="idx" class="flex items-center gap-4 mb-4">
+        <div v-for="(column, idx) in columns" :key="idx" class="flex items-center gap-2 mb-2">
           <div class="drag-handle cursor-move">
             <TIcon name="view-list" />
           </div>
-          <AFormItem label="列标题" :name="['columns', idx, 'title']">
+          <TFormItem label="列标题" :name="`columns[${idx}].title`">
             <TInput v-model:value="column.title" />
-          </AFormItem>
-          <AFormItem label="键名" :name="['columns', idx, 'key']">
+          </TFormItem>
+          <TFormItem label="键名" :name="`columns[${idx}].key`">
             <TInput v-model:value="column.key" />
-          </AFormItem>
-          <AFormItem label="列宽度" :name="['columns', idx, 'width']">
+          </TFormItem>
+          <TFormItem label="列宽度" :name="`columns[${idx}].width`">
             <TInput v-model:value="column.width" placeholder="请输入含单位的值" />
-          </AFormItem>
-          <AFormItem label="列对齐方式" :name="['columns', idx, 'align']">
+          </TFormItem>
+          <TFormItem label="列对齐方式" :name="`columns[${idx}].align`">
             <TSelect v-model:value="column.align" :options="alignOpts" />
-          </AFormItem>
-          <TTooltip content="配置列渲染格式">
-            <TButton shape="square" theme="default" @click="openColumnFormatSetter(column)">
-              <template #icon><TIcon name="code-1" /></template>
-            </TButton>
-          </TTooltip>
-          <TTooltip content="删除列">
-            <TButton shape="square" theme="default">
-              <template #icon><TIcon name="delete" /></template>
-            </TButton>
-          </TTooltip>
+          </TFormItem>
+          <div class="flex-none flex items-center gap-1">
+            <TTooltip content="配置列渲染格式">
+              <TButton
+                shape="square"
+                theme="default"
+                class="flex-none"
+                @click="openColumnFormatSetter(column)"
+              >
+                <template #icon><TIcon name="code" /></template>
+              </TButton>
+            </TTooltip>
+            <TTooltip content="删除列">
+              <TButton shape="square" theme="default" class="flex-none" @click="deleteColumn(idx)">
+                <template #icon><TIcon name="delete" /></template>
+              </TButton>
+            </TTooltip>
+          </div>
         </div>
       </div>
 
-      <TButton variant="outline" block>
+      <TButton variant="outline" block @click="addColumn">
         <template #icon><TIcon name="add" /></template>
         添加列
       </TButton>
