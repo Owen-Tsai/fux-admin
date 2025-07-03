@@ -46,6 +46,7 @@
 
   <FuncModal ref="funcModal" />
   <ApiModal ref="apiModal" />
+  <PreviewModal ref="previewModal" />
 </template>
 
 <script setup lang="ts">
@@ -54,11 +55,13 @@ import TreeView from './tree-view/index.vue'
 import FuncModal from './modals/func.vue'
 import JsonView from './json-view/index.vue'
 import ApiModal from './modals/api.vue'
+import PreviewModal from './modals/preview.vue'
 
 const activeTab = ref<(typeof tabs)[number]['value']>('factory')
 
 const funcModal = ref<InstanceType<typeof FuncModal>>()
 const apiModal = ref<InstanceType<typeof ApiModal>>()
+const previewModal = ref<InstanceType<typeof PreviewModal>>()
 
 const tabs = [
   { title: '组件库', value: 'factory', icon: 'control-platform' },
@@ -72,7 +75,7 @@ const showFuncModal = (modal: 'func' | 'api' | 'preview') => {
   } else if (modal === 'api') {
     apiModal.value?.open()
   } else if (modal === 'preview') {
-    // previewModal.value?.open()
+    previewModal.value?.open()
   }
 }
 

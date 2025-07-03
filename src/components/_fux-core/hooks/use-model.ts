@@ -10,12 +10,12 @@ export const useModel = (widget: FormWidget) => {
 
   const model = computed({
     get: () => {
-      if (!formData) return widget.type === 'dateRangePicker' ? [] : undefined
-      return get(formData, key)
+      if (!formData?.value) return widget.type === 'dateRangePicker' ? [] : undefined
+      return get(formData.value, key)
     },
     set: (val) => {
-      if (!formData) return
-      set(formData, key, val)
+      if (!formData?.value) return
+      set(formData.value, key, val)
     },
   })
 
