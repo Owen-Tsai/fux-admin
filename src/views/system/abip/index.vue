@@ -1,7 +1,7 @@
 <template>
   <div class="view">
     <!-- filter form -->
-    <ACard v-if="permission.has('system:ip-list:query')" class="mb-4">
+    <ACard v-if="permission.has('system:ip-management:query')" class="mb-4">
       <AForm
         ref="filterForm"
         :label-col="{ span: 6 }"
@@ -11,29 +11,54 @@
       >
         <ARow :gutter="[0, 16]">
           <ACol :lg="8" :span="24">
-            <AFormItem label="IP地址" name="ipAddress">
-              <AInput
-                v-model:value="queryParams.ipAddress"
-                placeholder="请输入IP地址"
-                allow-clear
-              />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="8" :span="24">
-            <AFormItem label="IP类型" name="listType">
-              <ASelect
-                v-model:value="queryParams.listType"
-                :options="SYSTEM_IP_LIST"
-                disabled
-                placeholder="请选择列表类型"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
             <AFormItem label="添加时间" name="createTime">
               <ARangePicker
                 v-model:value="queryParams.createTime"
                 value-format="YYYY-MM-DD HH:mm:ss"
+              />
+            </AFormItem>
+          </ACol>
+          <ACol :lg="8" :span="24">
+            <AFormItem label="异常 IP 地址" name="ipAddress">
+              <AInput
+                v-model:value="queryParams.ipAddress"
+                placeholder="请输入异常 IP 地址"
+                allow-clear
+              />
+            </AFormItem>
+          </ACol>
+          <ACol v-show="filterExpanded" :lg="8" :span="24">
+            <AFormItem label="异常类型" name="abnormalType">
+              <ASelect
+                v-model:value="queryParams.abnormalType"
+                :options="SYSTEM_ABNORMAL"
+                placeholder="请选择异常类型"
+              />
+            </AFormItem>
+          </ACol>
+          <ACol v-show="filterExpanded" :lg="8" :span="24">
+            <AFormItem label="访问时间" name="accessTime">
+              <ARangePicker
+                v-model:value="queryParams.accessTime"
+                value-format="YYYY-MM-DD HH:mm:ss"
+              />
+            </AFormItem>
+          </ACol>
+          <ACol v-show="filterExpanded" :lg="8" :span="24">
+            <AFormItem label="访问的资源" name="accessResource">
+              <AInput
+                v-model:value="queryParams.accessResource"
+                placeholder="请输入访问的资源"
+                allow-clear
+              />
+            </AFormItem>
+          </ACol>
+          <ACol v-show="filterExpanded" :lg="8" :span="24">
+            <AFormItem label="处理状态" name="handlingStatus">
+              <ASelect
+                v-model:value="queryParams.handlingStatus"
+                :options="SYSTEM_PROCESSING"
+                placeholder="请选择处理状态"
               />
             </AFormItem>
           </ACol>
@@ -53,11 +78,11 @@
     </ACard>
 
     <!-- table card -->
-    <ACard :title="queryParams.listType ? 'IP白名单' : 'IP黑名单'">
+    <ACard title="异常IP管理">
       <template #extra>
         <AFlex :gap="8">
           <AButton
-            v-if="permission.has('system:ip-list:create')"
+            v-if="permission.has('system:ip-management:create') && null"
             type="primary"
             :loading="pending"
             @click="modal?.open()"
@@ -74,7 +99,7 @@
               </template>
             </AButton>
           </ATooltip>
-          <ATooltip v-if="permission.has('system:ip-list:export')" title="导出">
+          <ATooltip v-if="permission.has('system:ip-management:export')" title="导出">
             <AButton type="text" :loading="pending">
               <template #icon>
                 <ExportOutlined />
@@ -92,34 +117,35 @@
           :pagination="pagination"
           @change="onChange"
         >
-          <template #bodyCell="scope: TableScope<IpListVO>">
-            <template v-if="scope.column.key === 'deleted'">
-              <DictTag :dict-object="INFRA_BOOLEAN_STRING" :value="scope?.text" />
-            </template>
-            <template v-if="scope.column.key === 'listType'">
-              <DictTag :dict-object="SYSTEM_IP_LIST" :value="scope?.text" />
-            </template>
+          <template #bodyCell="scope: TableScope<IpManagementVO>">
             <template v-if="scope.column.key === 'createTime'">
-              {{ dayjs(scope.text).format('YYYY-MM-DD HH:mm:ss') }}
+              {{ dayjs(scope.text).format('YYYY-MM-DD') }}
+            </template>
+            <template v-if="scope.column.key === 'abnormalType'">
+              <DictTag :dict-object="SYSTEM_ABNORMAL" :value="scope?.text" />
+            </template>
+            <template v-if="scope.column.key === 'accessTime'">
+              {{ dayjs(scope.text).format('YYYY-MM-DD') }}
+            </template>
+            <template v-if="scope.column.key === 'handlingStatus'">
+              <DictTag :dict-object="SYSTEM_PROCESSING" :value="scope?.text" />
             </template>
             <template v-if="scope.column.title === '操作'">
               <AFlex :gap="16">
-                <ATypographyLink
-                  v-if="permission.has('system:ip-list:update')"
-                  @click="modal?.open(scope?.record.id)"
-                >
-                  <EditOutlined />
-                  编辑
+                <ATypographyLink @click="onCheckDetail(scope?.record)">
+                  <UnorderedListOutlined />
+                  查看详情
                 </ATypographyLink>
+
                 <APopconfirm
-                  v-if="permission.has('system:ip-list:delete')"
-                  title="该操作无法撤销，确定要删除吗？"
+                  v-if="permission.has('system:ip-management:delete')"
+                  title="确定将该IP纳入黑名单吗？"
                   :overlay-style="{ width: '240px' }"
                   @confirm="onDelete(scope?.record)"
                 >
                   <ATypographyLink type="danger">
-                    <DeleteOutlined />
-                    删除
+                    <StopOutlined />
+                    纳入黑名单
                   </ATypographyLink>
                 </APopconfirm>
               </AFlex>
@@ -131,6 +157,9 @@
 
     <!-- form modal -->
     <FormModal ref="modal" @success="execute" />
+
+    <!-- detail drawer -->
+    <DetailDrawer ref="detailDrawer" :entry="selectedEntry" />
   </div>
 </template>
 
@@ -142,21 +171,30 @@ import useDict from '@/hooks/use-dict'
 import { useTable, columns } from './use-table'
 import useActions from './use-actions'
 import FormModal from './form.vue'
-import type { IpListVO } from '@/api/system/iplist'
+import DetailDrawer from './detail.vue'
+import type { IpManagementVO } from '@/api/system/abip'
 import { permission } from '@/hooks/use-permission'
 
 const modal = useTemplateRef('modal')
+const detailDrawer = useTemplateRef('detailDrawer')
 
 const [filterExpanded, toggle] = useToggle(false)
 
 const filterFormRef = ref()
+const selectedEntry = ref<IpManagementVO | null>(null)
 
-const [INFRA_BOOLEAN_STRING, SYSTEM_IP_LIST] = useDict('infra_boolean_string', 'system_ip_list')
+const [SYSTEM_ABNORMAL, SYSTEM_PROCESSING] = useDict('SYSTEM_ABNORMAL', 'SYSTEM_PROCESSING')
 
 const { data, execute, pending, queryParams, onFilter, onFilterReset, pagination, onChange } =
   useTable(filterFormRef)
 
 const { onDelete } = useActions(execute)
 
-defineOptions({ name: 'IpList' })
+// 查看详情函数
+const onCheckDetail = (record: IpManagementVO) => {
+  selectedEntry.value = record
+  detailDrawer.value?.open()
+}
+
+defineOptions({ name: 'IpManagement' })
 </script>
