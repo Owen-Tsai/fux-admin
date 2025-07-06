@@ -37,7 +37,7 @@
       </div>
     </header>
 
-    <DataConfig v-if="current === 0" />
+    <DataConfig v-if="current === 0" @finish="current = 1" />
     <FormConfig v-if="current === 1" />
   </div>
 </template>
@@ -45,7 +45,10 @@
 <script setup lang="ts">
 import DataConfig from './data/index.vue'
 import FormConfig from './form/index.vue'
+import { useAppLoad, useAppSave, useAppDesignCtxInject } from './use-app-design'
 import type { StepsProps } from 'tdesign-vue-next'
+
+useAppLoad()
 
 const steps: StepsProps['options'] = [
   { title: '数据源配置' },

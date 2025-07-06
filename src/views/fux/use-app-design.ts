@@ -13,10 +13,17 @@ import { compact, flattenDeep, merge } from 'lodash-es'
 import dayjs from 'dayjs'
 import type { AppSchema, TaskNode } from '@fusionx/core/types'
 
-const useAppLoad = () => {
+const APP_DESIGN_CTX_KEY = Symbol('app-design-ctx')
+
+type AppDesignCtx = {
+  appEditMode: Ref<'create' | 'update' | null>
+  appSchema: Ref<AppSchema>
+}
+
+export const useAppLoad = () => {
   const { params } = useRoute()
   const appSchemaDetail = ref<AppSchemaVO>()
-  const appSchema = ref<AppSchema>()
+  const appSchema = ref<AppSchema>({ ...defaultSchema })
   const appDesignMode = ref<'create' | 'update'>('create')
 
   const message = useMessage()
@@ -49,6 +56,11 @@ const useAppLoad = () => {
 
   loadAppSchemaDetail()
 
+  provide<AppDesignCtx>(APP_DESIGN_CTX_KEY, {
+    appEditMode: appDesignMode,
+    appSchema,
+  })
+
   return {
     appSchema,
     appSchemaDetail,
@@ -59,7 +71,11 @@ const useAppLoad = () => {
   }
 }
 
-const useAppSave = (appSchema: Ref<AppSchema>, vo: Ref<AppSchemaVO>, appDetail: Ref<AppVO>) => {
+export const useAppSave = (
+  appSchema: Ref<AppSchema>,
+  vo: Ref<AppSchemaVO>,
+  appDetail: Ref<AppVO>,
+) => {
   const loading = ref(false)
   const dialog = useDialog()
   const message = useMessage()
@@ -126,7 +142,7 @@ const useAppSave = (appSchema: Ref<AppSchema>, vo: Ref<AppSchemaVO>, appDetail: 
     return id
   }
 
-  const generateAuditMenu = async (id: string, mode?: 'create' | 'update' = 'update') => {
+  const generateAuditMenu = async (id: string, mode: 'create' | 'update' = 'update') => {
     const getTasks = (nodes: TaskNode[] = appSchema.value.flow.nodes): TaskNode[] => {
       const ret: TaskNode[] = []
 
@@ -190,4 +206,8 @@ const useAppSave = (appSchema: Ref<AppSchema>, vo: Ref<AppSchemaVO>, appDetail: 
       },
     })
   }
+}
+
+export const useAppDesignCtxInject = () => {
+  return inject<AppDesignCtx>(APP_DESIGN_CTX_KEY)
 }
