@@ -13,14 +13,6 @@
       <TSwitch v-model:value="props.pagination.disabled" />
     </TFormItem>
     <template v-if="!props.pagination.disabled">
-      <TFormItem label="每页条数">
-        <TInputNumber
-          v-model:value="props.pagination.pageSize"
-          :min="1"
-          :step="1"
-          :decimal-places="0"
-        />
-      </TFormItem>
       <TFormItem label="精简模式" class="boolean-setter">
         <TSwitch v-model:value="props.pagination.lite" />
       </TFormItem>

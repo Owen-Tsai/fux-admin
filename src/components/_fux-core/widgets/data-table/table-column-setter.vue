@@ -12,7 +12,7 @@ const visible = ref(false)
 const open = () => {
   visible.value = true
   if (props.value.columns) {
-    columns.value = props.value.columns
+    columns.value = [...props.value.columns]
   } else {
     columns.value = []
   }

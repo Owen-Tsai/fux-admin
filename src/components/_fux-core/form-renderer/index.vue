@@ -6,7 +6,7 @@
       :colon="appSchema.form.colon"
       :label-width="appSchema.form.labelWidth"
       :label-align="appSchema.form.labelAlign"
-      :layout="appSchema.form.layout === 'vertical' ? 'vertical' : 'inline'"
+      layout="vertical"
       :disabled="appSchema.form.disabled || disabled"
     >
       <WidgetRenderer

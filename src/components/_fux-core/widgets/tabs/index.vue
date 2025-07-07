@@ -2,7 +2,9 @@
   <TTabs v-model:value="current" :theme="type">
     <TTabPanel v-for="(pane, i) in widget.props.children" :key="i" :label="pane.title" :value="i">
       <template v-if="ctx && ctx.mode !== 'dev'">
-        <WidgetRenderer v-for="w in pane.widgets" :key="w.uid" :widget="w" />
+        <div class="mt-4">
+          <WidgetRenderer v-for="w in pane.widgets" :key="w.uid" :widget="w" />
+        </div>
       </template>
       <template v-else>
         <div class="draggable-area mt-4 p-1" :class="{ 'empty-slot': pane.widgets.length <= 0 }">

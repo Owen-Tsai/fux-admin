@@ -71,15 +71,18 @@ const onSubmit = async () => {
 
 const onAdd = () => {
   mode.value = 'create'
+  visible.value = true
 }
 
 const onEdit = async (id: string) => {
   mode.value = 'update'
+  visible.value = true
   await loadData(id)
 }
 
 const onView = async (id: string) => {
   mode.value = 'view'
+  visible.value = true
   await loadData(id)
 }
 
@@ -89,17 +92,23 @@ defineExpose({ onAdd, onEdit, onView })
 </script>
 
 <template>
-  <TDialog v-model:visible="visible" :header="dialogTitle" @confirm="onSubmit">
-    <TForm
-      ref="formRef"
-      :data="data"
-      :colon="widget.props.form?.colon"
-      :label-width="widget.props.form?.labelWidth"
-      :label-align="widget.props.form?.labelAlign"
-      :layout="widget.props.form?.layout === 'vertical' ? 'vertical' : 'inline'"
-      :disabled="isDisabled"
-    >
-      <WidgetRenderer v-for="w in widget.props.widgets" :key="w.uid" :widget="w" />
-    </TForm>
+  <TDialog
+    v-model:visible="visible"
+    :header="dialogTitle"
+    :width="widget.props.dialogWidth"
+    @confirm="onSubmit"
+  >
+    <div class="w-full">
+      <TForm
+        ref="formRef"
+        :data="data"
+        :colon="widget.props.form?.colon"
+        :label-width="widget.props.form?.labelWidth"
+        :label-align="widget.props.form?.labelAlign"
+        :disabled="isDisabled"
+      >
+        <WidgetRenderer v-for="w in widget.props.widgets" :key="w.uid" :widget="w" />
+      </TForm>
+    </div>
   </TDialog>
 </template>

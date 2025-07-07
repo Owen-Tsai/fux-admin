@@ -9,9 +9,9 @@
       </TButton>
     </div>
     <TTable
-      v-show="!isProd && widget.props.state.mode === 'table'"
+      v-show="isProd || widget.props.state.mode === 'table'"
       :columns="widget.props.columns"
-      :pagination="pagination"
+      :pagination="widget.props.pagination.disabled ? undefined : pagination"
       :data="states.data"
       row-key="id"
       class="!mt-4"
@@ -107,6 +107,9 @@ const loading = ref(false)
 const pagination = computed<TableProps['pagination']>(() => ({
   current: states.value.current,
   total: states.value.total,
+  theme: widget.props.pagination.lite ? 'simple' : 'default',
+  showPageSize: !widget.props.pagination.lite,
+  size: widget.props.pagination.small ? 'small' : 'medium',
 }))
 
 const dictTypes = ref(
