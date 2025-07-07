@@ -14,7 +14,7 @@
             v-model:value="selectedTables"
             multiple
             clearable
-            filterable
+            :filter="filterFn"
             @change="onTableSelectChange"
           >
             <TOption
@@ -82,9 +82,9 @@
           <TButton v-else @click="emit('finish')">下一步</TButton>
         </div>
       </TForm>
-      <pre>{{ tableSortList }}</pre>
-      <pre>{{ subTableMap }}</pre>
     </div>
+
+    <TLoading :loading="isGenerating || isLoading" fullscreen />
   </div>
 </template>
 
@@ -95,6 +95,7 @@ import { getDataSourceList } from '@/api/infra/data-source'
 import { useSortable } from '@vueuse/integrations/useSortable'
 import genAppFormSchema from './gen-schema'
 import type { AppSchema } from '@fusionx/core/types'
+import type { SelectProps } from 'tdesign-vue-next'
 
 const { appEditMode, appSchema } = useAppDesignCtxInject()!
 const dialog = useDialog()
@@ -104,6 +105,7 @@ const emit = defineEmits(['finish'])
 const tableList = ref<HTMLElement>()
 
 const isGenerating = ref(false)
+const isLoading = ref(false)
 const hasModified = ref(false)
 
 // 最终将会合并到 appSchema 中的配置项
@@ -128,10 +130,18 @@ const onTableSelectChange = () => {
   })
 }
 
+const filterFn: SelectProps<any>['filter'] = (text, option) => {
+  const match = tableDefList.value?.filter(
+    (d) => d.tableName?.includes(text) || d.tableComment?.includes(text),
+  )
+  return match ? match.findIndex((d) => d.id === option.value) !== -1 : false
+}
+
 const { data: tableDefList, execute: getTableDefListExec } = useRequest(getTableDefList)
 const { data: dataSourceList, execute: getDataSourceListExec } = useRequest(getDataSourceList)
 
 const init = async () => {
+  isLoading.value = true
   await getDataSourceListExec()
   await getTableDefListExec()
 
@@ -144,9 +154,10 @@ const init = async () => {
   })
 
   onTableSelectChange()
+  isLoading.value = false
 }
 
-useSortable(tableList, dataConfigState.value.tables, {
+useSortable(tableList, tableSortList, {
   animation: 150,
 })
 
