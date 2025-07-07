@@ -1,24 +1,20 @@
 import useRequest from '@/hooks/use-request'
-import { getList, type ListQueryParams } from '@/api/system/iplist'
+import { getList, type ListQueryParams } from '@/api/system/abip'
 import type { FormInstance, TableProps } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
 
 export const columns: TableProps['columns'] = [
-  { key: 'ipAddress', title: 'IP地址', dataIndex: 'ipAddress' },
-  { key: 'description', title: '描述信息', dataIndex: 'description' },
-  // { key: 'deleted', title: '是否删除', dataIndex: 'deleted' },
-  //{ key: 'listType', title: 'IP类型', dataIndex: 'listType' },
-  { key: 'createTime', title: '添加时间', dataIndex: 'createTime' },
+  { key: 'ipAddress', title: '异常 IP 地址', dataIndex: 'ipAddress' },
+  { key: 'abnormalType', title: '异常类型', dataIndex: 'abnormalType' },
+  // { key: 'createTime', title: '添加时间', dataIndex: 'createTime' },
+  { key: 'accessTime', title: '访问时间', dataIndex: 'accessTime' },
+  //{ key: 'accessResource', title: '访问的资源', dataIndex: 'accessResource' },
+  { key: 'handlingStatus', title: '处理状态', dataIndex: 'handlingStatus' },
   { key: 'actions', title: '操作', dataIndex: 'actions', width: 240 },
 ]
 
 export const useTable = (filterFormRef: Ref<FormInstance | undefined>) => {
-  const { query } = useRoute()
-  const type = query.listType
-
-  const queryParams = ref<ListQueryParams>({
-    listType: type === 'true',
-  })
+  const queryParams = ref<ListQueryParams>({})
 
   const { data, pending, execute } = useRequest(() => getList(queryParams.value), {
     immediate: true,

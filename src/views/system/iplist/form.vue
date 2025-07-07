@@ -13,20 +13,25 @@
         :rules="rules"
         class="mt-4"
       >
-        <AFormItem label="是否删除" name="deleted">
+        <!-- <AFormItem label="是否删除" name="deleted">
           <ARadioGroup v-model:value="formData.deleted" :options="INFRA_BOOLEAN_STRING" />
-        </AFormItem>
+        </AFormItem> -->
         <AFormItem label="IP地址" name="ipAddress">
           <AInput v-model:value="formData.ipAddress" placeholder="请输入IP地址" />
         </AFormItem>
-        <AFormItem label="列表类型" name="listType">
-          <ARadioGroup v-model:value="formData.listType" :options="SYSTEM_IP_LIST" />
+        <AFormItem label="描述信息" name="description">
+          <AInput v-model:value="formData.description" placeholder="请输入描述信息" />
         </AFormItem>
-        <AFormItem label="创建时间" name="createTime">
+        <!-- <AFormItem label="列表类型" name="listType">
+          <ARadioGroup v-model:value="formData.listType" :options="SYSTEM_IP_LIST" />
+        </AFormItem> -->
+        <AFormItem label="添加时间" name="createTime">
           <ADatePicker
             v-model:value="formData.createTime"
-            value-format="x"
-            placeholder="请选择创建时间"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            show-time
+            placeholder="请选择添加时间"
+            disabled
           />
         </AFormItem>
       </AForm>
@@ -37,12 +42,15 @@
 <script lang="ts" setup>
 import { createIpList, updateIpList, getDetail, type IpListVO } from '@/api/system/iplist'
 import { message, type FormInstance, type FormProps } from 'ant-design-vue'
+import { useRoute } from 'vue-router'
+import dayjs from 'dayjs'
 import logger from '@/utils/logger'
 
 const rules: FormProps['rules'] = {}
 
 const mode = ref<'create' | 'update'>('create')
 const visible = ref(false)
+const route = useRoute()
 
 const emit = defineEmits(['success'])
 const formRef = ref<FormInstance>()
@@ -90,6 +98,11 @@ const open = (id?: number) => {
     mode.value = 'update'
   } else {
     mode.value = 'create'
+
+    formData.value.deleted = false
+
+    // 新增时从URL参数中获取listType默认值
+    formData.value.listType = route.query.listType
   }
 
   visible.value = true
