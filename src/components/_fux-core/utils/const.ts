@@ -23,3 +23,8 @@ export const dateValueTypeOpts = [
   { value: 'YYYY-MM-DD HH:mm:ss', label: 'YYYY-MM-DD HH:mm:ss' },
   { value: 'YYYY-MM-DD HH:mm:ss:SSS', label: 'YYYY-MM-DD HH:mm:ss:SSS' },
 ]
+
+export enum TaskNodeActorStrategy {
+  ROLE = 10,
+  ORG = 30,
+}
