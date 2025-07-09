@@ -3,11 +3,8 @@ import { deleteIpManagement, type IpManagementVO } from '@/api/system/abip'
 
 const useActions = (execute: () => void) => {
   const onDelete = (record: IpManagementVO) => {
-    console.log('~~~~~~~~~~~~~   操作对象如下：')
-    console.log(record)
-
     deleteIpManagement(record.id!).then(() => {
-      message.success('删除成功')
+      message.success('添加成功')
       execute()
     })
   }

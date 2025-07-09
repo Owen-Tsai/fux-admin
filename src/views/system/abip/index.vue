@@ -138,7 +138,10 @@
                 </ATypographyLink>
 
                 <APopconfirm
-                  v-if="permission.has('system:ip-management:delete')"
+                  v-if="
+                    permission.has('system:ip-management:delete') &&
+                    scope?.record?.handlingStatus !== 3
+                  "
                   title="确定将该IP纳入黑名单吗？"
                   :overlay-style="{ width: '240px' }"
                   @confirm="onDelete(scope?.record)"
@@ -148,6 +151,20 @@
                     纳入黑名单
                   </ATypographyLink>
                 </APopconfirm>
+
+                <!-- 当处理状态为3时显示禁用状态的按钮 -->
+                <ATypographyLink
+                  v-if="
+                    permission.has('system:ip-management:delete') &&
+                    scope?.record?.handlingStatus === 3
+                  "
+                  type="danger"
+                  disabled
+                  class="cursor-not-allowed opacity-50"
+                >
+                  <StopOutlined />
+                  纳入黑名单
+                </ATypographyLink>
               </AFlex>
             </template>
           </template>
