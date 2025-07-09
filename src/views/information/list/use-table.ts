@@ -16,7 +16,9 @@ export const columns: TableProps['columns'] = [
 export const useTable = (filterFormRef: Ref<FormInstance | null>) => {
   const queryParams = ref<ListQueryParams>({})
 
-  const { data, pending, execute } = useRequest(() => getList(), { immediate: true })
+  const { data, pending, execute } = useRequest(() => getList(queryParams.value), {
+    immediate: true,
+  })
 
   const pagination = computed<TablePaginationConfig>(() => ({
     pageSize: queryParams.value.pageSize,
@@ -32,7 +34,6 @@ export const useTable = (filterFormRef: Ref<FormInstance | null>) => {
   const onChange = ({ current, pageSize }: TablePaginationConfig) => {
     queryParams.value.pageNo = current
     queryParams.value.pageSize = pageSize
-
     execute()
   }
 

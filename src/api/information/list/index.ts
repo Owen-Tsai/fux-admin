@@ -13,11 +13,12 @@ export type InformationVO = {
   infotype?: string
 }
 
-const prefix = '/admin-api/information'
+const prefix = '/admin-api/info'
 
-export const getList = () => {
+export const getList = (params: ListQueryParams) => {
   return request.get({
-    url: '/user/info/get_info_list',
+    url: `${prefix}/get-info-list`,
+    params,
   })
 }
 

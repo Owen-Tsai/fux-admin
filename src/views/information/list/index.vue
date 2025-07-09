@@ -91,7 +91,7 @@
 import dayjs from 'dayjs'
 import useDict from '@/hooks/use-dict'
 import { permission } from '@/hooks/use-permission'
-import type { InformationVO } from '@/api/information'
+import type { InformationVO } from '@/api/information/list'
 import { useTable, columns } from './use-table'
 import useActions from './use-actions'
 

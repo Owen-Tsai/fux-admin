@@ -15,7 +15,9 @@ export const columns: TableProps['columns'] = [
 ]
 
 export const useTable = (formRef: Ref<FormInstance>) => {
-  const { data, pending, execute } = useRequest(() => getMenuTree(), { immediate: true })
+  const { data, pending, execute } = useRequest(() => getMenuTree(queryParams.value), {
+    immediate: true,
+  })
 
   const queryParams = ref<TreeQueryParams>({})
 

@@ -57,9 +57,11 @@ const useRequest = <T>(service: () => Promise<T>, options?: UseRequestOptions<T>
     }
   }
 
-  if (immediate) {
-    execute()
-  }
+  nextTick(() => {
+    if (immediate) {
+      execute()
+    }
+  })
 
   const debouncedExecute = useDebounceFn(execute, debounceTime)
 
