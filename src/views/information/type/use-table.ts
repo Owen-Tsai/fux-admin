@@ -1,5 +1,10 @@
 import useRequest from '@/hooks/use-request'
-import { getTypeTree, type TypeQueryParams } from '@/api/information/type'
+import {
+  getTypeTree,
+  updateInfoType,
+  type TypeQueryParams,
+  type InformationTypeVO,
+} from '@/api/information/type'
 import type { TableProps, FormInstance } from 'ant-design-vue'
 
 export const columns: TableProps['columns'] = [
@@ -25,6 +30,16 @@ export const useTable = (formRef: Ref<FormInstance>) => {
     execute()
   }
 
+  const onChange = (data: InformationTypeVO) => {
+    updateInfoType({
+      id: data.id,
+      name: data.name,
+      isinmobile: data.isinmobile,
+    }).then(() => {
+      execute()
+    })
+  }
+
   const onFilterReset = () => {
     formRef.value?.resetFields()
     execute()
@@ -38,5 +53,6 @@ export const useTable = (formRef: Ref<FormInstance>) => {
     queryParams,
     onFilter,
     onFilterReset,
+    onChange,
   }
 }

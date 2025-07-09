@@ -61,6 +61,7 @@
                     v-model:checked="scope.record.isinmobile"
                     checked-children="是"
                     un-checked-children="否"
+                    @change="onChange(scope.record)"
                   />
                 </ASpace>
               </template>
@@ -123,7 +124,8 @@ const modal = useTemplateRef('modal')
 
 const [commonStatus] = useDict('common_status')
 
-const { data, execute, pending, queryParams, onFilter, onFilterReset } = useTable(filterFormRef)
+const { data, execute, pending, queryParams, onFilter, onFilterReset, onChange } =
+  useTable(filterFormRef)
 
 const { onDelete } = useActions(execute)
 
