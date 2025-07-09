@@ -95,8 +95,8 @@
             <template v-if="scope.column.key === 'deleted'">
               <DictTag :dict-object="INFRA_BOOLEAN_STRING" :value="scope?.text" />
             </template>
-            <template v-if="scope.column.key === 'createTime'">
-              {{ dayjs(scope.text).format('YYYY-MM-DD') }}
+            <template v-if="scope.column.key === 'trafficTime'">
+              {{ dayjs(scope.text).format('YYYY-MM-DD HH:ss:mm') }}
             </template>
             <template v-if="scope.column.title === '操作'">
               <AFlex :gap="16">

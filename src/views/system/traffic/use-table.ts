@@ -9,8 +9,8 @@ export const columns: TableProps['columns'] = [
   { key: 'inboundTraffic', title: '入站流量', dataIndex: 'inboundTraffic' },
   { key: 'outboundTraffic', title: '出站流量', dataIndex: 'outboundTraffic' },
   { key: 'trafficTime', title: '流量统计时间', dataIndex: 'trafficTime' },
-  { key: 'createTime', title: '访问时间', dataIndex: 'createTime' },
-  { key: 'actions', title: '操作', dataIndex: 'actions', width: 240 },
+  //{ key: 'createTime', title: '访问时间', dataIndex: 'createTime' },
+  //{ key: 'actions', title: '操作', dataIndex: 'actions', width: 240 },
 ]
 
 export const useTable = (filterFormRef: Ref<FormInstance | undefined>) => {
