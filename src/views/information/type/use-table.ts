@@ -35,9 +35,13 @@ export const useTable = (formRef: Ref<FormInstance>) => {
       id: data.id,
       name: data.name,
       isinmobile: data.isinmobile,
-    }).then(() => {
-      execute()
     })
+      .then(() => {
+        execute()
+      })
+      .catch(() => {
+        data.isinmobile = !data.isinmobile
+      })
   }
 
   const onFilterReset = () => {
