@@ -1,8 +1,8 @@
 <template>
-  <div class="h-full bg-[var(--td-bg-color-secondarycontainer)] overflow-auto">
-    <div class="fixed top-0 left-1/2 -translate-x-1/2 h-full bg-red-500"></div>
+  <div class="h-full bg-[var(--td-bg-color-secondarycontainer)] overflow-auto relative">
+    <div class="sticky top-0 left-0 w-full bg-red-500/20">12345</div>
 
-    <div class="h-full w-full"></div>
+    <div class="w-full h-1200px bg-blue-500/20"></div>
   </div>
 </template>
 

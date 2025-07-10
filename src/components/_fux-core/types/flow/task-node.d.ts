@@ -21,7 +21,7 @@ export interface NPropsAudit {
 }
 
 export type NPropsStart = {
-  uid: string
+  [x: string]: any
 }
 
 export type NPropsCondition = {

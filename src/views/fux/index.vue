@@ -39,12 +39,14 @@
 
     <DataConfig v-if="current === 0" @finish="current = 1" />
     <FormConfig v-if="current === 1" />
+    <FlowConfig v-if="current === 2" />
   </div>
 </template>
 
 <script setup lang="ts">
 import DataConfig from './data/index.vue'
 import FormConfig from './form/index.vue'
+import FlowConfig from './flow/index.vue'
 import { useAppLoad, useAppSave, useAppDesignCtxInject } from './use-app-design'
 import type { StepsProps } from 'tdesign-vue-next'
 
