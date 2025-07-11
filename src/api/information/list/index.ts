@@ -6,11 +6,12 @@ export type ListQueryParams = CommonQueryParams & {
 }
 
 export type InformationVO = {
-  id: string
+  id?: string
   title?: string
-  creator?: string
-  createTime?: string
+  sort?: number
+  isTop?: boolean
   infotype?: string
+  content?: string
 }
 
 const prefix = '/admin-api/info'
@@ -25,5 +26,31 @@ export const getList = (params: ListQueryParams) => {
 export const deleteInformation = (id: string) => {
   return request.delete({
     url: `${prefix}/delete?id=${id}`,
+  })
+}
+
+export const getInformationDetail = (id: string) => {
+  return request.get({
+    url: `${prefix}/get-information-detail?id=${id}`,
+  })
+}
+
+export const getInfoTyoeTree = () => {
+  return request.get({
+    url: `${prefix}/get-info-tyoe-tree`,
+  })
+}
+
+export const addInformation = (data: InformationVO) => {
+  return request.post({
+    url: `${prefix}/create`,
+    data,
+  })
+}
+
+export const updateInformation = (data: InformationVO) => {
+  return request.put({
+    url: `${prefix}/update`,
+    data,
   })
 }

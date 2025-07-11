@@ -7,10 +7,10 @@ export type TypeQueryParams = {
 export type InformationTypeVO = {
   id?: string
   name?: string
-  code?: string
   parentId?: string
   sort?: number
-  isinmobile?: boolean
+  isInMobile?: boolean
+  isAudit?: boolean
   status?: number
   creator?: string
   createTime?: string

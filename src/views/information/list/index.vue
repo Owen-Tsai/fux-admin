@@ -2,20 +2,24 @@
   <div class="view">
     <ARow :gutter="24">
       <ACol :span="24">
-        <ACard class="mb-4">
+        <ACard v-if="permission.has('system:info-list:query')" class="mb-4">
           <AForm ref="filterFormRef" :model="queryParams" class="dense-form">
             <ARow :gutter="24">
               <ACol :span="24" :lg="8">
                 <AFormItem label="标题" name="title">
-                  <AInput v-model:value="queryParams.title" placeholder="请输入标题" />
+                  <AInput v-model:value="queryParams.title" allow-clear placeholder="请输入标题" />
                 </AFormItem>
               </ACol>
               <ACol :span="24" :lg="8">
                 <AFormItem label="资讯分类" name="infotype">
-                  <ASelect
+                  <ATreeSelect
                     v-model:value="queryParams.infotype"
-                    :options="commonStatus"
+                    show-search
                     placeholder="请选择资讯分类"
+                    allow-clear
+                    tree-default-expand-all
+                    :tree-data="treeData"
+                    tree-node-filter-prop="label"
                   />
                 </AFormItem>
               </ACol>
@@ -34,7 +38,12 @@
         <ACard title="信息资讯" class="flex-1">
           <template #extra>
             <AFlex :gap="8">
-              <AButton type="primary" :loading="pending" @click="createInformation">
+              <AButton
+                type="primary"
+                v-if="permission.has('system:info-list:create')"
+                :loading="pending"
+                @click="onEdit()"
+              >
                 <template #icon>
                   <PlusOutlined />
                 </template>
@@ -53,22 +62,29 @@
           <ATable :data-source="data?.list" :columns="columns" row-key="id" :loading="pending">
             <template #bodyCell="scope: TableScope<InformationVO>">
               <template v-if="scope?.column.key === 'title'">
-                {{ scope.text.length > 15 ? scope.text.substring(0, 15) + '...' : scope.text }}
+                {{ scope.text.length > 27 ? scope.text.substring(0, 26) + '...' : scope.text }}
               </template>
               <template v-if="scope?.column.key === 'createTime'">
-                {{ dayjs(scope.text).format('YYYY-MM-DD') }}
+                {{ dayjs(scope.text).format('YYYY-MM-DD HH:mm') }}
               </template>
               <template v-if="scope?.column.key === 'audittime'">
-                {{ scope.text == null ? '' : dayjs(scope.text).format('YYYY-MM-DD') }}
+                {{ scope.text == null ? '' : dayjs(scope.text).format('YYYY-MM-DD HH:mm') }}
+              </template>
+              <template v-if="scope?.column.key === 'auditstate'">
+                <DictTag :dict-object="informationStatus" :value="scope.text" />
               </template>
               <template v-if="scope?.column.key === 'actions'">
                 <AFlex :gap="16">
-                  <ATypographyLink @click="updateInformation">
+                  <ATypographyLink
+                    v-if="permission.has('system:info-list:update')"
+                    @click="onEdit(scope.record)"
+                  >
                     <EditOutlined />
                     修改
                   </ATypographyLink>
                   <APopconfirm
-                    title="删除该菜单项将一并删除该菜单下的所有子菜单，确定要删除吗？"
+                    v-if="permission.has('system:info-list:delete')"
+                    title="确定要删除吗？"
                     :overlay-inner-style="{ width: '260px' }"
                     @confirm="onDelete(scope.record!)"
                   >
@@ -84,28 +100,36 @@
         </ACard>
       </ACol>
     </ARow>
+    <FormModal v-if="visible" :record="entry" @success="execute" @close="visible = false" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import useDict from '@/hooks/use-dict'
+import FormModal from './form.vue'
 import { permission } from '@/hooks/use-permission'
-import type { InformationVO } from '@/api/information/list'
+import { getInfoTyoeTree, type InformationVO } from '@/api/information/list'
 import { useTable, columns } from './use-table'
 import useActions from './use-actions'
 
 const filterFormRef = ref()
 
-const [commonStatus] = useDict('common_status')
+const treeData = ref()
+
+const [informationStatus] = useDict('information_status')
 
 const { data, execute, pending, queryParams, onFilter, onFilterReset } = useTable(filterFormRef)
 
-const { onDelete } = useActions(execute)
-
-defineOptions({ name: 'Information' })
+const { entry, visible, onDelete, onEdit } = useActions(execute)
 
 const createInformation = () => {}
 
 const updateInformation = () => {}
+
+getInfoTyoeTree().then((res) => {
+  treeData.value = res
+})
+
+defineOptions({ name: 'InformationList' })
 </script>

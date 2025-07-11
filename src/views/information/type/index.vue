@@ -7,7 +7,11 @@
             <ARow :gutter="24">
               <ACol :span="24" :lg="8">
                 <AFormItem label="类别名称" name="name">
-                  <AInput v-model:value="queryParams.name" placeholder="请输入资讯类别名称" />
+                  <AInput
+                    v-model:value="queryParams.name"
+                    allow-clear
+                    placeholder="请输入资讯类别名称"
+                  />
                 </AFormItem>
               </ACol>
               <ACol :span="24" :lg="16">
@@ -55,10 +59,10 @@
             :pagination="false"
           >
             <template #bodyCell="scope: TableScope<InformationTypeVO>">
-              <template v-if="scope?.column.key === 'isinmobile'">
+              <template v-if="scope?.column.key === 'isInMobile'">
                 <ASpace direction="vertical">
                   <ASwitch
-                    v-model:checked="scope.record.isinmobile"
+                    v-model:checked="scope.record.isInMobile"
                     checked-children="是"
                     un-checked-children="否"
                     @change="onChange(scope.record)"

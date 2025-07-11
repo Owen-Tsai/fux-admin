@@ -29,13 +29,9 @@
         <AFormItem label="资讯类别名称" name="name">
           <AInput v-model:value="formData.name" placeholder="请输入资讯类别名称" />
         </AFormItem>
-        <AFormItem label="资讯编码" name="code">
-          <AInput v-model:value="formData.code" placeholder="请输入资讯类别名称" />
-        </AFormItem>
         <ARow>
           <ACol :span="12">
             <AFormItem label="排序" name="sort">
-              <!-- <AInput v-model:value="formData.name" placeholder="请输入资讯类别名称" /> -->
               <AInputNumber v-model:value="formData.sort" class="w-full" />
             </AFormItem>
           </ACol>
@@ -49,12 +45,26 @@
             </AFormItem>
           </ACol>
         </ARow>
-        <AFormItem label="是否上架移动端" name="code">
-          <ARadioGroup v-model:value="formData.isinmobile">
-            <ARadio :value="true">是</ARadio>
-            <ARadio :value="false">否</ARadio>
-          </ARadioGroup>
-        </AFormItem>
+        <ARow>
+          <ACol :span="12">
+            <AFormItem label="是否上架移动端" name="isInMobile">
+              <ARadioGroup
+                v-model:value="formData.isInMobile"
+                :options="infraBooleanString"
+                option-type="button"
+              />
+            </AFormItem>
+          </ACol>
+          <ACol :span="12">
+            <AFormItem label="是否需要审核" name="isAudit">
+              <ARadioGroup
+                v-model:value="formData.isAudit"
+                :options="infraBooleanString"
+                option-type="button"
+              />
+            </AFormItem>
+          </ACol>
+        </ARow>
       </ASpin>
     </AForm>
   </AModal>
@@ -71,7 +81,7 @@ import {
 import useDict from '@/hooks/use-dict'
 import logger from '@/utils/logger'
 
-const [commonStatus] = useDict('common_status')
+const [commonStatus, infraBooleanString] = useDict('common_status', 'infra_boolean_string')
 
 const rules: FormProps['rules'] = {
   name: [{ required: true, message: '请填写菜单名称' }],
@@ -94,7 +104,8 @@ const isCustomLayout = ref(false)
 const formData = ref<InformationTypeVO>({
   status: 0,
   sort: 1,
-  isinmobile: true,
+  isInMobile: true,
+  isAudit: true,
 })
 
 const submit = async () => {
