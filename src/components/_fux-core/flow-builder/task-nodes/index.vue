@@ -11,7 +11,6 @@
       v-if="item.type === 'group'"
       :config="item"
       @add-node="(type) => addNode(type, i)"
-      @delete-node="deleteNode(i)"
     />
     <AuditNode
       v-if="item.type === 'audit'"
