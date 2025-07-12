@@ -38,7 +38,7 @@ const deleteBranch = (branchIdx: number) => {
 <template>
   <div class="conditional-group">
     <div class="text-center relative z-2">
-      <AButton shape="round" @click="addBranch">添加条件</AButton>
+      <TButton shape="round" theme="default" variant="outline" @click="addBranch">添加条件</TButton>
     </div>
     <div class="node-wrapper -mt-4 z-1">
       <div class="branches">

@@ -55,7 +55,7 @@ const onEdit = () => {
 
 <template>
   <div class="node-wrapper">
-    <div class="node start-node">
+    <div class="node audit-node">
       <div class="header">
         <div class="flex items-center gap-1">
           <TIcon name="seal" />
@@ -75,7 +75,7 @@ const onEdit = () => {
           </div>
         </div>
 
-        <TIcon name="close" @click="emit('delete-node')" />
+        <TIcon name="close" class="cursor-pointer" @click="emit('delete-node')" />
       </div>
 
       <div class="body" @click.stop="selectedNode = config">

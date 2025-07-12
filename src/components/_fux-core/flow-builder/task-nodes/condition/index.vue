@@ -11,22 +11,29 @@ const emit = defineEmits<{
 }>()
 
 const isEditing = ref(false)
+const inputEl = useTemplateRef<HTMLInputElement>('inputEl')
 
 const { selectedNode } = useFlowBuilderCtxInject()!
 
 const onAddNode = (type: keyof TaskNodeConfigMap) => {
   emit('add-node', type)
 }
+
+const onEdit = () => {
+  isEditing.value = true
+  nextTick(() => {
+    inputEl.value?.focus()
+  })
+}
 </script>
 
 <template>
-  <div class="node-wrapper">
+  <div class="node-wrapper px-10 pt-8">
     <div class="node condition-node">
       <div class="header">
         <div class="flex items-center gap-1">
           <TIcon name="seal" />
           <div class="input-wrapper">
-            <span class="node-name">{{ config.name }}</span>
             <TInput
               v-show="isEditing"
               v-model:value="config.name"
@@ -34,15 +41,15 @@ const onAddNode = (type: keyof TaskNodeConfigMap) => {
               class="node-name-input"
               size="small"
               @blur="isEditing = false"
-              @keydown.enter="isEditing = false"
+              @enter="isEditing = false"
             />
-            <span v-show="!isEditing" class="node-name" @click="isEditing = true">
+            <span v-show="!isEditing" class="node-name" @click="onEdit">
               {{ config.name }}
             </span>
           </div>
         </div>
 
-        <TIcon name="close" @click="emit('delete-node')" />
+        <TIcon name="close" class="cursor-pointer" @click="emit('delete-node')" />
       </div>
 
       <div class="body font-mono" @click="selectedNode = config">

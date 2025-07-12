@@ -7,8 +7,18 @@
       @add-node="(type) => addNode(type, i)"
       @delete-node="deleteNode(i, true)"
     />
-    <ConditionGroup v-if="item.type === 'group'" :config="item" @delete-node="deleteNode(i)" />
-    <AuditNode v-if="item.type === 'audit'" :config="item" @delete-node="deleteNode(i)" />
+    <ConditionGroup
+      v-if="item.type === 'group'"
+      :config="item"
+      @add-node="(type) => addNode(type, i)"
+      @delete-node="deleteNode(i)"
+    />
+    <AuditNode
+      v-if="item.type === 'audit'"
+      :config="item"
+      @add-node="(type) => addNode(type, i)"
+      @delete-node="deleteNode(i)"
+    />
   </div>
 </template>
 
