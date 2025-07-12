@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NodeButton from '../node-button.vue'
-import { useFuxFlowBuilderCtxInject } from '@fusionx/core/hooks'
+import { useFlowBuilderCtxInject } from '@fusionx/core/hooks'
 import type { TaskNodeConfigMap } from '@fusionx/core/types'
 
 const config = defineModel<TaskNodeConfigMap['condition']>('config', { required: true })
@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 const isEditing = ref(false)
 
-const { selectedNode } = useFuxFlowBuilderCtxInject()!
+const { selectedNode } = useFlowBuilderCtxInject()!
 
 const onAddNode = (type: keyof TaskNodeConfigMap) => {
   emit('add-node', type)

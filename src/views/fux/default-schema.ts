@@ -6,7 +6,16 @@ const defaultSchema: AppSchema = {
     labelWidth: '100px',
     labelAlign: 'left',
   },
-  flow: {},
+  flow: {
+    nodes: [
+      {
+        name: '发起人',
+        type: 'start',
+        uid: 'start-node',
+        props: {},
+      },
+    ],
+  },
   info: {
     tables: [],
     gridColumns: 2,

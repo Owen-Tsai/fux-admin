@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import NodeButton from '../node-button.vue'
-import { useFuxFlowBuilderCtxInject } from '@fusionx/core/hooks'
+import { useFlowBuilderCtxInject } from '@fusionx/core/hooks'
 import { TaskNodeActorStrategy } from '@fusionx/core/utils'
 import type { TaskNodeConfigMap } from '@fusionx/core/types'
 
@@ -12,8 +12,9 @@ const emit = defineEmits<{
 }>()
 
 const isEditing = ref(false)
+const inputEl = useTemplateRef<HTMLInputElement>('inputEl')
 
-const { selectedNode } = useFuxFlowBuilderCtxInject()!
+const { selectedNode } = useFlowBuilderCtxInject()!
 
 const actors = computed(() => {
   const { strategy, text, value } = config.value.props.actor
@@ -26,7 +27,7 @@ const actors = computed(() => {
   if (strategy === 10) {
     if (value!.length > 1) {
       return `${text} 等 ${value!.length} 个角色`
-    } else if (value!.length === 1) {
+    } else if (value!.length === 1 && text) {
       return `角色 ${text}`
     } else {
       return dft
@@ -43,6 +44,13 @@ const actors = computed(() => {
 const onAddNode = (type: keyof TaskNodeConfigMap) => {
   emit('add-node', type)
 }
+
+const onEdit = () => {
+  isEditing.value = true
+  nextTick(() => {
+    inputEl.value?.focus()
+  })
+}
 </script>
 
 <template>
@@ -52,7 +60,6 @@ const onAddNode = (type: keyof TaskNodeConfigMap) => {
         <div class="flex items-center gap-1">
           <TIcon name="seal" />
           <div class="input-wrapper">
-            <span class="node-name">{{ config.name }}</span>
             <TInput
               v-show="isEditing"
               v-model:value="config.name"
@@ -60,9 +67,9 @@ const onAddNode = (type: keyof TaskNodeConfigMap) => {
               class="node-name-input"
               size="small"
               @blur="isEditing = false"
-              @keydown.enter="isEditing = false"
+              @enter="isEditing = false"
             />
-            <span v-show="!isEditing" class="node-name" @click="isEditing = true">
+            <span v-show="!isEditing" class="node-name" @click="onEdit">
               {{ config.name }}
             </span>
           </div>
@@ -76,7 +83,7 @@ const onAddNode = (type: keyof TaskNodeConfigMap) => {
           <div class="w-10/12">
             <div class="truncate">{{ actors }}</div>
           </div>
-          <TIcon name="chevron-right-s" />
+          <TIcon name="chevron-right" />
         </div>
       </div>
     </div>

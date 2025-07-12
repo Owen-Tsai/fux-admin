@@ -6,6 +6,22 @@ export default defineConfig({
   theme: {
     colors: {},
   },
+  rules: [
+    [
+      /^radius-(.*)-b/,
+      ([, v]) => ({
+        'border-bottom-left-radius': `var(--td-radius-${v})`,
+        'border-bottom-right-radius': `var(--td-radius-${v})`,
+      }),
+    ],
+    [
+      /^radius-(.*)-t/,
+      ([, v]) => ({
+        'border-top-left-radius': `var(--td-radius-${v})`,
+        'border-top-right-radius': `var(--td-radius-${v})`,
+      }),
+    ],
+  ],
   shortcuts: [
     {
       's-full': 'w-full h-full',

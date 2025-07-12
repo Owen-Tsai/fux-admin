@@ -25,7 +25,7 @@
   bottom: 0;
   left: calc(50% - calc(var(--line-width) / 2));
   width: var(--line-width);
-  background-color: var(--td-border-level-1-color);
+  background-color: var(--td-border-level-2-color);
 }
 
 @mixin bg-audit {
@@ -99,7 +99,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      @apply radius-t px-4;
+      @apply radius-medium-t px-4;
 
       .close-icon {
         display: none;
@@ -120,7 +120,7 @@
       display: flex;
       align-items: center;
       cursor: pointer;
-      @apply radius-b px-4;
+      @apply radius-medium-b px-4;
     }
 
     &:hover {
@@ -146,7 +146,7 @@
         height: 4px;
         border-style: solid;
         border-width: 8px 6px 4px;
-        border-color: var(--td-border-level-1-color) transparent transparent;
+        border-color: var(--td-border-level-2-color) transparent transparent;
         background: var(--td-bg-color-secondarycontainer);
       }
     }
@@ -164,7 +164,7 @@
       content: '';
       height: 12px;
       width: 12px;
-      background-color: var(--td-border-level-1-color);
+      background-color: var(--td-border-level-2-color);
       position: absolute;
       top: 0;
       left: 50%;
@@ -178,8 +178,8 @@
   .branches {
     display: flex;
     position: relative;
-    border-top: var(--line-width) solid var(--td-border-level-1-color);
-    border-bottom: var(--line-width) solid var(--td-border-level-1-color);
+    border-top: var(--line-width) solid var(--td-border-level-2-color);
+    border-bottom: var(--line-width) solid var(--td-border-level-2-color);
     overflow: visible;
     background-color: var(--td-bg-color-secondarycontainer);
 

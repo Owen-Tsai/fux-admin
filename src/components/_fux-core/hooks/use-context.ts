@@ -55,7 +55,7 @@ export const useRendererCtxInject = () => {
   return injectLocal<FuxRendererCtx | null>(FUX_KEY_RENDERER, null)
 }
 
-export const useFuxFlowBuilderCtxProvide = (appFlowSchema: Ref<FlowSchema>) => {
+export const useFlowBuilderCtxProvide = (appFlowSchema: Ref<FlowSchema>) => {
   const selectedNode = ref<TaskNode | undefined>()
 
   const deleteNode = (uid: string) => {
@@ -70,9 +70,13 @@ export const useFuxFlowBuilderCtxProvide = (appFlowSchema: Ref<FlowSchema>) => {
     selectedNode,
     deleteNode,
   })
+
+  return {
+    selectedNode,
+  }
 }
 
-export const useFuxFlowBuilderCtxInject = () => {
+export const useFlowBuilderCtxInject = () => {
   return inject<FuxFlowBuilderCtx | null>(FUX_KEY_FLOW_BUILDER, null)
 }
 

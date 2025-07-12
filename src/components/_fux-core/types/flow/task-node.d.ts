@@ -1,6 +1,6 @@
 export interface FieldControlOverride {
   name?: string
-  config?: 'show' | 'hide' | 'readonly' | 'edit'
+  config?: 'shown' | 'hidden' | 'readonly' | 'writable'
 }
 
 export interface NPropsAudit {
