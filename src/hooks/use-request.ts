@@ -12,7 +12,7 @@ export type UseRequestOptions<T> = {
    * @param raw response data
    * @returns transformed response data
    */
-  transformer?: (raw: Ref<T | undefined>) => T | undefined
+  transformer?: (raw: any) => T | undefined
   onSuccess?: (data: T) => void
   onError?: (err: unknown) => void
   onFinish?: () => void
@@ -33,7 +33,7 @@ const useRequest = <T>(service: () => Promise<T>, options?: UseRequestOptions<T>
     try {
       const response = await service()
       if (transformer) {
-        data.value = transformer(data)
+        data.value = transformer(response)
       } else {
         data.value = response
       }

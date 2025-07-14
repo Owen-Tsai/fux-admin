@@ -11,6 +11,7 @@ declare module 'vue' {
     CodeEditor: typeof import('./src/components/_internal/code-editor.vue')['default']
     CurrentUser: typeof import('./src/components/_internal/current-user.vue')['default']
     DictTag: typeof import('./src/components/_internal/dict-tag.vue')['default']
+    FileUpload: typeof import('./src/components/_internal/file-upload.vue')['default']
     IconSelect: typeof import('./src/components/_internal/icon-select.vue')['default']
     ListActions: typeof import('./src/components/_internal/list-actions.vue')['default']
     Logo: typeof import('./src/components/_internal/logo.vue')['default']

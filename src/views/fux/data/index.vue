@@ -2,10 +2,10 @@
   <div class="flex-1 min-h-0 px-6 py-4 overflow-auto">
     <div class="min-h-full bg-[var(--td-bg-color-container)] rounded-lg py-6">
       <TForm :data="dataConfigState" class="w-5/12 min-w-500px !mx-auto" label-width="100px">
-        <TAlert theme="warning" class="!mb-6">
+        <TAlert v-if="appEditMode === 'update'" theme="warning" class="!mb-6">
           <template #message>
-            当前应用的 Schema 版本为 <b>44</b>。如不需要重新生成
-            Schema，请直接点击页面上方步骤条中的对应环节进行切换。
+            当前应用的版本为 <b>{{ appVersion }}</b
+            >。如不需要重新生成 Schema，请直接点击页面上方步骤条中的对应环节进行切换。
           </template>
         </TAlert>
 
@@ -48,6 +48,12 @@
             <TRadioButton :value="2">2 列</TRadioButton>
             <TRadioButton :value="3">3 列</TRadioButton>
           </TRadioGroup>
+        </TFormItem>
+        <TFormItem>
+          <TAlert
+            theme="info"
+            message="当对某个数据表启用子表模式时，该数据表所对应的表单字段将视为子表。子表采用数据表格渲染，且可以添加多条数据"
+          />
         </TFormItem>
         <TFormItem label="已选数据表">
           <div ref="tableList" class="w-full flex-1 min-w-0">
@@ -97,7 +103,7 @@ import genAppFormSchema from './gen-schema'
 import type { AppSchema } from '@fusionx/core/types'
 import type { SelectProps } from 'tdesign-vue-next'
 
-const { appEditMode, appSchema } = useAppDesignCtxInject()!
+const { appEditMode, appSchema, appVersion } = useAppDesignCtxInject()!
 const dialog = useDialog()
 
 const emit = defineEmits(['finish'])

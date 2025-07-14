@@ -23,7 +23,7 @@ export type ListQueryParams = {
   name?: string
   type?: string
   published?: number
-  updateTime?: string
+  updateTime?: string[]
 } & CommonQueryParams
 
 export type TableVO = {

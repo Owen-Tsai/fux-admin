@@ -18,11 +18,12 @@ const APP_DESIGN_CTX_KEY = Symbol('app-design-ctx')
 type AppDesignCtx = {
   appEditMode: Ref<'create' | 'update' | null>
   appSchema: Ref<AppSchema>
+  appVersion: Ref<string | undefined>
 }
 
 export const useAppLoad = () => {
   const { params } = useRoute()
-  const appSchemaDetail = ref<AppSchemaVO>()
+  const appSchemaDetail = ref<AppSchemaVO>({})
   const appSchema = ref<AppSchema>({ ...defaultSchema })
   const appDesignMode = ref<'create' | 'update'>('create')
 
@@ -38,6 +39,9 @@ export const useAppLoad = () => {
   const loadAppSchemaDetail = async () => {
     loading.value = true
     try {
+      if (!params.appId) {
+        throw new Error('应用信息获取失败，默认 Schema 已加载')
+      }
       const data = await getAppDesignSchema(params.appId as string)
       if (data === null || !data.appSchema) {
         appSchema.value = defaultSchema
@@ -48,7 +52,7 @@ export const useAppLoad = () => {
       }
     } catch (e) {
       appSchema.value = defaultSchema
-      message.warning('应用信息获取失败，默认 Schema 已加载')
+      message.warning((e as Error).message)
     } finally {
       loading.value = false
     }
@@ -59,6 +63,7 @@ export const useAppLoad = () => {
   provide<AppDesignCtx>(APP_DESIGN_CTX_KEY, {
     appEditMode: appDesignMode,
     appSchema,
+    appVersion: computed(() => appSchemaDetail.value?.version),
   })
 
   return {
@@ -74,7 +79,7 @@ export const useAppLoad = () => {
 export const useAppSave = (
   appSchema: Ref<AppSchema>,
   vo: Ref<AppSchemaVO>,
-  appDetail: Ref<AppVO>,
+  appDetail: Ref<AppVO | undefined>,
 ) => {
   const loading = ref(false)
   const dialog = useDialog()
@@ -116,6 +121,7 @@ export const useAppSave = (
   }
 
   const generateWorkflowXML = async () => {
+    if (!appDetail.value) return
     loading.value = true
     try {
       const xml = await getProcessXML({
@@ -205,6 +211,10 @@ export const useAppSave = (
         }
       },
     })
+  }
+
+  return {
+    save,
   }
 }
 
