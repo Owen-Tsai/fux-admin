@@ -1,5 +1,5 @@
 import useRequest from '@/hooks/use-request'
-import { getList, type ListQueryParams } from '@/api/information/list'
+import { getList, type ListQueryParams } from '@/api/information/audit'
 import type { FormInstance, TableProps } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
 
@@ -8,7 +8,7 @@ export const columns: TableProps['columns'] = [
   { key: 'creator', title: '创建人', dataIndex: 'creator', width: 100 },
   { key: 'createTime', title: '创建时间', dataIndex: 'createTime', width: 180 },
   { key: 'auditstate', title: '审核状态', dataIndex: 'auditstate', width: 100 },
-  { key: 'actions', title: '操作', dataIndex: 'actions', width: 180 },
+  { key: 'actions', title: '操作', dataIndex: 'actions', width: 100 },
 ]
 
 export const useTable = (filterFormRef: Ref<FormInstance | null>) => {

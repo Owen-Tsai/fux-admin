@@ -47,15 +47,6 @@
         </ARow>
         <ARow>
           <ACol :span="12">
-            <AFormItem label="是否上架移动端" name="isInMobile">
-              <ARadioGroup
-                v-model:value="formData.isInMobile"
-                :options="infraBooleanString"
-                option-type="button"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol :span="12">
             <AFormItem label="是否需要审核" name="isAudit">
               <ARadioGroup
                 v-model:value="formData.isAudit"

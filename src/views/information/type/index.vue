@@ -59,10 +59,10 @@
             :pagination="false"
           >
             <template #bodyCell="scope: TableScope<InformationTypeVO>">
-              <template v-if="scope?.column.key === 'isInMobile'">
+              <template v-if="scope?.column.key === 'isAudit'">
                 <ASpace direction="vertical">
                   <ASwitch
-                    v-model:checked="scope.record.isInMobile"
+                    v-model:checked="scope.record.isAudit"
                     checked-children="是"
                     un-checked-children="否"
                     @change="onChange(scope.record)"

@@ -2,7 +2,7 @@
   <div class="view">
     <ARow :gutter="24">
       <ACol :span="24">
-        <ACard v-if="permission.has('system:info-list:query')" class="mb-4">
+        <ACard v-if="permission.has('system:info-audit:query')" class="mb-4">
           <AForm ref="filterFormRef" :model="queryParams" class="dense-form">
             <ARow :gutter="24">
               <ACol :span="24" :lg="8">
@@ -35,20 +35,9 @@
       </ACol>
 
       <ACol :span="24">
-        <ACard title="信息资讯" class="flex-1">
+        <ACard title="待审核资讯" class="flex-1">
           <template #extra>
             <AFlex :gap="8">
-              <AButton
-                type="primary"
-                v-if="permission.has('system:info-list:create')"
-                :loading="pending"
-                @click="onEdit()"
-              >
-                <template #icon>
-                  <PlusOutlined />
-                </template>
-                新增
-              </AButton>
               <ATooltip title="重新载入">
                 <AButton type="text" :loading="pending" @click="execute">
                   <template #icon>
@@ -68,13 +57,10 @@
           >
             <template #bodyCell="scope: TableScope<InformationVO>">
               <template v-if="scope?.column.key === 'title'">
-                {{ scope.text.length > 44 ? scope.text.substring(0, 43) + '...' : scope.text }}
+                {{ scope.text.length > 46 ? scope.text.substring(0, 45) + '...' : scope.text }}
               </template>
               <template v-if="scope?.column.key === 'createTime'">
                 {{ dayjs(scope.text).format('YYYY-MM-DD HH:mm') }}
-              </template>
-              <template v-if="scope?.column.key === 'audittime'">
-                {{ scope.text == null ? '' : dayjs(scope.text).format('YYYY-MM-DD HH:mm') }}
               </template>
               <template v-if="scope?.column.key === 'auditstate'">
                 <DictTag :dict-object="informationStatus" :value="scope.text" />
@@ -82,23 +68,12 @@
               <template v-if="scope?.column.key === 'actions'">
                 <AFlex :gap="16">
                   <ATypographyLink
-                    v-if="permission.has('system:info-list:update')"
-                    @click="onEdit(scope.record)"
+                    v-if="permission.has('system:info-audit:approve')"
+                    @click="onAudit(scope.record)"
                   >
                     <EditOutlined />
-                    修改
+                    审核
                   </ATypographyLink>
-                  <APopconfirm
-                    v-if="permission.has('system:info-list:delete')"
-                    title="确定要删除吗？"
-                    :overlay-inner-style="{ width: '260px' }"
-                    @confirm="onDelete(scope.record!)"
-                  >
-                    <ATypographyLink type="danger">
-                      <DeleteOutlined />
-                      删除
-                    </ATypographyLink>
-                  </APopconfirm>
                 </AFlex>
               </template>
             </template>
@@ -115,7 +90,7 @@ import dayjs from 'dayjs'
 import useDict from '@/hooks/use-dict'
 import FormModal from './form.vue'
 import { permission } from '@/hooks/use-permission'
-import { getInfoTyoeTree, type InformationVO } from '@/api/information/list'
+import { getInfoTyoeTree, type InformationVO } from '@/api/information/audit'
 import { useTable, columns } from './use-table'
 import useActions from './use-actions'
 
@@ -128,7 +103,7 @@ const [informationStatus] = useDict('information_status')
 const { data, execute, pending, queryParams, onFilter, onFilterReset, pagination } =
   useTable(filterFormRef)
 
-const { entry, visible, onDelete, onEdit } = useActions(execute)
+const { entry, visible, onAudit } = useActions()
 
 getInfoTyoeTree().then((res) => {
   treeData.value = res

@@ -42,7 +42,7 @@ export const createInfoType = (data: InformationTypeVO) => {
 
 export const updateInfoType = (data: InformationTypeVO) => {
   return request.put({
-    url: `${prefix}/update`,
+    url: `${prefix}/update-info-type`,
     data,
   })
 }
