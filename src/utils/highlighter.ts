@@ -1,13 +1,25 @@
-import {
-  createHighlighter,
-  type HighlighterGeneric,
-  type BundledLanguage,
-  type BundledTheme,
-} from 'shiki'
+import { createHighlighterCore } from 'shiki'
+import vitesseLight from '@shikijs/themes/vitesse-light'
+import vitesseDark from '@shikijs/themes/vitesse-dark'
+import { createJavaScriptRegexEngine } from 'shiki/engine/javascript'
+import useAppStore from '@/stores/app'
 
-const highlighter: HighlighterGeneric<BundledLanguage, BundledTheme> = await createHighlighter({
-  themes: ['vitesse-light', 'vitesse-dark'],
-  langs: ['json', 'js', 'vue', 'ts', 'tsx', 'jsx', 'sql', 'xml', 'java', 'txt'],
+const jsEngine = createJavaScriptRegexEngine()
+
+const highlighterPromise = createHighlighterCore({
+  themes: [vitesseLight, vitesseDark],
+  langs: [import('@shikijs/langs/json')],
+  engine: jsEngine,
 })
 
-export default highlighter
+const highlightCode = async (code: string, lang: string) => {
+  const { isDark } = storeToRefs(useAppStore())
+
+  const highlighter = await highlighterPromise
+  return highlighter.codeToHtml(code, {
+    lang,
+    theme: isDark.value ? 'vitesse-dark' : 'vitesse-light',
+  })
+}
+
+export default highlightCode

@@ -1,132 +1,81 @@
+<script setup lang="ts">
+import type { LoginLogVO } from '@/api/system/log/login-log'
+import { columns, useTable } from './use-table'
+import cn from 'classnames'
+import dayjs from 'dayjs'
+import Detail from './detail.vue'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
+
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const detailRef = useTemplateRef<InstanceType<typeof Detail>>('detailRef')
+
+const { permission } = usePermission()
+const { data, pending, query, onQueryChange, onPageChange, pagination } = useTable(queryForm)
+
+const expanded = ref(false)
+const [loginType] = useDict('system_login_type')
+</script>
+
 <template>
   <div class="view">
-    <ACard v-if="permission.has('system:operate-log:query')" class="mb-4">
-      <AForm
-        ref="filterForm"
-        :label-col="{ span: 6 }"
-        class="dense-form"
-        :class="{ expanded: filterExpanded }"
-        :model="queryParams"
+    <TCard v-if="permission.has('system:login-log:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4 w-full"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
       >
-        <ARow :gutter="[0, 16]">
-          <ACol :lg="8" :span="24">
-            <AFormItem label="用户账号" name="username">
-              <AInput
-                v-model:value="queryParams.username"
-                placeholder="请输入用户账号"
-                allow-clear
-              />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="8" :span="24">
-            <AFormItem label="登录地址" name="userIp">
-              <AInput v-model:value="queryParams.userIp" placeholder="请输入登录地址" allow-clear />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="登录日期" name="createTime">
-              <ARangePicker
-                v-model:value="queryParams.createTime"
-                value-format="YYYY-MM-DD HH:mm:ss"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="{ span: 8, offset: filterExpanded ? 16 : 0 }" :span="24">
-            <AFlex justify="end" align="center" :gap="16">
-              <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-              <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-              <ATypographyLink @click="toggle()">
-                {{ filterExpanded ? '收起' : '展开' }}
-                <DownOutlined :class="{ 'rotate-180': filterExpanded }" />
-              </ATypographyLink>
-            </AFlex>
-          </ACol>
-        </ARow>
-      </AForm>
-    </ACard>
+        <TFormItem label="用户账号" name="username" class="col">
+          <TInput v-model:value="query.username" placeholder="请输入用户账号" clearable />
+        </TFormItem>
+        <TFormItem label="登录地址" name="userIp" class="col">
+          <TInput v-model:value="query.userIp" placeholder="请输入登录地址" clearable />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="登录日期" name="createTime" class="col">
+          <TDateRangePicker
+            v-model:value="query.createTime"
+            placeholder="请选择登录日期"
+            clearable
+          />
+        </TFormItem>
+        <QueryActions v-model:expanded="expanded" :class="cn('col', { 'ml-2/3': expanded })" />
+      </TForm>
+    </TCard>
 
-    <ACard title="登录日志">
-      <template #extra>
-        <AFlex :gap="8">
-          <ATooltip v-if="permission.has('system:operate-log:export')" title="导出">
-            <AButton type="text" :loading="pending">
+    <TCard title="登录日志">
+      <TTable
+        :data="data?.list"
+        row-key="id"
+        :columns="columns"
+        :pagination="pagination"
+        :loading="pending"
+        @page-change="onPageChange"
+      >
+        <template #logType="{ row }: TableScope<LoginLogVO>">
+          {{ loginType.find((e) => e.value === row.logType)?.label }}
+        </template>
+        <template #result="{ row }: TableScope<LoginLogVO>">
+          <TTag v-if="row.result === 0" theme="success" variant="light-outline">成功</TTag>
+          <TTag v-else theme="danger" variant="light-outline">失败</TTag>
+        </template>
+        <template #createTime="{ row }: TableScope<LoginLogVO>">
+          {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template #actions="{ row }: TableScope<LoginLogVO>">
+          <TTooltip content="查看详情">
+            <TButton shape="square" theme="primary" variant="text" @click="detailRef?.open(row)">
               <template #icon>
-                <ExportOutlined />
+                <TIcon name="browse" />
               </template>
-            </AButton>
-          </ATooltip>
-          <ATooltip title="重新载入">
-            <AButton type="text" :loading="pending" @click="execute">
-              <template #icon>
-                <ReloadOutlined />
-              </template>
-            </AButton>
-          </ATooltip>
-        </AFlex>
-      </template>
+            </TButton>
+          </TTooltip>
+        </template>
+      </TTable>
+    </TCard>
 
-      <div class="overflow-x-auto">
-        <ATable
-          :columns="columns"
-          :data-source="data?.list"
-          :loading="pending"
-          :pagination="pagination"
-          @change="onChange"
-        >
-          <template #bodyCell="scope: TableScope<LoginLogVO>">
-            <template v-if="scope?.column.dataIndex === 'logType'">
-              {{ systemLoginType.find((e) => e.value === scope.text)?.label }}
-            </template>
-            <template v-if="scope?.column.dataIndex === 'result'">
-              <ATag v-if="scope?.text === 0" color="success">成功</ATag>
-              <ATag v-else color="error">失败</ATag>
-            </template>
-            <template v-if="scope?.column.dataIndex === 'createTime'">
-              {{ dayjs(scope.text).format('YYYY-MM-DD HH:mm:ss') }}
-            </template>
-            <template v-if="scope?.column.dataIndex === 'duration'">{{ scope.text }} ms</template>
-            <template v-if="scope!.column.title === '操作'">
-              <ATypographyLink @click="openDetail(scope!.record)">
-                <UnorderedListOutlined />
-                详情
-              </ATypographyLink>
-            </template>
-          </template>
-        </ATable>
-      </div>
-    </ACard>
-
-    <ADrawer v-model:open="visible" width="50%" title="日志详情">
-      <DetailPanel :entry="entry!" />
-    </ADrawer>
+    <Detail ref="detailRef" />
   </div>
 </template>
-
-<script lang="ts" setup>
-import dayjs from 'dayjs'
-import useDict from '@/hooks/use-dict'
-import { permission } from '@/hooks/use-permission'
-import { columns, useTable } from './use-table'
-import DetailPanel from './detail.vue'
-import type { FormInstance } from 'ant-design-vue'
-import type { LoginLogVO } from '@/api/system/login-log'
-
-const filterForm = ref<FormInstance>()
-
-const [filterExpanded, toggle] = useToggle(false)
-
-const [systemLoginType] = useDict('system_login_type')
-
-const { data, pending, execute, queryParams, onFilter, onChange, onFilterReset, pagination } =
-  useTable(filterForm)
-
-const entry = ref<LoginLogVO>()
-const visible = ref(false)
-
-const openDetail = (row: LoginLogVO) => {
-  entry.value = row
-  visible.value = true
-}
-
-defineOptions({ name: 'SystemLoginLog' })
-</script>

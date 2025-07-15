@@ -1,0 +1,27 @@
+<template>
+  <TInput
+    v-model:value="model"
+    :align="widget.props.align"
+    :default-value="widget.props.defaultValue"
+    :clearable="widget.props.allowClear"
+    :disabled="widget.props.disabled"
+    :placeholder="widget.props.placeholder"
+    :maxlength="widget.props.maxlength"
+    :show-limit-number="widget.props.showCount"
+  >
+    <template #prefix-icon v-if="widget.props.prefixIcon">
+      <TIcon :name="widget.props.prefixIcon" />
+    </template>
+  </TInput>
+</template>
+
+<script setup lang="ts">
+import { useModel } from '@fusionx/core/hooks'
+import type { WidgetMap } from '@fusionx/core/types'
+
+const { widget } = defineProps<{
+  widget: WidgetMap['input']
+}>()
+
+const model = useModel(widget)
+</script>

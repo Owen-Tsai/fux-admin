@@ -1,50 +1,45 @@
-import useRequest from '@/hooks/use-request'
-import type { TableProps, FormInstance, TablePaginationConfig } from 'ant-design-vue'
-import { getLoginLogPage, type ListQueryParams } from '@/api/system/login-log'
+import { getLoginLogPage, type ListQueryParams } from '@/api/system/log/login-log'
+import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { key: 'id', title: '日志编号', dataIndex: 'id', width: 120 },
-  { key: 'logType', title: '操作类型', dataIndex: 'logType', width: 120 },
-  { key: 'username', title: '用户账号', dataIndex: 'username' },
-  { key: 'userIp', title: '登录地址', dataIndex: 'userIp' },
-  { key: 'result', title: '登录结果', dataIndex: 'result', width: 120 },
-  { key: 'startTime', title: '操作时间', dataIndex: 'createTime', width: 180 },
-  { key: 'actions', title: '操作', width: 120 },
+  { colKey: 'id', title: '日志编号', width: 120 },
+  { colKey: 'logType', title: '操作类型', width: 120 },
+  { colKey: 'username', title: '用户账号' },
+  { colKey: 'userIp', title: '登录地址', width: 140 },
+  { colKey: 'result', title: '登录结果', width: 120 },
+  { colKey: 'createTime', title: '操作时间', width: 180 },
+  { colKey: 'actions', title: '操作', width: 120 },
 ]
 
-export const useTable = (formRef: Ref<FormInstance | undefined>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const query = ref<ListQueryParams>({
+    pageNo: 1,
+    pageSize: 10,
+    createTime: [],
+  })
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
-    total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
-  }))
-
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
-
-    execute()
-  }
-
-  const { data, pending, execute } = useRequest(() => getLoginLogPage(queryParams.value), {
+  const { data, pending, execute } = useRequest(() => getLoginLogPage(query.value), {
     immediate: true,
   })
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
+    total: data.value?.total,
+  }))
+
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
+
     execute()
   }
 
-  const onFilterReset = () => {
-    queryParams.value.pageNo = 1
-    formRef.value?.resetFields()
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
@@ -52,10 +47,9 @@ export const useTable = (formRef: Ref<FormInstance | undefined>) => {
     data,
     pending,
     execute,
-    queryParams,
-    onFilter,
-    onFilterReset,
+    query,
+    onQueryChange,
     pagination,
-    onChange,
+    onPageChange,
   }
 }

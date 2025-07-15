@@ -9,7 +9,7 @@ export type DataSourceVO = {
   createTime?: Date
 }
 
-const url = '/admin-api/infra/data-source-config'
+const url = '/infra/data-source-config'
 
 export const getDataSourceList = () => {
   return request.get<DataSourceVO[]>({

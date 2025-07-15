@@ -1,141 +1,161 @@
-<template>
-  <div class="view">
-    <ARow :gutter="24">
-      <ACol :span="24">
-        <ACard v-if="permission.has('system:menu:query')" class="mb-4">
-          <AForm ref="filterFormRef" :model="queryParams" class="dense-form">
-            <ARow :gutter="24">
-              <ACol :span="24" :lg="8">
-                <AFormItem label="菜单名称" name="name">
-                  <AInput v-model:value="queryParams.name" placeholder="请输入菜单名称" />
-                </AFormItem>
-              </ACol>
-              <ACol :span="24" :lg="8">
-                <AFormItem label="菜单状态" name="status">
-                  <ASelect
-                    v-model:value="queryParams.status"
-                    :options="commonStatus"
-                    placeholder="请选择菜单状态"
-                  />
-                </AFormItem>
-              </ACol>
-              <ACol :span="24" :lg="8">
-                <AFlex justify="end" align="center" :gap="16">
-                  <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-                  <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-                </AFlex>
-              </ACol>
-            </ARow>
-          </AForm>
-        </ACard>
-      </ACol>
-
-      <ACol :span="24">
-        <ACard title="菜单管理" class="flex-1">
-          <template #extra>
-            <AFlex :gap="8">
-              <AButton
-                v-if="permission.has('system:menu:create')"
-                type="primary"
-                :loading="pending"
-                @click="modal?.open('create')"
-              >
-                <template #icon>
-                  <PlusOutlined />
-                </template>
-                新增
-              </AButton>
-              <ATooltip title="重新载入">
-                <AButton type="text" :loading="pending" @click="execute">
-                  <template #icon>
-                    <ReloadOutlined />
-                  </template>
-                </AButton>
-              </ATooltip>
-              <ATooltip title="刷新菜单缓存">
-                <AButton type="text" :loading="pending" @click="onClearCache">
-                  <template #icon>
-                    <RetweetOutlined />
-                  </template>
-                </AButton>
-              </ATooltip>
-            </AFlex>
-          </template>
-
-          <ATable
-            :data-source="data"
-            :columns="columns"
-            row-key="id"
-            :scroll="{ x: 1400 }"
-            :loading="pending"
-            :sticky="{ offsetHeader: 90 }"
-            :pagination="false"
-          >
-            <template #bodyCell="scope: TableScope<MenuVO>">
-              <template v-if="scope?.column.key === 'type'">
-                <ATag color="processing">
-                  {{ menuTypes.find((e) => e.value === scope.record.type)?.label }}
-                </ATag>
-              </template>
-              <template v-if="scope?.column.key === 'status'">
-                <DictTag :dict-object="commonStatus" :value="scope.text" />
-              </template>
-              <template v-if="scope?.column.key === 'actions'">
-                <AFlex :gap="16">
-                  <ATypographyLink
-                    v-if="permission.has('system:menu:update')"
-                    @click="modal?.open('update', scope.record.id)"
-                  >
-                    <EditOutlined />
-                    修改
-                  </ATypographyLink>
-                  <ATypographyLink
-                    v-if="permission.has('system:menu:create')"
-                    @click="modal?.open('create', scope.record.id)"
-                  >
-                    <PlusOutlined />
-                    新增
-                  </ATypographyLink>
-                  <APopconfirm
-                    v-if="permission.has('system:menu:delete')"
-                    title="删除该菜单项将一并删除该菜单下的所有子菜单，确定要删除吗？"
-                    :overlay-inner-style="{ width: '260px' }"
-                    @confirm="onDelete(scope.record!)"
-                  >
-                    <ATypographyLink type="danger">
-                      <DeleteOutlined />
-                      删除
-                    </ATypographyLink>
-                  </APopconfirm>
-                </AFlex>
-              </template>
-            </template>
-          </ATable>
-        </ACard>
-      </ACol>
-    </ARow>
-
-    <FormModal ref="modal" :tree-data="data" @success="execute" />
-  </div>
-</template>
-
-<script lang="ts" setup>
-import useDict from '@/hooks/use-dict'
-import { permission } from '@/hooks/use-permission'
-import { menuTypes } from '@/utils/constants'
+<script setup lang="ts">
+import { MENU_TYPES } from '@/utils/constant'
 import type { MenuVO } from '@/api/system/menu'
 import { useTable, columns } from './use-table'
-import useActions from './use-actions'
-import FormModal from './form.vue'
+import Form from './form.vue'
+import type { FormInstanceFunctions, EnhancedTableInstanceFunctions } from 'tdesign-vue-next'
 
-const filterFormRef = ref()
-const modal = useTemplateRef('modal')
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+const tableRef = useTemplateRef<EnhancedTableInstanceFunctions>('tableRef')
 
-const [commonStatus] = useDict('common_status')
+const [statusOpts] = useDict('common_status')
 
-const { data, execute, pending, queryParams, onFilter, onFilterReset } = useTable(filterFormRef)
+const { permission } = usePermission()
+const { query, onQueryChange, data, execute, onDelete, onClearCache, pending } = useTable(queryForm)
 
-const { onClearCache, onDelete } = useActions(execute)
+const [tableExpanded, toggle] = useToggle(false)
+
+const toggleTableExpanded = () => {
+  toggle()
+  if (tableExpanded.value) {
+    tableRef.value?.expandAll()
+  } else {
+    tableRef.value?.foldAll()
+  }
+}
 
 defineOptions({ name: 'SystemMenu' })
 </script>
+
+<template>
+  <div class="view">
+    <TCard v-if="permission.has('system:menu:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
+      >
+        <TFormItem label="菜单名称" name="name" class="col">
+          <TInput v-model:value="query.name" placeholder="请输入菜单名称" />
+        </TFormItem>
+        <TFormItem label="菜单状态" name="status" class="col">
+          <TSelect v-model:value="query.status" :options="statusOpts" clearable />
+        </TFormItem>
+        <QueryActions :expanded="null" class="col" />
+      </TForm>
+    </TCard>
+
+    <TCard title="后台菜单" bordered>
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TButton
+            v-if="permission.has('system:menu:create')"
+            theme="primary"
+            :loading="pending"
+            @click="formRef?.open('create')"
+          >
+            <template #icon>
+              <TIcon name="add" />
+            </template>
+            新增
+          </TButton>
+
+          <TTooltip content="全部展开/折叠">
+            <TButton
+              shape="square"
+              variant="text"
+              :loading="pending"
+              @click="toggleTableExpanded()"
+            >
+              <template #icon>
+                <TIcon name="unfold-less" />
+              </template>
+            </TButton>
+          </TTooltip>
+
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" :loading="pending" @click="execute()">
+              <template #icon>
+                <TIcon name="refresh" />
+              </template>
+            </TButton>
+          </TTooltip>
+
+          <TTooltip content="清除菜单缓存">
+            <TButton shape="square" variant="text" :loading="pending" @click="onClearCache()">
+              <template #icon>
+                <TIcon name="delete-time" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </div>
+      </template>
+
+      <TEnhancedTable
+        ref="tableRef"
+        :data="data"
+        :columns="columns"
+        row-key="id"
+        :tree="{ defaultExpandAll: true }"
+        :loading="pending"
+      >
+        <template #type="{ row }: TableScope<MenuVO>">
+          <TTag theme="primary" variant="light-outline">
+            {{ MENU_TYPES.find((e) => e.value === row.type)?.label }}
+          </TTag>
+        </template>
+        <template #status="{ row }">
+          <DictTag :dict-data="statusOpts" :value="row.status" />
+        </template>
+        <template #actions="{ row }: TableScope<MenuVO>">
+          <div class="flex gap-2">
+            <TTooltip content="编辑">
+              <TButton
+                shape="square"
+                theme="primary"
+                variant="text"
+                @click="formRef?.open('update', row.id)"
+              >
+                <template #icon>
+                  <TIcon name="edit-2" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TTooltip content="新增下一级">
+              <TButton
+                shape="square"
+                theme="primary"
+                variant="text"
+                @click="formRef?.open('create', row.id)"
+              >
+                <template #icon>
+                  <TIcon name="add" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TTooltip content="删除">
+              <TPopconfirm
+                content="确定删除吗？该操作无法撤销"
+                theme="danger"
+                @confirm="onDelete(row.id!)"
+              >
+                <TButton shape="square" theme="danger" variant="text">
+                  <template #icon>
+                    <TIcon name="delete" />
+                  </template>
+                </TButton>
+              </TPopconfirm>
+            </TTooltip>
+          </div>
+        </template>
+      </TEnhancedTable>
+    </TCard>
+
+    <Form ref="formRef" :tree-data="data" @success="execute()" />
+  </div>
+</template>

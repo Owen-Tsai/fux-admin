@@ -1,52 +1,73 @@
 import useRequest from '@/hooks/use-request'
-import { getRolesList, type ListQueryParams } from '@/api/system/role'
-import type { FormInstance, TableProps } from 'ant-design-vue'
-import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
+import { getRolesList, deleteRole, type ListQueryParams } from '@/api/system/role'
+import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { key: 'id', title: '编号', dataIndex: 'id', width: 60 },
-  { key: 'name', title: '角色名称', dataIndex: 'name' },
-  { key: 'code', title: '角色标识', dataIndex: 'code' },
-  { key: 'status', title: '状态', dataIndex: 'status' },
-  { key: 'remark', title: '备注', dataIndex: 'remark' },
-  { key: 'createTime', title: '创建时间', dataIndex: 'createTime' },
-  { key: 'actions', title: '操作', dataIndex: 'actions', width: 240 },
+  { colKey: 'id', title: '编号', width: 80 },
+  { colKey: 'name', title: '角色名称' },
+  { colKey: 'code', title: '角色标识' },
+  { colKey: 'status', title: '状态' },
+  { colKey: 'remark', title: '备注' },
+  { colKey: 'createTime', title: '创建时间' },
+  { colKey: 'actions', title: '操作', width: 120 },
 ]
 
-export const useTable = (filterFormRef: Ref<FormInstance | undefined>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (filterFormRef: Ref<FormInstanceFunctions | null>) => {
+  const loading = ref(false)
+  const message = useMessage()
+  const dialog = useDialog()
 
-  const { data, pending, execute } = useRequest(() => getRolesList(queryParams.value), {
+  const query = ref<ListQueryParams>({
+    createTime: [],
+    pageNo: 1,
+    pageSize: 10,
+  })
+
+  const { data, pending, execute } = useRequest(() => getRolesList(query.value), {
     immediate: true,
   })
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
 
     execute()
   }
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      filterFormRef.value?.reset()
+    }
     execute()
   }
 
-  const onFilterReset = () => {
-    filterFormRef.value?.resetFields()
-    queryParams.value.pageNo = 1
-    execute()
+  const onDelete = async (id: number) => {
+    loading.value = true
+    const instance = dialog.confirm({
+      theme: 'danger',
+      showOverlay: true,
+      header: '删除角色',
+      body: '确定要删除角色吗？已经具有被分配该角色的用户使用系统时可能受影响',
+      confirmLoading: loading.value,
+      async onConfirm() {
+        try {
+          await deleteRole(id)
+          instance.destroy()
+          execute()
+          message.success('删除成功')
+        } catch (e) {
+        } finally {
+          loading.value = false
+        }
+      },
+    })
   }
 
   return {
@@ -54,9 +75,9 @@ export const useTable = (filterFormRef: Ref<FormInstance | undefined>) => {
     pending,
     execute,
     pagination,
-    queryParams,
-    onFilter,
-    onFilterReset,
-    onChange,
+    query,
+    onQueryChange,
+    onPageChange,
+    onDelete,
   }
 }

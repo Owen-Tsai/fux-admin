@@ -1,0 +1,106 @@
+<template>
+  <TRadioGroup v-model:value="active" variant="default-filled">
+    <TRadioButton :value="0">审核设置</TRadioButton>
+    <TRadioButton :value="1">字段控制设置</TRadioButton>
+  </TRadioGroup>
+  <TForm v-show="active === 0" :data="node" class="!mt-4">
+    <TFormItem
+      label="审核人"
+      name="actor.strategy"
+      :rules="[{ required: true, message: '请选择审核人' }]"
+    >
+      <TSelect
+        v-model="node.actor.strategy"
+        :options="auditActorStrategyOpts"
+        @change="onStrategyChange"
+      />
+    </TFormItem>
+    <TFormItem
+      v-if="node.actor.strategy === TaskNodeActorStrategy.ROLE"
+      label="选择角色"
+      name="actor.value"
+      :rules="[{ required: true, message: '请选择角色' }]"
+    >
+      <TSelect
+        v-model="node.actor.value"
+        :options="roleOptions"
+        :loading="pending"
+        placeholder="请选择角色"
+        :keys="{ label: 'name', value: 'id' }"
+        :filterable="true"
+        :clearable="true"
+        multiple
+        @change="onRoleChange"
+      />
+    </TFormItem>
+    <TFormItem
+      label="会签"
+      name="joint"
+      help="会签时，所有审核人员都需要审核通过后才可继续下一任务环节"
+    >
+      <TSwitch v-model:value="node.joint" />
+    </TFormItem>
+  </TForm>
+  <TForm v-show="active === 1" :data="node.fieldsOverride">
+    <div v-for="(field, index) in node.fieldsOverride" :key="index" class="flex gap-2">
+      <TFormItem label="字段名" extra="字段的 props.field.name">
+        <TInput v-model:value="field.name" />
+      </TFormItem>
+      <TFormItem label="控制方式">
+        <TSelect v-model="field.config" :options="fieldOverrideOpts" />
+      </TFormItem>
+      <TButton
+        shape="square"
+        variant="text"
+        theme="danger"
+        @click="node.fieldsOverride.splice(index, 1)"
+      >
+        <template #icon>
+          <TIcon name="delete" />
+        </template>
+      </TButton>
+    </div>
+    <TFormItem>
+      <TButton block theme="default" @click="node.fieldsOverride.push({})">添加字段配置</TButton>
+    </TFormItem>
+  </TForm>
+</template>
+
+<script setup lang="ts">
+import { TaskNodeActorStrategy } from '@fusionx/core/utils'
+import { getSimpleAuditList } from '@/api/system/role'
+import type { TaskNodePropsMap } from '@fusionx/core/types'
+
+const auditActorStrategyOpts = [
+  { label: '指定角色', value: TaskNodeActorStrategy.ROLE },
+  { label: '所属单位', value: TaskNodeActorStrategy.ORG },
+]
+
+const fieldOverrideOpts = [
+  { label: '可见', value: 'shown' },
+  { label: '隐藏', value: 'hidden' },
+  { label: '只读', value: 'readonly' },
+  { label: '可编辑', value: 'writable' },
+]
+
+const node = defineModel<TaskNodePropsMap['audit']>('node', { required: true })
+
+const active = ref(0)
+
+const { data: roleOptions, pending } = useRequest(getSimpleAuditList, { immediate: true })
+
+const onStrategyChange = () => {
+  const strategy = node.value.actor.strategy
+  if (strategy === TaskNodeActorStrategy.ORG) {
+    node.value.actor.value = ['org']
+    node.value.actor.text = '发起人所属单位'
+  } else {
+    node.value.actor.value = []
+  }
+}
+
+const onRoleChange = () => {
+  const first = node.value.actor.value?.[0]
+  node.value.actor.text = roleOptions.value?.find((u) => u.id === first)?.name
+}
+</script>

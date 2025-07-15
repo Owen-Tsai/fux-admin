@@ -81,7 +81,7 @@ export type CodePreviewVO = Array<{
   code: string
 }>
 
-const url = '/admin-api/infra/codegen'
+const url = '/infra/codegen'
 export const getTableDefList = (params: TableQueryParams) => {
   return request.get<TableDefListVO>({
     url: `${url}/db/table/list`,

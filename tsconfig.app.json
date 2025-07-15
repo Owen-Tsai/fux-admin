@@ -5,19 +5,17 @@
     "src/**/*",
     "src/**/*.vue",
     "src/**/*.ts",
-    "src/**/*.d.ts",
-    "auto-imports.d.ts"
+    "src/**/*.tsx",
+    "auto-imports.d.ts",
+    "components.d.ts"
   ],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
-    "lib": ["DOM", "ESNext"],
-    "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "noImplicitAny": false,
-    "baseUrl": ".",
+    "jsx": "preserve",
     "paths": {
       "@/*": ["./src/*"],
-      "~img/*": ["./src/assets/img"]
+      "@fusionx/core/*": ["./src/components/_fux-core/*"]
     }
   }
 }

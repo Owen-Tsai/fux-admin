@@ -1,16 +1,25 @@
-type PaginatedList<T> = {
-  total: number
-  list: Array<T>
-}
+export {}
 
-type TableScope<T> =
-  | {
-      column: import('ant-design-vue').TableColumnType<T> & {
-        key?: import('type-fest').LiteralUnion<keyof T, string> | number
-      }
-      record: Partial<T>
-      index: number
-      text: T<keyof T>
-      value: any
+import type { TableProps } from 'tdesign-vue-next'
+
+declare global {
+  type PaginatedList<T> = {
+    total: number
+    list: Array<T>
+  }
+
+  type CommonQueryParams = {
+    pageSize?: number
+    pageNo?: number
+    createTime?: string[] | number[] | Date[]
+  }
+
+  type TableScope<T> = {
+    row: {
+      [x in keyof T]: T[x]
     }
-  | undefined
+    col: undefined | Exclude<TableProps['columns'], undefined>[number]
+    rowIndex: number
+    colIndex: number
+  }
+}

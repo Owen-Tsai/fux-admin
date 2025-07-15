@@ -1,38 +1,27 @@
 <template>
   <div class="view">
-    <ARow :gutter="[16, 16]">
-      <ACol :span="24">
-        <ARow :gutter="16">
-          <ACol :span="16">
-            <OrgCard />
-          </ACol>
-          <ACol :span="8">
-            <StatCard />
-          </ACol>
-        </ARow>
-      </ACol>
-      <ACol :span="24" :lg="{ span: 16 }">
-        <ChartCard />
-        <!-- <TodosCard class="mt-4" /> -->
-      </ACol>
-      <ACol :span="24" :lg="{ span: 8 }">
-        <QuickActions />
-        <NoticeCard class="mt-4" />
-        <!--        <HelperSection class="mt-4" />-->
-      </ACol>
-    </ARow>
+    <div class="flex gap-6 w-full flex-wrap lg:flex-nowrap">
+      <div class="w-full lg:w-2/3">
+        <Profile />
+        <PolicyCalendar class="!mt-4" />
+        <TalentChart class="!mt-4" />
+      </div>
+      <div class="w-full lg:w-1/3">
+        <Stats />
+        <FrequentActions class="!mt-4" />
+        <Notifications class="!mt-4" />
+        <Help class="!mt-4" />
+      </div>
+    </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import UserProfile from './user-profile.vue'
-import QuickActions from './actions.vue'
-import ChartCard from './chart.vue'
-import NoticeCard from './notifications.vue'
-import TodosCard from './todos.vue'
-import HelperSection from './helper.vue'
-import OrgCard from './org-card.vue'
-import StatCard from './stat-card.vue'
-
-defineOptions({ name: 'index' })
+<script setup lang="ts">
+import Profile from './profile.vue'
+import PolicyCalendar from './calendar.vue'
+import Stats from './stats.vue'
+import FrequentActions from './frequent-actions.vue'
+import Notifications from './notifications.vue'
+import TalentChart from './talent-chart.vue'
+import Help from './help.vue'
 </script>

@@ -20,7 +20,7 @@ export type ProfileVO = {
   username?: string
 }
 
-const prefix = '/admin-api/system/user/profile'
+const prefix = '/system/user/profile'
 
 export const getProfile = () => {
   return request.get<ProfileVO>({

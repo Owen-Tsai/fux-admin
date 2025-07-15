@@ -5,30 +5,20 @@ export default defineConfig({
   transformers: [transformerDirectives()],
   theme: {
     colors: {},
-    breakpoints: {
-      sm: '576px',
-      md: '768px',
-      lg: '992px',
-      xl: '1200px',
-      xxl: '1600px',
-    },
   },
   rules: [
-    [/^size-(\d+)px/, ([, d]) => ({ height: `${d}px`, width: `${d}px` })],
-    [/^size-(\d+)%/, ([, d]) => ({ height: `${d}%`, width: `${d}%` })],
-    [/^text-muted/, () => ({ color: 'var(--color-text-tertiary)' })],
     [
-      /^radius-b/,
-      () => ({
-        'border-bottom-left-radius': 'var(--border-radius)',
-        'border-bottom-right-radius': 'var(--border-radius)',
+      /^radius-(.*)-b/,
+      ([, v]) => ({
+        'border-bottom-left-radius': `var(--td-radius-${v})`,
+        'border-bottom-right-radius': `var(--td-radius-${v})`,
       }),
     ],
     [
-      /^radius-t/,
-      () => ({
-        'border-top-left-radius': 'var(--border-radius)',
-        'border-top-right-radius': 'var(--border-radius)',
+      /^radius-(.*)-t/,
+      ([, v]) => ({
+        'border-top-left-radius': `var(--td-radius-${v})`,
+        'border-top-right-radius': `var(--td-radius-${v})`,
       }),
     ],
   ],
@@ -38,6 +28,8 @@ export default defineConfig({
       'flex-center': 'flex items-center justify-center',
       'flex-center-v': 'flex flex-col items-center justify-center',
       'flex-between': 'flex items-center justify-between',
+      'text-brand': 'text-[var(--td-brand-color)]',
+      'text-secondary': 'text-[var(--td-text-color-secondary)]',
     },
   ],
 })

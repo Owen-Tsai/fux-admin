@@ -19,7 +19,7 @@ export type ListQueryParams = CommonQueryParams & {
   status?: number
 }
 
-const prefix = '/admin-api/system/role'
+const prefix = '/system/role'
 
 export const getSimpleList = () => {
   return request.get<RoleVO[]>({

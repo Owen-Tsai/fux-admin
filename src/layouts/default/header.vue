@@ -1,122 +1,95 @@
 <template>
-  <header class="header">
-    <div class="title-wrapper">
-      <AButton v-if="!screen.lg" type="text" @click="drawerVisible = true">
-        <template #icon>
-          <MenuOutlined />
-        </template>
-      </AButton>
-      <Logo class="logo" type="full" />
+  <THeader class="flex-between px-4 lg:px-6">
+    <!-- logo wrapper -->
+    <div class="flex-center gap-2">
+      <TButton
+        v-if="bps.smallerOrEqual('md').value"
+        theme="default"
+        variant="text"
+        shape="square"
+        :icon="() => h(MenuFoldIcon)"
+        @click="emit('click:drawer')"
+      />
+      <Logo :type="bps.smallerOrEqual('md').value ? 'simple' : 'full'" class="h-8 lg:h-10" />
     </div>
 
-    <div class="actions">
-      <AFlex align="center" :gap="8">
-        <ATooltip title="通知消息" placement="bottom">
-          <AButton type="text">
-            <template #icon>
-              <BellOutlined />
-            </template>
-          </AButton>
-        </ATooltip>
-        <ATooltip :title="themeBtnText" placement="bottom">
-          <AButton type="text" class="ant-btn-icon-only" @click="switchTheme">
-            <ThemeIcon :theme="theme" />
-          </AButton>
-        </ATooltip>
-
-        <ADropdown placement="bottomRight">
-          <div class="flex items-center gap-2 cursor-pointer">
-            <AAvatar :src="user?.avatar" />
-            <div v-if="screen.lg">{{ user?.nickname }}</div>
+    <!-- actions -->
+    <div>
+      <div class="flex items-center gap-2">
+        <TTooltip content="通知消息" placement="bottom">
+          <TButton
+            theme="default"
+            variant="text"
+            shape="square"
+            :icon="() => h(NotificationIcon)"
+          />
+        </TTooltip>
+        <TTooltip :content="isDark ? '亮色模式' : '暗黑模式'">
+          <ThemeToggle />
+        </TTooltip>
+        <TDropdown
+          :options="userDropdownOpts"
+          @click="({ value }) => onDropdownClick(value as string)"
+        >
+          <div
+            class="bg-[var(--td-bg-color-container-hover)] px-2 max-w-140px py-1 flex items-center rounded-lg gap-2 cursor-pointer"
+          >
+            <TAvatar :image="user?.avatar" size="24px" class="flex-none">
+              {{ user?.nickname.substring(0, 2) }}
+            </TAvatar>
+            <span class="truncate">{{ user?.nickname }}</span>
           </div>
-
-          <template #overlay>
-            <AMenu>
-              <AMenuItem v-if="!screen.lg">用户：{{ user?.nickname }}</AMenuItem>
-              <AMenuDivider v-if="!screen.lg" />
-              <AMenuItem>个人设置</AMenuItem>
-              <AMenuDivider />
-              <AMenuItem @click="onClickLogout">退出登录</AMenuItem>
-            </AMenu>
-          </template>
-        </ADropdown>
-      </AFlex>
+        </TDropdown>
+      </div>
     </div>
-
-    <ADrawer
-      v-model:open="drawerVisible"
-      placement="left"
-      :closeable="false"
-      :body-style="{ padding: 0 }"
-      :width="240"
-      :header-style="{ display: 'none' }"
-    >
-      <Menu />
-    </ADrawer>
-  </header>
+  </THeader>
 </template>
 
-<script lang="ts" setup>
-import { Modal } from 'ant-design-vue'
+<script setup lang="ts">
+import { h } from 'vue'
+import { MenuFoldIcon, NotificationIcon } from 'tdesign-icons-vue-next'
+import ThemeToggle from '@/components/_internal/theme-toggle.vue'
+import bps from '@/utils/breakpoints'
 import useAppStore from '@/stores/app'
 import useUserStore from '@/stores/user'
-import useBreakpoint from '@/hooks/use-breakpoint'
-import ThemeIcon from './theme-icon.vue'
-import Menu from './menu.vue'
+import { useRouter } from 'vue-router'
+import type { DropdownProps } from 'tdesign-vue-next'
 
-const drawerVisible = ref(false)
+const { isDark } = storeToRefs(useAppStore())
+const { user } = storeToRefs(useUserStore())
 
-const { theme } = storeToRefs(useAppStore())
-const screen = useBreakpoint()
-const userStore = useUserStore()
-const { setTheme } = useAppStore()
+const { push } = useRouter()
+const dialog = useDialog()
 
-const { user } = toRefs(userStore)
+const emit = defineEmits(['click:drawer'])
 
-const themeBtnText = computed(() => (theme.value === 'light' ? '暗黑模式' : '明亮模式'))
+const userDropdownOpts: DropdownProps['options'] = [
+  { content: '个人设置', value: '/me', divider: true },
+  { content: '注销登录', value: 'logout', theme: 'error' },
+]
 
-const switchTheme = () => {
-  setTheme(theme.value === 'dark' ? 'light' : 'dark')
-}
+const onDropdownClick = (value?: string) => {
+  if (value?.startsWith('http')) {
+    window.open(value, '_blank')
+  } else if (value?.startsWith('/')) {
+    push(value)
+  }
 
-const onClickLogout = () => {
-  Modal.confirm({
-    title: '注销登录',
-    content: '确定注销并退出系统吗',
-    okText: '确定',
-    cancelText: '取消',
-    onOk() {
-      userStore.logout().then(() => {
-        location.reload()
-      })
-    },
-  })
-}
-</script>
-
-<style lang="scss" scoped>
-@use '@/styles/mixins.scss' as *;
-
-header {
-  @apply flex-between px-4 lg:px-6;
-  background: unset;
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--color-border-secondary);
-  position: sticky;
-  top: 0;
-  left: 0;
-  z-index: 20;
-  background-color: var(--color-bg-alt);
-}
-
-.title-wrapper {
-  @apply flex-center;
-  gap: 8px;
-  .logo {
-    height: 40px;
-    border-radius: 6px;
-    user-select: none;
-    -webkit-user-drag: none;
+  // handle commands
+  if (value === 'logout') {
+    dialog.confirm({
+      theme: 'warning',
+      showOverlay: true,
+      header: '注销登录',
+      body: '确定注销登录并退出系统吗？',
+      onConfirm() {
+        useUserStore()
+          .logout()
+          .then(() => {
+            location.reload()
+          })
+      },
+    })
   }
 }
-</style>
+</script>

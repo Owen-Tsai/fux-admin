@@ -1,22 +1,21 @@
-import registerGlobalComponents from '@/plugins/global-components'
-import registerAntd from '@/plugins/ant-design'
-import registerAIKit from '@/plugins/ai-kit'
-import '@/plugins/dayjs'
-
+import 'tdesign-vue-next/dist/reset.css'
+import 'tdesign-vue-next/es/style/index.css'
+import '@/assets/css/index.scss'
 import 'virtual:uno.css'
+import TDesign from 'tdesign-vue-next'
 
-import '@/styles/index.scss'
-
-import App from './app'
+import App from './app.tsx'
 import router from './router'
 import './router/guard'
 
+import registerComponents from './plugins/register.ts'
+
 const app = createApp(App)
 
-registerGlobalComponents(app)
-registerAntd(app)
-registerAIKit(app)
-
+app.use(TDesign)
 app.use(createPinia())
 app.use(router)
+
+registerComponents(app)
+
 app.mount('#app')

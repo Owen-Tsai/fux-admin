@@ -1,185 +1,130 @@
-<template>
-  <div class="view">
-    <ACard v-if="permission.has('system:role:query')" class="mb-4">
-      <AForm
-        ref="filterForm"
-        :label-col="{ span: 6 }"
-        class="dense-form"
-        :class="{ expanded: filterExpanded }"
-        :model="queryParams"
-      >
-        <ARow :gutter="[0, 16]">
-          <ACol :lg="8" :span="24">
-            <AFormItem label="角色名称" name="name">
-              <AInput v-model:value="queryParams.name" placeholder="请输入角色名称" allow-clear />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="8" :span="24">
-            <AFormItem label="角色标识" name="code">
-              <AInput v-model:value="queryParams.code" placeholder="请输入角色标识" allow-clear />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="角色状态" name="status">
-              <ASelect
-                v-model:value="queryParams.status"
-                :options="commonStatus"
-                placeholder="请选择角色状态"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="创建时间" name="createTime">
-              <ARangePicker v-model:value="queryParams.createTime" value-format="YYYY-MM-DD" />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="{ span: 8, offset: filterExpanded ? 8 : 0 }" :span="24">
-            <AFlex justify="end" align="center" :gap="16">
-              <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-              <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-              <ATypographyLink @click="toggle()">
-                {{ filterExpanded ? '收起' : '展开' }}
-                <DownOutlined :class="{ 'rotate-180': filterExpanded }" />
-              </ATypographyLink>
-            </AFlex>
-          </ACol>
-        </ARow>
-      </AForm>
-    </ACard>
-
-    <ACard title="角色列表">
-      <template #extra>
-        <AFlex :gap="8">
-          <AButton
-            v-if="permission.has('system:role:create')"
-            type="primary"
-            :loading="pending"
-            @click="roleModel?.open()"
-          >
-            <template #icon>
-              <PlusOutlined />
-            </template>
-            新增
-          </AButton>
-          <ATooltip v-if="permission.has('system:role:export')" title="导出">
-            <AButton type="text" :loading="pending">
-              <template #icon>
-                <ExportOutlined />
-              </template>
-            </AButton>
-          </ATooltip>
-          <ATooltip title="重新载入">
-            <AButton type="text" :loading="pending" @click="execute">
-              <template #icon>
-                <ReloadOutlined />
-              </template>
-            </AButton>
-          </ATooltip>
-        </AFlex>
-      </template>
-
-      <div class="overflow-x-auto">
-        <ATable
-          :columns="columns"
-          :data-source="data?.list"
-          :loading="pending"
-          :pagination="pagination"
-          @change="onChange"
-        >
-          <template #bodyCell="scope: TableScope<RoleVO>">
-            <template v-if="scope!.column.key === 'status'">
-              <DictTag :dict-object="commonStatus" :value="scope?.text" />
-            </template>
-            <template v-if="scope?.column.key === 'createTime'">
-              {{ dayjs(scope.record.createTime).format('YYYY-MM-DD') }}
-            </template>
-            <template v-if="scope?.column.title === '操作'">
-              <AFlex :gap="16">
-                <ATypographyLink
-                  v-if="permission.has('system:role:update')"
-                  @click="roleModel?.open(scope.record.id)"
-                >
-                  <EditOutlined />
-                  编辑
-                </ATypographyLink>
-                <ADropdown
-                  v-if="
-                    permission.hasOne(
-                      'system:permission:assign-role-menu',
-                      'system:permission:assign-role-data-scope',
-                    )
-                  "
-                >
-                  <ATypographyLink>
-                    <DownOutlined />
-                    权限配置
-                  </ATypographyLink>
-                  <template #overlay>
-                    <AMenu>
-                      <AMenuItem
-                        :disabled="!permission.has('system:permission:assign-role-menu')"
-                        @click="permissionModal!.open(scope.record, 'menu')"
-                      >
-                        菜单权限
-                      </AMenuItem>
-                      <AMenuItem
-                        :disabled="!permission.has('system:permission:assign-role-data-scope')"
-                        @click="permissionModal?.open(scope.record, 'data')"
-                      >
-                        数据权限
-                      </AMenuItem>
-                    </AMenu>
-                  </template>
-                </ADropdown>
-                <APopconfirm
-                  v-if="permission.has('system:role:delete')"
-                  title="此操作不可撤销，确定要删除吗？"
-                  :overlay-style="{ width: '260px' }"
-                  @confirm="onDelete(scope.record)"
-                >
-                  <ATypographyLink type="danger">
-                    <DeleteOutlined />
-                    删除
-                  </ATypographyLink>
-                </APopconfirm>
-              </AFlex>
-            </template>
-          </template>
-        </ATable>
-      </div>
-    </ACard>
-
-    <!-- 编辑角色 -->
-    <FormModal ref="roleModal" @success="execute" />
-    <!-- 编辑角色的菜单权限 -->
-    <PermissionFormModal ref="permissionModal" @success="execute" />
-  </div>
-</template>
-
-<script lang="ts" setup>
+<script setup lang="ts">
 import dayjs from 'dayjs'
-import useDict from '@/hooks/use-dict'
-import { permission } from '@/hooks/use-permission'
-import FormModal from './form.vue'
-import PermissionFormModal from './permission-form.vue'
+import Form from './form.vue'
 import { columns, useTable } from './use-table'
-import useActions from './use-actions'
-import type { FormInstance } from 'ant-design-vue'
+import MenuForm from './menu-form.vue'
+import DataForm from './data-form.vue'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
 import type { RoleVO } from '@/api/system/role'
 
-const filterForm = ref<FormInstance>()
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+const menuForm = useTemplateRef<InstanceType<typeof MenuForm>>('menuForm')
+const dataForm = useTemplateRef<InstanceType<typeof DataForm>>('dataForm')
+const { permission } = usePermission()
+const [statusOpts] = useDict('common_status')
 
-const roleModel = useTemplateRef('roleModal')
-const permissionModal = useTemplateRef('permissionModal')
+const { query, onQueryChange, data, execute, onDelete, onPageChange, pagination, pending } =
+  useTable(queryForm)
 
-const [filterExpanded, toggle] = useToggle(false)
-
-const [commonStatus] = useDict('common_status')
-
-const { data, pending, execute, queryParams, onFilter, onFilterReset, onChange, pagination } =
-  useTable(filterForm)
-
-const { onDelete } = useActions(execute)
+const expanded = ref(false)
 
 defineOptions({ name: 'SystemRole' })
 </script>
+
+<template>
+  <div class="view">
+    <TCard v-if="permission.has('system:role:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
+      >
+        <TFormItem label="角色名称" name="name" class="col">
+          <TInput v-model:value="query.name" placeholder="请输入角色名称" />
+        </TFormItem>
+        <TFormItem label="角色标识" name="code" class="col">
+          <TInput v-model:value="query.code" placeholder="请输入角色标识" />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="状态" name="status" class="col">
+          <TSelect v-model:value="query.status" :options="statusOpts" />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="创建时间" name="createTime" class="col">
+          <TDateRangePicker v-model:value="query.createTime" />
+        </TFormItem>
+        <QueryActions v-model:expanded="expanded" :class="`col ${expanded ? 'ml-1/3' : ''}`" />
+      </TForm>
+    </TCard>
+
+    <TCard title="角色列表" bordered>
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TButton
+            v-if="permission.has('system:role:create')"
+            theme="primary"
+            @click="formRef?.open()"
+          >
+            <template #icon>
+              <TIcon name="add" />
+            </template>
+            新增
+          </TButton>
+
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" @click="execute()">
+              <template #icon>
+                <TIcon name="refresh" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </div>
+      </template>
+
+      <TTable
+        :data="data?.list"
+        row-key="id"
+        :columns="columns"
+        :pagination="pagination"
+        :loading="pending"
+        @page-change="onPageChange"
+      >
+        <template #status="{ row }">
+          <DictTag :value="row.status" :dict-data="statusOpts" />
+        </template>
+        <template #createTime="{ row }">
+          {{ dayjs(row.createTime).format('YYYY-MM-DD') }}
+        </template>
+        <template #actions="{ row }">
+          <div class="flex gap-2">
+            <TTooltip content="编辑">
+              <TButton shape="square" theme="primary" variant="text" @click="formRef?.open(row.id)">
+                <template #icon>
+                  <TIcon name="edit-2" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TDropdown>
+              <TButton shape="square" theme="primary" variant="text">
+                <template #icon>
+                  <TIcon name="unfold-more" />
+                </template>
+              </TButton>
+              <TDropdownMenu>
+                <TDropdownItem
+                  :disabled="!permission.has('system:permission:assign-role-menu')"
+                  @click="menuForm?.open(row)"
+                  >菜单权限</TDropdownItem
+                >
+                <TDropdownItem
+                  :disabled="!permission.has('system:permission:assign-role-data-scope')"
+                  divider
+                  @click="dataForm?.open(row)"
+                  >数据权限</TDropdownItem
+                >
+                <TDropdownItem theme="error" @click="onDelete(row.id!)">删除角色</TDropdownItem>
+              </TDropdownMenu>
+            </TDropdown>
+          </div>
+        </template>
+      </TTable>
+    </TCard>
+
+    <Form ref="formRef" @success="execute" />
+    <MenuForm ref="menuForm" @success="execute" />
+    <DataForm ref="dataForm" @success="execute" />
+  </div>
+</template>

@@ -1,63 +1,94 @@
-import useRequest from '@/hooks/use-request'
-import { getUsers, type ListQueryParams } from '@/api/system/user'
-import type { TableProps, FormInstance } from 'ant-design-vue'
-import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
+import { getUsers, deleteUser, updateUserStatus, type ListQueryParams } from '@/api/system/user'
+import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { key: 'id', title: '编号', dataIndex: 'id', width: 120 },
-  { key: 'username', title: '用户账号', dataIndex: 'username', width: 120 },
-  { key: 'nickname', title: '用户名称', dataIndex: 'nickname', width: 160 },
-  { key: 'deptName', title: '所属部门', dataIndex: 'deptName', width: 120 },
-  { key: 'mobile', title: '已绑定手机', dataIndex: 'mobile' },
-  { key: 'status', title: '状态' },
-  { key: 'createTime', title: '注册时间', dataIndex: 'createTime' },
-  { key: 'actions', title: '操作', fixed: 'right', width: 140 },
+  { colKey: 'id', title: '编号', width: 120 },
+  { colKey: 'username', title: '用户账号', width: 160 },
+  { colKey: 'nickname', title: '用户名称', width: 160 },
+  { colKey: 'deptName', title: '所属部门', width: 120 },
+  { colKey: 'mobile', title: '绑定手机', ellipsis: true },
+  { colKey: 'status', title: '状态' },
+  { colKey: 'createTime', title: '注册时间', width: 140 },
+  { colKey: 'actions', title: '操作', fixed: 'right', width: 110 },
 ]
 
-export const useUserTable = (formRef: Ref<FormInstance | null>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useUserTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const dialog = useDialog()
+  const message = useMessage()
+  // only used in dialog button
+  const loading = ref(false)
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
-    total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
-  }))
+  const query = ref<ListQueryParams>({
+    createTime: [],
+    pageNo: 1,
+    pageSize: 10,
+  })
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
-
-    execute()
-  }
-
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
-    execute()
-  }
-
-  const onFilterReset = () => {
-    formRef.value?.resetFields()
-    queryParams.value.pageNo = 1
-    execute()
-  }
-
-  const { data, pending, execute } = useRequest(() => getUsers(queryParams.value), {
+  const { data, pending, execute } = useRequest(() => getUsers(query.value), {
     immediate: true,
   })
 
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
+    total: data.value?.total,
+  }))
+
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
+
+    execute()
+  }
+
+  const onQueryChange = (reset?: boolean) => {
+    if (reset) {
+      formRef.value?.reset()
+    }
+    query.value.pageNo = 1
+    execute()
+  }
+
+  const onDelete = async (id: number) => {
+    const instance = dialog.confirm({
+      theme: 'danger',
+      showOverlay: true,
+      header: '删除用户',
+      body: '确定要删除用户吗？删除的用户将无法登录和访问系统。',
+      confirmLoading: loading.value,
+      async onConfirm() {
+        loading.value = true
+        try {
+          await deleteUser(id)
+          instance.destroy()
+          message.success('删除成功')
+          execute()
+        } catch (e) {
+        } finally {
+          loading.value = false
+        }
+      },
+    })
+  }
+
+  const onSetStatus = async (id: number, status: number) => {
+    try {
+      await updateUserStatus(id, status)
+      message.success('操作成功')
+    } finally {
+      execute()
+    }
+  }
+
   return {
     data,
+    query,
     pending,
     execute,
-    queryParams,
     pagination,
-    onChange,
-    onFilter,
-    onFilterReset,
+    onPageChange,
+    onQueryChange,
+    onDelete,
+    onSetStatus,
   }
 }

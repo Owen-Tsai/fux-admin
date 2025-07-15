@@ -1,47 +1,40 @@
-import { defineStore } from 'pinia'
-import { ref, shallowRef } from 'vue'
-import useStorage from '@/hooks/use-storage'
-import { getToken, removeToken, setToken } from '@/utils/auth'
+import { removeToken, setToken } from '@/utils/auth'
 import { generateRoutes } from '@/utils/route'
+import { sessionCache } from '@/utils/storage'
 import {
   login as doLogin,
   logout as doLogout,
   getPermissionInfo,
-  type LoginDTO,
-  type LoginVO,
-  type PermissionInfoVO,
-} from '@/api/login'
+  type LoginReqVO,
+  type LoginRespVO,
+  type PermissionVO,
+} from '@/api/auth'
+import defaultAvatar from '@/assets/img/default-avatar.png'
 import type { RouteRecordRaw } from 'vue-router'
 
-import defaultAvatar from '~img/default-avatar.png'
-
-const cacheKey = 'permission-info'
+const CACHE_KEY = 'permission-info'
 
 export default defineStore('user', () => {
-  const token = ref(getToken())
-  const id = ref<number>()
-  const isUserInfoSet = ref(false)
-  const user = ref<PermissionInfoVO['user'] | undefined>()
+  const uid = ref<number>()
+  const isUserInfoReady = ref(false)
+  const user = ref<PermissionVO['user'] | undefined>()
   const roles = ref<string[]>([])
   const permissions = ref<string[]>([])
-  const routerMap = ref<PermissionInfoVO['menus']>()
+  const routerMap = ref<PermissionVO['menus']>()
   const routes = shallowRef<RouteRecordRaw[]>()
 
-  const login = (loginInfo: LoginDTO) => {
-    const { username, password, captchaVerification, tenantName } = loginInfo
-
-    return new Promise<LoginVO>((resolve, reject) => {
+  const login = async (loginReqVO: LoginReqVO) => {
+    const { username, password, captchaVerification } = loginReqVO
+    return new Promise<LoginRespVO>((resolve, reject) => {
       doLogin({
         username: username.trim(),
         password,
-        tenantName,
         captchaVerification,
       })
         .then((data) => {
           const { accessToken, refreshToken, userId } = data
           setToken({ accessToken, refreshToken })
-          token.value = accessToken
-          id.value = userId
+          uid.value = userId
           resolve(data)
         })
         .catch((err) => {
@@ -51,10 +44,7 @@ export default defineStore('user', () => {
   }
 
   const getUserInfo = () => {
-    const storage = useStorage('sessionStorage')
-    const permissionInfo = storage.get(cacheKey)
-
-    const process = (data: PermissionInfoVO) => {
+    const process = (data: PermissionVO) => {
       const { user: u, roles: rs, permissions: ps, menus } = data
 
       roles.value = rs
@@ -64,23 +54,25 @@ export default defineStore('user', () => {
         ...u,
         avatar: u.avatar || defaultAvatar,
       }
-      id.value = user.value.id as number
+      uid.value = user.value.id as number
 
-      isUserInfoSet.value = true
+      isUserInfoReady.value = true
       routes.value = generateRoutes(routerMap.value)
     }
 
+    const permissionInfo = sessionCache.get(CACHE_KEY)
+
     if (permissionInfo) {
-      return new Promise<PermissionInfoVO>((resolve) => {
+      return new Promise<PermissionVO>((resolve) => {
         process(permissionInfo)
         resolve(permissionInfo)
       })
     } else {
-      return new Promise<PermissionInfoVO>((resolve, reject) => {
+      return new Promise<PermissionVO>((resolve, reject) => {
         getPermissionInfo()
           .then((res) => {
             process(res)
-            storage.set(cacheKey, res)
+            sessionCache.set(CACHE_KEY, res)
             resolve(res)
           })
           .catch((err) => {
@@ -92,13 +84,16 @@ export default defineStore('user', () => {
 
   const logout = () => {
     return new Promise((resolve, reject) => {
-      const storage = useStorage('sessionStorage')
       doLogout()
         .then(() => {
-          token.value = ''
+          uid.value = undefined
+          isUserInfoReady.value = false
+          user.value = undefined
           roles.value = []
           permissions.value = []
-          storage.delete(cacheKey)
+          routerMap.value = undefined
+          routes.value = []
+          sessionCache.delete(CACHE_KEY)
           removeToken()
           resolve(true)
         })
@@ -109,16 +104,15 @@ export default defineStore('user', () => {
   }
 
   return {
-    id,
-    isUserInfoSet,
+    uid,
+    isUserInfoReady,
+    user,
     roles,
     permissions,
-    routes,
     routerMap,
-    token,
+    routes,
     login,
-    logout,
     getUserInfo,
-    user,
+    logout,
   }
 })

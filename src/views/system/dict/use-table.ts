@@ -1,78 +1,79 @@
 import dayjs from 'dayjs'
 import useRequest from '@/hooks/use-request'
-import { getDictTypeList, type ListQueryParams, type DictTypeVO } from '@/api/system/dict/type'
-import type { FormInstance, TableProps } from 'ant-design-vue'
-import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
+import {
+  getDictTypeList,
+  deleteDictType,
+  type ListQueryParams,
+  type DictTypeVO,
+} from '@/api/system/dict/type'
+import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { title: '字典编号', width: 90, dataIndex: 'id', key: 'id' },
-  { title: '字典名称', dataIndex: 'name', key: 'name' },
-  { title: '字典类别', dataIndex: 'type', key: 'type' },
-  { title: '字典状态', width: 90, dataIndex: 'status', key: 'status' },
-  { title: '备注', width: 200, dataIndex: 'remark', ellipsis: true },
+  { title: '字典编号', width: 90, colKey: 'id' },
+  { title: '字典名称', colKey: 'name' },
+  { title: '字典类别', colKey: 'type' },
+  { title: '字典状态', width: 90, colKey: 'status' },
+  { title: '备注', width: 200, colKey: 'remark', ellipsis: true },
   {
     title: '创建时间',
     minWidth: 120,
-    dataIndex: 'createTime',
-    key: 'createTime',
-    sortDirections: ['ascend', 'descend'],
-    sorter: (a: DictTypeVO, b: DictTypeVO) => {
-      return dayjs(a.createTime).isSameOrBefore(b.createTime) ? 1 : -1
-    },
+    colKey: 'createTime',
   },
-  { title: '操作', width: 220 },
+  { title: '操作', width: 150, colKey: 'actions' },
 ]
 
-export const useTable = (formRef: Ref<FormInstance | undefined>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const query = ref<ListQueryParams>({
+    createTime: [],
+    pageNo: 1,
+    pageSize: 10,
+  })
 
-  const { data, execute, pending } = useRequest(
-    () =>
-      getDictTypeList({
-        ...queryParams.value,
-      }),
-    {
-      immediate: true,
-    },
-  )
+  const { push } = useRouter()
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const { data, execute, pending } = useRequest(() => getDictTypeList({ ...query.value }), {
+    immediate: true,
+  })
+
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
+
     execute()
   }
 
-  const onFilterReset = () => {
-    formRef.value?.resetFields()
-    queryParams.value.pageNo = 1
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
-
+  const onDelete = async (id: number) => {
+    await deleteDictType(id)
     execute()
+  }
+
+  const onShowData = async (type: string) => {
+    push(`/system/dict/data/${type}`)
   }
 
   return {
     data,
-    execute,
     pending,
-    queryParams,
-    onChange,
+    query,
     pagination,
-    onFilter,
-    onFilterReset,
+    onPageChange,
+    onQueryChange,
+    execute,
+    onDelete,
+    onShowData,
   }
 }

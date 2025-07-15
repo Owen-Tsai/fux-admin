@@ -1,46 +1,33 @@
 import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import unoCss from 'unocss/vite'
+import vueDevTools from 'vite-plugin-vue-devtools'
 import autoImport from 'unplugin-auto-import/vite'
-import devTools from 'vite-plugin-vue-devtools'
+import unocss from 'unocss/vite'
+import components from 'unplugin-vue-components/vite'
 
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
-  const { VITE_BASE_URL } = loadEnv(mode, process.cwd())
-
-  return {
-    base: VITE_BASE_URL,
-    plugins: [
-      vue(),
-      vueJsx(),
-      unoCss({
-        hmrTopLevelAwait: false,
-      }),
-      autoImport({
-        imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
-        dirs: ['src/hooks'],
-      }),
-      devTools(),
-    ],
-    resolve: {
-      alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url)),
-        '~img': fileURLToPath(new URL('./src/assets/img', import.meta.url)),
-      },
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    vue(),
+    vueJsx(),
+    vueDevTools(),
+    autoImport({
+      imports: ['vue', 'vue-router', 'pinia', '@vueuse/core', '@vueuse/math'],
+      dirs: ['./src/hooks'],
+    }),
+    unocss({ hmrTopLevelAwait: false }),
+    components({
+      dirs: ['./src/components/_internal'],
+      extensions: ['vue', 'tsx'],
+    }),
+  ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@fusionx/core': fileURLToPath(new URL('./src/components/_fux-core', import.meta.url)),
     },
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: 'modern-compiler',
-        },
-      },
-    },
-    server: {
-      port: 1127,
-      host: true,
-    },
-  }
+  },
 })
