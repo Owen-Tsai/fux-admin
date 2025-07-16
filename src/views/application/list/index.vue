@@ -44,26 +44,26 @@ const toDesignPage = (id: string) => {
         @submit="onQueryChange()"
         @reset="onQueryChange(true)"
       >
-        <TFormItem label="应用名称" name="name">
+        <TFormItem label="应用名称" name="name" class="col">
           <TInput v-model:value="query.name" placeholder="请输入应用名称" />
         </TFormItem>
-        <TFormItem label="应用类别" name="type">
+        <TFormItem label="应用类别" name="type" class="col">
           <TSelect v-model:value="query.type" :options="typeOpts" placeholder="请选择应用类别" />
         </TFormItem>
-        <TFormItem v-show="expanded" label="上架状态" name="published">
+        <TFormItem v-show="expanded" label="上架状态" name="published" class="col">
           <TSelect
             v-model:value="query.published"
             :options="statusOpts"
             placeholder="请选择上架状态"
           />
         </TFormItem>
-        <TFormItem v-show="expanded" label="创建时间" name="createTime">
+        <TFormItem v-show="expanded" label="创建时间" name="createTime" class="col">
           <TDateRangePicker v-model:value="query.createTime" value-type="YYYY-MM-DD" clearable />
         </TFormItem>
-        <TFormItem v-show="expanded" label="更新时间" name="updateTime">
+        <TFormItem v-show="expanded" label="更新时间" name="updateTime" class="col">
           <TDateRangePicker v-model:value="query.updateTime" value-type="YYYY-MM-DD" clearable />
         </TFormItem>
-        <QueryActions v-model:expanded="expanded" :class="`col ${expanded ? 'ml-2/3' : ''}`" />
+        <QueryActions v-model:expanded="expanded" class="col" />
       </TForm>
     </TCard>
 
@@ -105,7 +105,6 @@ const toDesignPage = (id: string) => {
           <TSwitch
             v-model:value="row.published"
             :label="['上架', '下架']"
-            :disabled="permission.hasNone('system:application:publish')"
             @change="(v) => onSetPublished(row.id, v as boolean)"
           />
         </template>
@@ -157,5 +156,7 @@ const toDesignPage = (id: string) => {
         </template>
       </TTable>
     </TCard>
+
+    <Form ref="formRef" @success="execute" />
   </div>
 </template>

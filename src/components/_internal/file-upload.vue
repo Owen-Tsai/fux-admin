@@ -5,7 +5,7 @@ import type { UploadFile, UploadProps } from 'tdesign-vue-next'
 const {
   accept = ['.png', '.jpg', '.jpeg', '.pdf', '.svg', '.doc', '.docx'],
   action,
-  autoUpload,
+  autoUpload = true,
   disabled,
   draggable,
   loading,
@@ -30,8 +30,10 @@ const {
   placeholder?: string
 }>()
 
+const message = useMessage()
+
 // component modal. e.g. `<FileUpload v-model:value="data.src" />`
-const value = defineModel<string[]>('value')
+const value = defineModel<string | string[]>('value')
 // list used to display
 const fileList = ref<UploadFile[]>([])
 // list to upload
@@ -43,17 +45,28 @@ const emit = defineEmits(['update:value', 'start', 'success', 'error', 'finish']
 
 const uploadFn: UploadProps['requestMethod'] = async (files) => {
   emit('start')
+  const binary = Array.isArray(files) ? files[0] : files.raw
+
   try {
-    const res = await uploadFile({ file: files })
+    const res = await uploadFile({ file: binary })
     if (res.code === 0) {
       emit('success')
+      if (Array.isArray(value.value)) {
+        value.value.push(res.data)
+      } else {
+        value.value = res.data
+      }
       return Promise.resolve({
         status: 'success',
-        response: res,
+        response: { url: res.data },
       })
     } else {
       emit('error', res)
-      throw new Error('上传文件失败')
+      return Promise.resolve({
+        status: 'fail',
+        error: res.msg || '上传失败',
+        response: res,
+      })
     }
   } catch (e) {
     emit('error', e)
@@ -63,7 +76,12 @@ const uploadFn: UploadProps['requestMethod'] = async (files) => {
   }
 }
 
-const onSuccess = () => {}
+const onSuccess: UploadProps['onSuccess'] = ({ fileList, file, currentFiles }) => {
+  message.success('上传成功')
+  emit('success')
+
+  console.log(fileList, file, currentFiles)
+}
 </script>
 
 <template>
@@ -73,5 +91,6 @@ const onSuccess = () => {}
     :action="uploadUrl"
     :auto-upload="autoUpload"
     :request-method="uploadFn"
+    @success="onSuccess"
   ></TUpload>
 </template>

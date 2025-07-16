@@ -70,6 +70,14 @@ const open = (id?: string) => {
   visible.value = true
 }
 
+const onUserTypeChange = (value: string) => {
+  if (value === import.meta.env.VITE_USER_PERSONAL) {
+    formData.value.comopen = 0
+  } else {
+    formData.value.comopen = undefined
+  }
+}
+
 defineExpose({ open })
 </script>
 
@@ -92,9 +100,12 @@ defineExpose({ open })
           <TSelect v-model:value="formData.type" :options="typeOpts" />
         </TFormItem>
         <TFormItem label="申报主体" name="userType">
-          <TSelect v-model:value="formData.userType" @change="onUserTypeChange">
-            <TOption value="3">个人申报</TOption>
-            <TOption value="4">单位申报</TOption>
+          <TSelect
+            v-model:value="formData.userType"
+            @change="(v) => onUserTypeChange(v as '3' | '4')"
+          >
+            <TOption value="3" label="个人申报" />
+            <TOption value="4" label="单位申报" />
           </TSelect>
         </TFormItem>
         <TFormItem
@@ -104,11 +115,16 @@ defineExpose({ open })
           help="自主申报关闭时，个人用户需要所属单位为其开通申报权限方可申报"
         >
           <!-- 注意这里实际上是 “单位开通申报权限” 的相反值，即 自主申报开启 = 单位不需开通申报权限 = 0 -->
-          <TSwitch v-model:value="formData.comopen" :custom-value="[0, 1]" :label="['是', '否']" />
+          <TSelect v-model:value="formData.comopen">
+            <TOption :value="0" label="是" />
+            <TOption :value="1" label="否" />
+          </TSelect>
         </TFormItem>
         <TFormItem label="主管部门" name="dept">
           <TTreeSelect
             v-model:value="formData.dept"
+            :options="deptOpts"
+            :loading="pending"
             filterable
             clearable
             :keys="{ label: 'name', value: 'id' }"
