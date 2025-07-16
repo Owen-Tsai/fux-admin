@@ -30,4 +30,7 @@ export default defineConfig({
       '@fusionx/core': fileURLToPath(new URL('./src/components/_fux-core', import.meta.url)),
     },
   },
+  server: {
+    port: 1127,
+  },
 })
