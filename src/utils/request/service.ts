@@ -10,7 +10,11 @@ const ignoredErrorMsgs = ['无效的刷新令牌', '刷新令牌已过期']
 // 令牌是否正在刷新
 let isTokenRefresh = false
 // 请求队列，当令牌刷新时，将请求添加到请求队列中，等待令牌刷新后重试
-const requestQueue: any[] = []
+const requestQueue: Array<{
+  config: any
+  resolve: any
+  reject: any
+}> = []
 
 export const reloginHint = { show: false }
 
@@ -79,24 +83,28 @@ const handleInvalidToken = async (config: InternalAxiosRequestConfig, service: A
       setToken(r.data.data)
       config.headers.Authorization = `Bearer ${getToken()}`
       // 释放请求队列
-      requestQueue.forEach((fn) => fn())
+      requestQueue.forEach(({ config, reject, resolve }) => {
+        service(config).then(resolve).catch(reject)
+      })
       requestQueue.length = 0
       // 重试当前请求
       return service(config)
     } catch (error) {
       console.log(error)
       // 刷新令牌失败，强制重新登录
-      requestQueue.forEach((fn) => fn())
+      requestQueue.forEach(({ reject }) => reject(error))
       return redirectForAuth()
     } finally {
       isTokenRefresh = false
     }
   } else {
     // 当前正在刷新令牌，将当前请求添加到请求队列中
-    return new Promise((resolve) => {
-      requestQueue.push(() => {
-        config.headers.Authorization = `Bearer ${getToken()}`
-        resolve(service(config))
+    return new Promise((resolve, reject) => {
+      console.log(config, resolve, reject)
+      requestQueue.push({
+        config,
+        resolve,
+        reject,
       })
     })
   }
@@ -153,7 +161,7 @@ service.interceptors.response.use(
       return Promise.reject(msg)
     } else if (code === 401) {
       // 不合法的令牌
-      handleInvalidToken(config, service)
+      return handleInvalidToken(config, service)
     } else if (code !== 200) {
       if (msg === '无效的刷新令牌') {
         console.log(msg)
@@ -173,8 +181,7 @@ service.interceptors.response.use(
     let msg = ''
 
     if (status === 401) {
-      handleInvalidToken(config, service)
-      return
+      return handleInvalidToken(config, service)
     }
 
     if (message === 'Network Error') {
@@ -189,7 +196,10 @@ service.interceptors.response.use(
       }
     }
 
-    MessagePlugin.error(msg)
+    if (msg) {
+      MessagePlugin.error(msg)
+    }
+
     return Promise.reject(msg)
   },
 )
