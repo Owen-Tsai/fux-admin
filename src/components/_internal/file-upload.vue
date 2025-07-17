@@ -3,8 +3,8 @@ import { uploadFile } from '@/api/infra/file'
 import type { UploadFile, UploadProps } from 'tdesign-vue-next'
 
 const {
-  accept = ['.png', '.jpg', '.jpeg', '.pdf', '.svg', '.doc', '.docx'],
-  action,
+  accept,
+  requestFn,
   autoUpload = true,
   disabled,
   draggable,
@@ -16,9 +16,11 @@ const {
   sizeLimit = 5 * 1024,
   theme,
 } = defineProps<{
-  action?: string
-  accept?: string[]
-  theme?: 'single-input' | 'file' | 'image' | 'file-flow' | 'image-flow'
+  requestFn?: (
+    files: UploadFile | UploadFile[],
+  ) => Promise<{ code: number; msg?: string; data: string }>
+  accept?: string
+  theme?: 'file-input' | 'file' | 'image' | 'file-flow' | 'image-flow' | 'custom'
   multiple?: boolean
   max?: number
   sizeLimit?: number
@@ -39,18 +41,24 @@ const fileList = ref<UploadFile[]>([])
 // list to upload
 const filesToUpload = ref<UploadFile[]>([])
 
-const uploadUrl = action || import.meta.env.VITE_UPLOAD_URL
+const uploadUrl = import.meta.env.VITE_UPLOAD_URL
 
 const emit = defineEmits(['update:value', 'start', 'success', 'error', 'finish'])
 
 const uploadFn: UploadProps['requestMethod'] = async (files) => {
   emit('start')
-  const binary = Array.isArray(files) ? files[0] : files.raw
 
   try {
-    const res = await uploadFile({ file: binary })
+    if (Array.isArray(files) && requestFn === undefined) {
+      console.error('多选模式下请指定上传函数')
+      throw new Error('上传失败')
+    }
+
+    const res = requestFn
+      ? await requestFn(files)
+      : await uploadFile({ file: (files as UploadFile).raw! })
+
     if (res.code === 0) {
-      emit('success')
       if (Array.isArray(value.value)) {
         value.value.push(res.data)
       } else {
@@ -78,19 +86,58 @@ const uploadFn: UploadProps['requestMethod'] = async (files) => {
 
 const onSuccess: UploadProps['onSuccess'] = ({ fileList, file, currentFiles }) => {
   message.success('上传成功')
-  emit('success')
-
-  console.log(fileList, file, currentFiles)
+  emit('success', { file, fileList, currentFiles, value: value.value })
 }
+
+const onRemove: UploadProps['onRemove'] = ({ index }) => {
+  if (index === undefined) return
+
+  if (Array.isArray(value.value)) {
+    value.value.splice(index, 1)
+  } else {
+    value.value = ''
+  }
+}
+
+watch(
+  () => value.value,
+  (val) => {
+    fileList.value = []
+    if (!val) return
+
+    if (Array.isArray(val)) {
+      if (val.length > 0) {
+        fileList.value = val.map((item) => ({
+          url: item,
+        }))
+      }
+    } else {
+      fileList.value = [{ url: val }]
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
   <TUpload
-    v-model:value="fileList"
-    :accept="accept.join(',')"
+    v-model:files="fileList"
+    :accept="accept"
     :action="uploadUrl"
     :auto-upload="autoUpload"
     :request-method="uploadFn"
+    :max="max"
+    :multiple="multiple"
+    :disabled="disabled"
+    :draggable="draggable"
+    :loading="loading"
+    :name="name"
+    :placeholder="placeholder"
+    :size-limit="sizeLimit"
+    :theme="theme"
     @success="onSuccess"
-  ></TUpload>
+    @remove="onRemove"
+  >
+    <slot></slot>
+  </TUpload>
 </template>

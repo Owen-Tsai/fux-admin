@@ -42,7 +42,7 @@ export const createFile = (data: FileVO) => {
   })
 }
 
-export const uploadFile = (data: any) => {
+export const uploadFile = (data: FileUploadVO) => {
   return request.upload({
     url: `${prefix}/upload`,
     data,
