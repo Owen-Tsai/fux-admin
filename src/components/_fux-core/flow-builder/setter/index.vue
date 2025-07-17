@@ -1,5 +1,11 @@
 <template>
-  <TDrawer v-model:visible="visible" header="任务节点配置" size="30%">
+  <TDrawer
+    v-model:visible="visible"
+    header="任务节点配置"
+    size="30%"
+    :footer="false"
+    @close="selectedNode = undefined"
+  >
     <AuditSetter v-if="selectedNode?.type === 'audit'" :node="selectedNode.props" />
     <ConditionSetter v-if="selectedNode?.type === 'condition'" :node="selectedNode.props" />
   </TDrawer>
