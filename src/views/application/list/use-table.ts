@@ -61,11 +61,12 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   }
 
   const onDelete = async (id: string) => {
-    dialog.confirm({
+    const instance = dialog.confirm({
       header: '删除应用',
       body: '确认删除应用吗？该操作无法恢复，如需暂时停用应用可以使用【下架】功能。',
       async onConfirm() {
         await deleteApplication(id)
+        instance.destroy()
         execute()
       },
     })

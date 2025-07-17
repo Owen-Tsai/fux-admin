@@ -37,9 +37,12 @@
       </div>
     </header>
 
-    <DataConfig v-if="current === 0" @finish="current = 1" />
-    <FormConfig v-if="current === 1" />
-    <FlowConfig v-if="current === 2" />
+    <TLoading :loading="isAppSchemaLoading" fullscreen />
+    <template v-if="!isAppSchemaLoading">
+      <DataConfig v-if="current === 0" @finish="current = 1" />
+      <FormConfig v-if="current === 1" />
+      <FlowConfig v-if="current === 2" />
+    </template>
 
     <TDrawer v-model:visible="drawerVisible" header="应用 Schema 预览" size="40%">
       <div class="mt-4 w-full" v-html="code" />
@@ -59,7 +62,7 @@ import { useAppLoad, useAppSave, useAppDesignCtxInject } from './use-app-design'
 import highlight from '@/utils/highlighter'
 import type { StepsProps } from 'tdesign-vue-next'
 
-const { appSchema, appSchemaDetail, appDetail, appDesignMode } = useAppLoad()
+const { appSchema, appSchemaDetail, appDetail, appDesignMode, isAppSchemaLoading } = useAppLoad()
 const { save } = useAppSave(appSchema, appSchemaDetail, appDetail)
 
 const steps: StepsProps['options'] = [
