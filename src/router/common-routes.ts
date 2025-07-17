@@ -49,7 +49,7 @@ const commonRoutes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/app-design',
+    path: '/app-design/:appId',
     name: 'AppDesignRoot',
     component: MinimalLayout,
     redirect: 'AppDesign',

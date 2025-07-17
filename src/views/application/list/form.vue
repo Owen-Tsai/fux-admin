@@ -71,7 +71,7 @@ const open = (id?: string) => {
 }
 
 const onUserTypeChange = (value: string) => {
-  if (value === import.meta.env.VITE_USER_PERSONAL) {
+  if (value === '3') {
     formData.value.comopen = 0
   } else {
     formData.value.comopen = undefined
@@ -86,6 +86,7 @@ defineExpose({ open })
     v-model:visible="visible"
     :header="mode === 'create' ? '新增应用' : '编辑应用'"
     :confirm-loading="loading"
+    width="560px"
     @confirm="submit"
   >
     <TLoading :loading="loading">
@@ -108,20 +109,14 @@ defineExpose({ open })
             <TOption value="4" label="单位申报" />
           </TSelect>
         </TFormItem>
-        <TFormItem
-          v-if="formData.userType === '3'"
-          label="自主申报"
-          name="comopen"
-          help="自主申报关闭时，个人用户需要所属单位为其开通申报权限方可申报"
-        >
-          <!-- 注意这里实际上是 “单位开通申报权限” 的相反值，即 自主申报开启 = 单位不需开通申报权限 = 0 -->
-          <TSelect v-model:value="formData.comopen">
-            <TOption :value="0" label="是" />
-            <TOption :value="1" label="否" />
-          </TSelect>
+        <TFormItem v-if="formData.userType === '3'" label="申报方式" name="comopen">
+          <TRadioGroup v-model:value="formData.comopen">
+            <TRadio :value="0" label="个人自主申报" />
+            <TRadio :value="1" label="单位开通权限" />
+          </TRadioGroup>
         </TFormItem>
         <TFormItem label="主管部门" name="dept">
-          <TTreeSelect
+          <TSelect
             v-model:value="formData.dept"
             :options="deptOpts"
             :loading="pending"
@@ -134,9 +129,18 @@ defineExpose({ open })
         <TFormItem label="应用描述" name="description">
           <TTextarea v-model:value="formData.description" />
         </TFormItem>
-        <div class="flex items-center">
-          <TFormItem label="前台图标" name="iconFe" help="在用户端展示的图标"></TFormItem>
-        </div>
+        <TRow>
+          <TCol :span="6">
+            <TFormItem label="前台图标" name="iconFe" help="在用户端展示的图标">
+              <FileUpload v-model:value="formData.iconFe" theme="image" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="6">
+            <TFormItem label="后台图标" name="iconBe" help="在管理端展示的图标">
+              <FileUpload v-model:value="formData.iconBe" theme="image" />
+            </TFormItem>
+          </TCol>
+        </TRow>
       </TForm>
     </TLoading>
   </TDialog>

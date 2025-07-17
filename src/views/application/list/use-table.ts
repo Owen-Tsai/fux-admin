@@ -33,6 +33,8 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     pageSize: 10,
   })
 
+  const dialog = useDialog()
+
   const { data, execute, pending } = useRequest(() => getApplicationList(query.value), {
     immediate: true,
   })
@@ -59,8 +61,14 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   }
 
   const onDelete = async (id: string) => {
-    await deleteApplication(id)
-    execute()
+    dialog.confirm({
+      header: '删除应用',
+      body: '确认删除应用吗？该操作无法恢复，如需暂时停用应用可以使用【下架】功能。',
+      async onConfirm() {
+        await deleteApplication(id)
+        execute()
+      },
+    })
   }
 
   const onSetPublished = async (id: string, published: boolean) => {

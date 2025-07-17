@@ -148,7 +148,7 @@ const toDesignPage = (id: string) => {
                   :disabled="permission.hasNone('system:application:delete')"
                   theme="error"
                   @click="onDelete(row.id)"
-                  >删除配置</TDropdownItem
+                  >删除应用</TDropdownItem
                 >
               </TDropdownMenu>
             </TDropdown>

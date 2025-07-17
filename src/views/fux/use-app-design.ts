@@ -187,6 +187,7 @@ export const useAppSave = (
       appSchema: JSON.stringify(appSchema.value),
       name: `${params.appId}-${dayjs().format('YYYYMMDDHHmmss')}`,
       appId: params.appId as string,
+      conf: '{}',
     })
 
     const confirmText =
