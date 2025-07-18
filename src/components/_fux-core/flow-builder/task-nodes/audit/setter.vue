@@ -1,5 +1,5 @@
 <template>
-  <TRadioGroup v-model:value="active" variant="default-filled">
+  <TRadioGroup v-model:value="active" variant="default-filled" class="block">
     <TRadioButton :value="0">审核设置</TRadioButton>
     <TRadioButton :value="1">字段控制设置</TRadioButton>
   </TRadioGroup>
@@ -41,18 +41,21 @@
       <TSwitch v-model:value="node.joint" />
     </TFormItem>
   </TForm>
-  <TForm v-show="active === 1" :data="node.fieldsOverride">
+  <TForm v-show="active === 1" :data="node.fieldsOverride" label-width="0" class="!mt-4">
     <div v-for="(field, index) in node.fieldsOverride" :key="index" class="flex gap-2">
-      <TFormItem label="字段名" extra="字段的 props.field.name">
-        <TInput v-model:value="field.name" />
-      </TFormItem>
-      <TFormItem label="控制方式">
-        <TSelect v-model="field.config" :options="fieldOverrideOpts" />
-      </TFormItem>
+      <div class="flex-1 flex items-center gap-2">
+        <TFormItem class="min-w-0">
+          <TInput label="字段名" v-model:value="field.name" />
+        </TFormItem>
+        <TFormItem class="min-w-0">
+          <TSelect label="控制方式" v-model="field.config" :options="fieldOverrideOpts" />
+        </TFormItem>
+      </div>
       <TButton
         shape="square"
         variant="text"
         theme="danger"
+        class="flex-none"
         @click="node.fieldsOverride.splice(index, 1)"
       >
         <template #icon>
@@ -60,9 +63,7 @@
         </template>
       </TButton>
     </div>
-    <TFormItem>
-      <TButton block theme="default" @click="node.fieldsOverride.push({})">添加字段配置</TButton>
-    </TFormItem>
+    <TButton block @click="node.fieldsOverride.push({})">添加字段配置</TButton>
   </TForm>
 </template>
 
@@ -104,3 +105,13 @@ const onRoleChange = () => {
   node.value.actor.text = roleOptions.value?.find((u) => u.id === first)?.name
 }
 </script>
+
+<style lang="scss" scoped>
+.block {
+  @apply w-full;
+  :deep(.t-radio-button) {
+    width: 50%;
+    justify-content: center;
+  }
+}
+</style>
