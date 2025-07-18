@@ -11,6 +11,7 @@
       v-if="item.type === 'group'"
       :config="item"
       @add-node="(type) => addNode(type, i)"
+      @delete-node="deleteNode(i)"
     />
     <AuditNode
       v-if="item.type === 'audit'"
@@ -32,7 +33,7 @@ import { cloneDeep } from 'lodash-es'
 
 const taskNodes = defineModel<TaskNode[]>('taskNodes')
 const emit = defineEmits<{
-  (e: 'clear-branch', branchIdx: number): void
+  (e: 'clear-branch'): void
 }>()
 
 const addNode = (type: keyof TaskNodeConfigMap, pos: number) => {
@@ -69,7 +70,7 @@ const deleteNode = (pos: number, clearBranch?: boolean) => {
   taskNodes.value?.splice(pos, 1)
 
   if (clearBranch) {
-    emit('clear-branch', pos)
+    emit('clear-branch')
   }
 }
 

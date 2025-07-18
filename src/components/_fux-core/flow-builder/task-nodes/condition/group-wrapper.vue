@@ -43,7 +43,7 @@ const deleteBranch = (branchIdx: number) => {
     <div class="node-wrapper -mt-4 z-1">
       <div class="branches">
         <div class="branch" v-for="(subNodes, branchIdx) in config.props.children" :key="branchIdx">
-          <NodeRenderer :task-nodes="subNodes" @delete-branch="deleteBranch(branchIdx)" />
+          <NodeRenderer :task-nodes="subNodes" @clear-branch="deleteBranch(branchIdx)" />
           <div v-if="branchIdx === 0" class="edge-line line-tl"></div>
           <div v-if="branchIdx === 0" class="edge-line line-bl"></div>
           <div
