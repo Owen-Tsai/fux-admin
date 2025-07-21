@@ -4,7 +4,7 @@
       <div class="flex items-center gap-2 w-9/10 mx-auto">
         <TButton shape="square" theme="default" variant="outline" @click="scale -= 10">
           <template #icon>
-            <TIcon name="zoom-in" />
+            <TIcon name="zoom-out" />
           </template>
         </TButton>
         <div>{{ scale }}%</div>

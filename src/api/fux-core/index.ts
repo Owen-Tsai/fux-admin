@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 import type { ConfigVO } from '@/api/infra/code-gen'
-import type { FuxFlow } from '@fusionx/core/types'
+import type { AppSchema } from '@fusionx/core/types'
 
 export type AppSchemaVO = {
   id?: string
@@ -16,7 +16,7 @@ export type AppSchemaVO = {
 export type XMLGenerateVO = {
   id: string
   name: string
-  data: FuxFlow.FlowSchema['nodes']
+  data: AppSchema['flow']['nodes']
 }
 
 export type XMLRespVO = {

@@ -16,6 +16,10 @@ export type ProfileVO = {
     id?: number
     name?: string
   }>
+  roles?: Array<{
+    id?: number
+    name?: string
+  }>
   sex?: number
   username?: string
 }

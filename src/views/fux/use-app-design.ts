@@ -1,5 +1,5 @@
 import {
-  getAppDesignSchema,
+  getAppSchemaByAppId,
   createAppSchema,
   getProcessXML,
   updateProcessXML,
@@ -42,7 +42,7 @@ export const useAppLoad = () => {
       if (!params.appId) {
         throw new Error('应用信息获取失败，默认 Schema 已加载')
       }
-      const data = await getAppDesignSchema(params.appId as string)
+      const data = await getAppSchemaByAppId(params.appId as string)
       if (data === null || !data.appSchema) {
         appSchema.value = defaultSchema
       } else {
@@ -187,6 +187,7 @@ export const useAppSave = (
       appSchema: JSON.stringify(appSchema.value),
       name: `${params.appId}-${dayjs().format('YYYYMMDDHHmmss')}`,
       appId: params.appId as string,
+      conf: '{}',
     })
 
     const confirmText =
@@ -194,7 +195,7 @@ export const useAppSave = (
         ? '是否保存当前应用？'
         : '你正在编辑已保存的应用，保存后，应用将迭代至新版本，所有处于审核流程中的业务不会受到此次编辑的影响。如需强制使此次修改对正在办理中的业务生效，请先将正在办理中的业务退回至发起人处再保存。'
 
-    dialog.confirm({
+    const instance = dialog.confirm({
       header: '保存应用',
       body: confirmText,
       onConfirm: async () => {
@@ -205,6 +206,7 @@ export const useAppSave = (
           const id = await generateSchema()
           await generateAuditMenu(id, mode)
           loading.value = false
+          instance.destroy()
           message.success('保存成功')
         } catch (e) {
           console.error(e)

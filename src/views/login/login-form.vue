@@ -1,5 +1,5 @@
 <template>
-  <TForm ref="formRef" v-model:data="formData" :label-width="0" @submit="onSubmit">
+  <TForm ref="formRef" v-model:data="formData" :label-width="0" :rules="rules" @submit="onSubmit">
     <TFormItem name="username">
       <TInput v-model:value="formData.username" clearable placeholder="请输入用户名" size="large">
         <template #prefix-icon>
@@ -43,6 +43,12 @@ import Captcha from './captcha.vue'
 import useUserStore from '@/stores/user'
 import { encrypt, decrypt } from '@/utils/encryption'
 import { localCache } from '@/utils/storage'
+import type { FormProps } from 'tdesign-vue-next'
+
+const rules: FormProps['rules'] = {
+  username: [{ required: true, message: '请输入用户名' }],
+  password: [{ required: true, message: '请输入密码' }],
+}
 
 const { login } = useUserStore()
 
