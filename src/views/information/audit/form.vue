@@ -114,7 +114,7 @@ const audit = async (status: number) => {
     await auditInformation({
       id: formData.value.id,
       auditstate: status,
-      review: '',
+      review: '审核资讯',
     })
     message.success('审核成功')
 

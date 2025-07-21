@@ -1,7 +1,7 @@
 <template>
   <AModal
     v-model:open="visible"
-    :title="mode === 'create' ? '新增菜单' : '编辑菜单'"
+    :title="mode === 'create' ? '新增资讯类别' : '编辑资讯类别'"
     :confirm-loading="loading"
     width="550px"
     @ok="submit"
