@@ -8,10 +8,13 @@ export type ListQueryParams = CommonQueryParams & {
 export type InformationVO = {
   id?: string
   title?: string
+  herfurl?: string
   sort?: number
   isTop?: boolean
+  isHome?: boolean
   infotype?: string
   content?: string
+  senddate?: string
 }
 
 const prefix = '/admin-api/info'

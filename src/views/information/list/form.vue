@@ -48,6 +48,33 @@
               </AFormItem>
             </ACol>
           </ARow>
+          <ARow :gutter="24">
+            <ACol :span="12">
+              <AFormItem label="链接地址" name="herfurl">
+                <AInput v-model:value="formData.herfurl" placeholder="请输入链接地址" />
+              </AFormItem>
+            </ACol>
+            <ACol :span="6">
+              <AFormItem label="发布时间" name="senddate">
+                <ADatePicker
+                  v-model:value="formData.senddate"
+                  value-format="x"
+                  show-time
+                  placeholder="发布时间"
+                />
+              </AFormItem>
+            </ACol>
+            <ACol :span="6">
+              <AFormItem label="是否首页" name="isHome">
+                <ASwitch
+                  v-model:checked="formData.isHome"
+                  :options="infraBooleanString"
+                  checked-children="是"
+                  un-checked-children="否"
+                />
+              </AFormItem>
+            </ACol>
+          </ARow>
         </AForm>
 
         <div class="document-wrapper flex-grow">
@@ -89,6 +116,7 @@ const loading = ref(false)
 const open = ref(true)
 const formData = ref<InformationVO>({
   isTop: false,
+  isHome: true,
   content: '',
 })
 
