@@ -192,6 +192,8 @@
                 :checked="scope.record.isenable === 1"
                 :loading="scope.record.statusLoading"
                 @change="onStatusChange(scope.record, $event)"
+                checked-children="是"
+                un-checked-children="否"
               />
             </template>
 
@@ -225,7 +227,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, getCurrentInstance } from 'vue'
 import dayjs from 'dayjs'
 import { useToggle } from '@vueuse/core'
 import useDict from '@/hooks/use-dict'
@@ -242,21 +244,36 @@ const [filterExpanded, toggle] = useToggle(false)
 
 const filterFormRef = ref()
 
+// 获取全局属性
+const { proxy } = getCurrentInstance()
+const message = proxy.$message
+const confirm = proxy.$confirm
+
 // 状态切换方法
 const onStatusChange = async (record, checked) => {
-  console.log('~~~~~~~~~~~~~~~')
-  console.log(record)
-  record.statusLoading = true
-  try {
-    // 调用后端接口
-    await updateUnitStatus(record.id, checked ? 1 : 0)
-    record.isenable = checked ? 1 : 0
-    // 可选：显示成功提示
-  } catch (error) {
-    // 错误处理
-  } finally {
-    record.statusLoading = false
-  }
+  confirm({
+    title: '确认变更状态',
+    content: `确定要${checked ? '启用' : '禁用'}该单位的登录权限吗？`,
+    onOk: async () => {
+      record.statusLoading = true
+      try {
+        // 调用后端接口
+        await updateUnitStatus(record.id, checked ? 1 : 0)
+        record.isenable = checked ? 1 : 0
+        message.success('状态更新成功')
+      } catch (error) {
+        message.error('状态更新失败，请重试')
+        // 重置开关状态
+        record.isenable = checked ? 0 : 1
+      } finally {
+        record.statusLoading = false
+      }
+    },
+    onCancel: () => {
+      // 重置开关状态
+      record.isenable = checked ? 0 : 1
+    },
+  })
 }
 
 const [

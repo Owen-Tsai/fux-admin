@@ -96,7 +96,7 @@
             </div>
           </div>
 
-          <div class="info-section">
+          <!-- <div class="info-section">
             <h3 class="section-title">会员信息</h3>
             <div class="info-grid">
               <div class="info-item">
@@ -138,7 +138,7 @@
                 }}</span>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <div class="info-section">
             <h3 class="section-title">更多信息</h3>
@@ -360,7 +360,7 @@ defineExpose({ open })
   margin: 0 0 16px;
   padding-bottom: 8px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 700;
   color: #0050b3;
   border-bottom: 1px solid #e6f7ff;
 }
@@ -387,7 +387,7 @@ defineExpose({ open })
   font-size: 14px;
   color: #6b7280;
   margin-bottom: 4px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .item-value {
