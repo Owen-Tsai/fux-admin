@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { getPlanDetail, createPlan, updatePlan, type PlanVO } from '@/api/app/plan'
+import { getAttachmentTypeSimpleList } from '@/api/app/attachment'
 import type { AppVO } from '@/api/app/app'
 import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
 
 const { appList } = defineProps<{
-  appList: AppVO[]
+  appList?: AppVO[]
 }>()
+
+const { data: attachmentTypes, pending } = useRequest(getAttachmentTypeSimpleList, {
+  immediate: true,
+})
 
 const message = useMessage()
 
@@ -16,17 +21,22 @@ const emit = defineEmits(['success'])
 const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
 
 const loading = ref(false)
-
-const formData = ref<PlanVO>({})
+const formData = ref<PlanVO>({
+  daily: false,
+})
 
 const rules: FormProps['rules'] = {
   appId: [{ required: true, message: '请选择所属应用' }],
   item: [{ required: true, message: '请输入计划名称' }],
+  startTime: [{ required: true, message: '非常态化申报计划需要指定起止时间' }],
+  endTime: [{ required: true, message: '非常态化申报计划需要指定起止时间' }],
 }
 
 const submit = async () => {
   loading.value = true
   try {
+    formData.value.flow = appList?.find((app) => app.id === formData.value.appId)?.processIds
+
     const result = await formRef.value?.validate()
     if (result === true) {
       if (mode.value === 'create') {
@@ -65,6 +75,16 @@ const open = (id?: string) => {
   visible.value = true
 }
 
+const onDailyChange = (val: boolean) => {
+  if (val) {
+    formData.value.startTime = new Date().getTime().toString()
+    formData.value.endTime = new Date('2099-01-01').getTime().toString()
+  } else {
+    formData.value.startTime = undefined
+    formData.value.endTime = undefined
+  }
+}
+
 defineExpose({ open })
 </script>
 
@@ -80,25 +100,41 @@ defineExpose({ open })
         <TInput v-model:value="formData.item" placeholder="如：2025年人才分类认定申报计划" />
       </TFormItem>
       <TFormItem label="所属应用" name="appId">
-        <TSelect v-model:value="formData.appId" :options="appList" />
+        <TSelect
+          v-model:value="formData.appId"
+          :options="appList"
+          :keys="{ label: 'name', value: 'id' }"
+          filterable
+        />
+      </TFormItem>
+      <TFormItem label="所需附件" name="attachmentTypes" help="可在附件管理中设置附件类别">
+        <TSelect
+          v-model:value="formData.attachmentTypes"
+          multiple
+          :options="attachmentTypes"
+          :keys="{ label: 'name', value: 'id' }"
+          :loading="pending"
+        />
       </TFormItem>
       <TFormItem label="常态化申报" name="daily" help="常态化申报始终开启">
-        <TSwitch v-model:value="formData.daily" />
+        <TSwitch v-model:value="formData.daily" @change="(v) => onDailyChange(v as boolean)" />
       </TFormItem>
-      <TFormItem label="开始时间" name="startTime">
-        <TDatePicker
-          v-model:value="formData.startTime"
-          value-type="YYYY-MM-DD HH:mm:ss"
-          enable-time-picker
-        />
-      </TFormItem>
-      <TFormItem label="截止时间" name="endTime">
-        <TDatePicker
-          v-model:value="formData.endTime"
-          value-type="YYYY-MM-DD HH:mm:ss"
-          enable-time-picker
-        />
-      </TFormItem>
+      <template v-if="!formData.daily">
+        <TFormItem label="开始时间" name="startTime">
+          <TDatePicker
+            v-model:value="formData.startTime"
+            value-type="time-stamp"
+            enable-time-picker
+          />
+        </TFormItem>
+        <TFormItem label="截止时间" name="endTime">
+          <TDatePicker
+            v-model:value="formData.endTime"
+            value-type="time-stamp"
+            enable-time-picker
+          />
+        </TFormItem>
+      </template>
     </TForm>
   </TDialog>
 </template>

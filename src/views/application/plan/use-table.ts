@@ -7,15 +7,15 @@ export const columns: TableProps['columns'] = [
   { title: '所属应用', colKey: 'appId', ellipsis: true },
   {
     title: '开始时间',
-    width: 120,
-    colKey: 'createTime',
+    width: 180,
+    colKey: 'startTime',
   },
   {
     title: '截止时间',
-    width: 120,
+    width: 170,
     colKey: 'endTime',
   },
-  { title: '操作', width: 100, colKey: 'actions' },
+  { title: '操作', width: 140, colKey: 'actions' },
 ]
 
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {

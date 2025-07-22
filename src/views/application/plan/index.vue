@@ -3,7 +3,10 @@ import dayjs from 'dayjs'
 import Form from './form.vue'
 import { columns, useTable } from './use-table'
 import { getApplicationSimpleList } from '@/api/app/app'
+import type { PlanVO } from '@/api/app/plan'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
+
+const { resolve } = useRouter()
 
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
@@ -15,6 +18,11 @@ const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pendin
   useTable(queryForm)
 
 const { data: appList } = useRequest(getApplicationSimpleList, { immediate: true })
+
+const toDesignPage = (id: string) => {
+  const { href } = resolve({ path: `/app-design/${id}` })
+  window.open(href, '_blank')
+}
 </script>
 
 <template>
@@ -24,7 +32,7 @@ const { data: appList } = useRequest(getApplicationSimpleList, { immediate: true
         ref="queryForm"
         :data="query"
         layout="inline"
-        class="flex flex-wrap gap-y-4 w-full"
+        class="query-form flex flex-wrap gap-y-4 w-full"
         label-width="100px"
         @submit="onQueryChange()"
         @reset="onQueryChange(true)"
@@ -44,18 +52,22 @@ const { data: appList } = useRequest(getApplicationSimpleList, { immediate: true
         <TFormItem v-show="expanded" label="开始时间" name="createTime" class="col">
           <TDateRangePicker
             v-model:value="query.createTime"
-            type="date"
-            value-format="YYYY-MM-DD"
+            enable-time-picker
+            value-type="YYYY-MM-DD HH:mm:ss"
           />
         </TFormItem>
         <TFormItem v-show="expanded" label="截止时间" name="endTime" class="col">
-          <TDateRangePicker v-model:value="query.endTime" type="date" value-format="YYYY-MM-DD" />
+          <TDateRangePicker
+            v-model:value="query.endTime"
+            enable-time-picker
+            value-type="YYYY-MM-DD HH:mm:ss"
+          />
         </TFormItem>
-        <QueryActions v-model:expanded="expanded" class="col" />
+        <QueryActions v-model:expanded="expanded" :class="`col ${expanded ? 'ml-1/3' : ''}`" />
       </TForm>
     </TCard>
 
-    <TCard header="申报计划">
+    <TCard title="申报计划">
       <template #actions>
         <div class="flex items-center gap-2">
           <TButton
@@ -86,44 +98,70 @@ const { data: appList } = useRequest(getApplicationSimpleList, { immediate: true
         :loading="pending"
         @page-change="onPageChange"
       >
-        <template #stratTime="{ row }">
-          {{ dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss') }}
+        <template #startTime="{ row }">
+          {{
+            dayjs(row.endTime).year() >= 2099
+              ? '常态化'
+              : dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss')
+          }}
         </template>
         <template #endTime="{ row }">
-          {{ dayjs(row.endTime).format('YYYY-MM-DD HH:mm:ss') }}
+          {{
+            dayjs(row.endTime).year() >= 2099
+              ? '常态化'
+              : dayjs(row.endTime).format('YYYY-MM-DD HH:mm:ss')
+          }}
         </template>
         <template #appId="{ row }">
           {{ appList?.find((item) => item.id === row.appId)?.name }}
         </template>
-        <template #actions="{ row }">
-          <TTooltip content="编辑">
-            <TButton
-              shape="square"
-              theme="primary"
-              variant="text"
-              :disabled="permission.hasNone('system:application:update')"
-              @click="formRef?.open(row.id)"
-            >
-              <template #icon>
-                <TIcon name="edit-2" />
-              </template>
-            </TButton>
-          </TTooltip>
-          <TTooltip content="删除">
-            <TPopconfirm
-              content="确定删除吗？该操作无法撤销，请确认该计划没有正在进行中的申报流程"
-              theme="danger"
-              @confirm="onDelete(row.id!)"
-            >
-              <TButton shape="square" theme="danger" variant="text">
+        <template #actions="{ row }: TableScope<PlanVO>">
+          <div class="flex items-center gap-2">
+            <TTooltip content="编辑">
+              <TButton
+                shape="square"
+                theme="primary"
+                variant="text"
+                :disabled="permission.hasNone('system:apply-plan:update')"
+                @click="formRef?.open(row.id)"
+              >
                 <template #icon>
-                  <TIcon name="delete" />
+                  <TIcon name="edit-2" />
                 </template>
               </TButton>
-            </TPopconfirm>
-          </TTooltip>
+            </TTooltip>
+            <TTooltip content="设计应用">
+              <TButton
+                shape="square"
+                theme="primary"
+                variant="text"
+                :disabled="permission.hasNone('system:application:design')"
+                @click="toDesignPage(row.appId!)"
+              >
+                <template #icon>
+                  <TIcon name="system-code" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TTooltip content="删除">
+              <TPopconfirm
+                v-if="permission.has('system:apply-plan:delete')"
+                content="确定删除吗？该操作无法撤销，请确认该计划没有正在进行中的申报流程"
+                theme="danger"
+                @confirm="onDelete(row.id!)"
+              >
+                <TButton shape="square" theme="danger" variant="text">
+                  <template #icon>
+                    <TIcon name="delete" />
+                  </template>
+                </TButton>
+              </TPopconfirm>
+            </TTooltip>
+          </div>
         </template>
       </TTable>
     </TCard>
+
+    <Form ref="formRef" :app-list="appList" @success="execute" />
   </div>
 </template>
