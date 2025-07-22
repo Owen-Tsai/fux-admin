@@ -6,8 +6,8 @@ export type AttachmentTypeVO = {
   allowedFileTypes?: string[]
   maxFileSize?: number
   moduleName?: string
-  required?: number
-  isLib?: string
+  required?: boolean
+  isLib?: boolean
   libType?: string
   createTime?: string
 }

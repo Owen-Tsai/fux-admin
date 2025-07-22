@@ -143,9 +143,8 @@ const toDesignPage = (id: string) => {
                 </template>
               </TButton>
             </TTooltip>
-            <TTooltip content="删除">
+            <TTooltip v-if="permission.has('system:apply-plan:delete')" content="删除">
               <TPopconfirm
-                v-if="permission.has('system:apply-plan:delete')"
                 content="确定删除吗？该操作无法撤销，请确认该计划没有正在进行中的申报流程"
                 theme="danger"
                 @confirm="onDelete(row.id!)"
