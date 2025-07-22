@@ -186,9 +186,6 @@ const generateSchema = async () => {
     dialog.confirm({
       header: '重新生成 Schema',
       body: '当前应用的数据源配置已经被修改，生成 Schema 将覆盖应用原本的 Schema。确定要执行此操作吗？',
-      onCancel() {
-        return
-      },
       async onConfirm() {
         await doGenerate()
       },
