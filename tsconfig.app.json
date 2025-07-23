@@ -13,7 +13,7 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "jsx": "preserve",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "paths": {
       "@/*": ["./src/*"],
       "@fusionx/core/*": ["./src/components/_fux-core/*"]
