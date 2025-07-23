@@ -2,6 +2,7 @@ import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
 import {
   getCodeGenConfigList,
   deleteCodeGenConfig,
+  downloadCode,
   type ListQueryParams,
 } from '@/api/infra/code-gen'
 
@@ -76,6 +77,10 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     push(`/infra/code-gen/edit?id=${id}`)
   }
 
+  const onDownload = (id: number) => {
+    downloadCode(id)
+  }
+
   return {
     query,
     execute,
@@ -86,5 +91,6 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     onQueryChange,
     onDelete,
     onEdit,
+    onDownload,
   }
 }

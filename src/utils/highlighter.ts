@@ -8,7 +8,14 @@ const jsEngine = createJavaScriptRegexEngine()
 
 const highlighterPromise = createHighlighterCore({
   themes: [vitesseLight, vitesseDark],
-  langs: [import('@shikijs/langs/json')],
+  langs: [
+    import('@shikijs/langs/json'),
+    import('@shikijs/langs/typescript'),
+    import('@shikijs/langs/java'),
+    import('@shikijs/langs/vue'),
+    import('@shikijs/langs/sql'),
+    import('@shikijs/langs/xml'),
+  ],
   engine: jsEngine,
 })
 

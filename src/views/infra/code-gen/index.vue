@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import cn from 'classnames'
+import dayjs from 'dayjs'
 import { columns, useTable } from './use-table'
 import Form from './form.vue'
+import PreviewModal from './preview.vue'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
-import dayjs from 'dayjs'
 import { getDataSourceList } from '@/api/infra/data-source'
 import type { ConfigVO } from '@/api/infra/code-gen'
 
@@ -11,12 +12,27 @@ const { permission } = usePermission()
 
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+const previewModalRef = useTemplateRef<InstanceType<typeof PreviewModal>>('previewModalRef')
 
-const { query, data, pending, execute, pagination, onPageChange, onQueryChange, onDelete, onEdit } =
-  useTable(queryForm)
+const {
+  query,
+  data,
+  pending,
+  execute,
+  pagination,
+  onPageChange,
+  onQueryChange,
+  onDelete,
+  onEdit,
+  onDownload,
+} = useTable(queryForm)
 const { data: dataSourceList } = useRequest(getDataSourceList, { immediate: true })
 
 const expanded = ref(false)
+
+const onPreview = (id: number) => {
+  previewModalRef.value?.open(id)
+}
 
 defineOptions({ name: 'InfraCodeGen' })
 </script>
@@ -110,10 +126,15 @@ defineOptions({ name: 'InfraCodeGen' })
                 </template>
               </TButton>
               <TDropdownMenu>
-                <TDropdownItem :disabled="!permission.has('infra:code-gen:preview')"
+                <TDropdownItem
+                  :disabled="!permission.has('infra:code-gen:preview')"
+                  @click="onPreview(row.id!)"
                   >生成代码预览</TDropdownItem
                 >
-                <TDropdownItem :disabled="!permission.has('infra:code-gen:download')" divider
+                <TDropdownItem
+                  :disabled="!permission.has('infra:code-gen:download')"
+                  divider
+                  @click="onDownload(row.id!)"
                   >生成并下载代码</TDropdownItem
                 >
                 <TDropdownItem divider>同步表结构</TDropdownItem>
@@ -126,5 +147,6 @@ defineOptions({ name: 'InfraCodeGen' })
     </TCard>
 
     <Form ref="formRef" :data-source-list="dataSourceList" @success="execute()" />
+    <PreviewModal ref="previewModalRef" />
   </div>
 </template>
