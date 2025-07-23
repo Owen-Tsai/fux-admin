@@ -118,6 +118,7 @@ const formData = ref<InformationVO>({
   isTop: false,
   isHome: true,
   content: '',
+  senddate: new Date().getTime() as unknown as string,
 })
 
 const [infraBooleanString] = useDict('infra_boolean_string')
