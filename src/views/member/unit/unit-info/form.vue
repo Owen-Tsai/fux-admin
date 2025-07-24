@@ -1,7 +1,6 @@
 <template>
   <AModal
     v-model:open="visible"
-    :title="isViewMode ? '查看单位信息' : mode === 'create' ? '新增' : '编辑'"
     :confirm-loading="loading"
     :footer="isViewMode ? null : undefined"
     @ok="submit"
@@ -9,196 +8,122 @@
     class="company-modal"
   >
     <ASpin :spinning="loading">
-      <div class="company-info-card">
+      <div class="view-form mt-4">
         <div class="card-header">
           <h2 class="card-title">{{ formData.name || '企业信息' }}</h2>
-          <div class="card-subtitle">{{ '统一社会信用代码 : ' + formData.creditrate || '无' }}</div>
+          <div class="card-subtitle">
+            {{ getDictLabel(COMPANY_NATURE, formData.unitnature) || '' }}
+          </div>
         </div>
 
-        <div class="card-body">
-          <div class="info-section">
-            <h3 class="section-title">基本信息</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="item-label">用户名:</span>
-                <span class="item-value">{{ formData.username || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">email:</span>
-                <span class="item-value">{{ formData.email || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">注册时间:</span>
-                <span class="item-value">{{ formatDate(formData.regdate) || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">单位编码:</span>
-                <span class="item-value">{{ formData.code || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">单位性质:</span>
-                <span class="item-value">{{
-                  getDictLabel(UNIT_TYPE, formData.unitType) || '-'
-                }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">单位规模:</span>
-                <span class="item-value">{{
-                  getDictLabel(SCALE_SIZE, formData.unitSize) || '-'
-                }}</span>
-              </div>
-              <!-- <div class="info-item">
-                <span class="item-label">注册资金:</span>
-                <span class="item-value">{{ formData.regfund || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">行业类别:</span>
-                <span class="item-value">{{ formData.tradeinfoid || '-' }}</span>
-              </div> -->
-            </div>
-          </div>
+        <!-- 基本信息表格 -->
+        <div class="form-section">
+          <h3 class="section-title">基本信息</h3>
+          <table class="talent-table">
+            <tbody>
+              <tr>
+                <td class="label-cell">用户名</td>
+                <td class="value-cell">{{ formData.username || '-' }}</td>
+                <td class="label-cell">单位编码</td>
+                <td class="value-cell">{{ formData.code || '-' }}</td>
+              </tr>
+              <!-- <tr>
+                <td class="label-cell">注册时间</td>
+                <td class="value-cell">{{ formatDate(formData.regdate) || '-' }}</td>
+              </tr> -->
+              <tr>
+                <td class="label-cell">统一信用代码</td>
+                <td class="value-cell">{{ formData.creditrate || '-' }}</td>
+                <td class="label-cell">单位规模</td>
+                <td class="value-cell">{{ getDictLabel(SCALE_SIZE, formData.unitSize) || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="label-cell" style="vertical-align: top">单位简介</td>
+                <td class="value-cell" colspan="3">{{ formData.introduce || '暂无介绍' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <div class="info-section">
-            <h3 class="section-title">联系信息</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="item-label">单位地址:</span>
-                <span class="item-value">{{ formData.address || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">联系人:</span>
-                <span class="item-value">{{ formData.contact || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">手机号:</span>
-                <span class="item-value">{{ formData.mobile || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">电话:</span>
-                <span class="item-value">{{ formData.telphone || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">传真:</span>
-                <span class="item-value">{{ formData.fax || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">email:</span>
-                <span class="item-value">{{ formData.email || '-' }}</span>
-              </div>
-              <!-- <div class="info-item">
-                <span class="item-label">主页:</span>
-                <span class="item-value">{{ formData.homepage || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">单位网站:</span>
-                <span class="item-value">{{ formData.website || '-' }}</span>
-              </div> -->
-            </div>
-          </div>
+        <!-- 联系信息表格 -->
+        <div class="form-section">
+          <h3 class="section-title">联系信息</h3>
+          <table class="talent-table">
+            <tbody>
+              <tr>
+                <td class="label-cell">单位地址</td>
+                <td class="value-cell">{{ formData.address || '-' }}</td>
+                <td class="label-cell">联系人</td>
+                <td class="value-cell">{{ formData.contact || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="label-cell">手机号</td>
+                <td class="value-cell">{{ formData.mobile || '-' }}</td>
+                <td class="label-cell">电话</td>
+                <td class="value-cell">{{ formData.telphone || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="label-cell">传真</td>
+                <td class="value-cell">{{ formData.fax || '-' }}</td>
+                <td class="label-cell">email</td>
+                <td class="value-cell">{{ formData.email || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <!-- <div class="info-section">
-            <h3 class="section-title">会员信息</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="item-label">会员开始时间:</span>
-                <span class="item-value">{{ formatDate(formData.memstartdate) || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">会员结束时间:</span>
-                <span class="item-value">{{ formatDate(formData.memenddate) || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">是否市场会员:</span>
-                <span class="item-value">{{
-                  formData.ismarket ? '是' : formData.ismarket === false ? '否' : '-'
-                }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">市场会员开始时间:</span>
-                <span class="item-value">{{ formatDate(formData.marstartdate) || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">市场会员结束时间:</span>
-                <span class="item-value">{{ formatDate(formData.marenddate) || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">是否接收邮件:</span>
-                <span class="item-value">{{
-                  getDictLabel(YES_NO, formData.isreceiveemail) || '-'
-                }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">是否可用:</span>
-                <span class="item-value">{{ getDictLabel(YES_NO, formData.isenable) || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">是否VIP:</span>
-                <span class="item-value">{{
-                  formData.isvip ? '是' : formData.isvip === false ? '否' : '-'
-                }}</span>
-              </div>
-            </div>
-          </div> -->
+        <!-- 更多信息表格 -->
+        <div class="form-section">
+          <h3 class="section-title">更多信息</h3>
+          <table class="talent-table">
+            <tbody>
+              <tr>
+                <td class="label-cell">法定代表人</td>
+                <td class="value-cell">{{ formData.legalrepresent || '-' }}</td>
+                <td class="label-cell">银行</td>
+                <td class="value-cell">{{ formData.bank || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="label-cell">银行账号</td>
+                <td class="value-cell">{{ formData.account || '-' }}</td>
+                <td class="label-cell">税务登记号</td>
+                <td class="value-cell">{{ formData.taxNumber || '-' }}</td>
+              </tr>
+              <tr>
+                <td class="label-cell">隶属关系</td>
+                <td class="value-cell">
+                  {{ getDictLabel(COMPANY_RELATION, formData.belongTo) || '-' }}
+                </td>
+                <td class="label-cell">机构类型</td>
+                <td class="value-cell">
+                  {{ getDictLabel(ORG_TYPE, formData.institutionType) || '-' }}
+                </td>
+              </tr>
+              <tr>
+                <td class="label-cell">技术领域</td>
+                <td class="value-cell">
+                  {{ getDictLabel(TEC_FIELD, formData.technicalField) || '-' }}
+                </td>
+                <td class="label-cell">控股情况</td>
+                <td class="value-cell">
+                  {{ getDictLabel(COM_HOLDINGS, formData.holdingSituation) || '-' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <div class="info-section">
-            <h3 class="section-title">更多信息</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="item-label">法定代表人:</span>
-                <span class="item-value">{{ formData.legalrepresent || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">银行:</span>
-                <span class="item-value">{{ formData.bank || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">银行账号:</span>
-                <span class="item-value">{{ formData.account || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">税务登记号:</span>
-                <span class="item-value">{{ formData.taxNumber || '-' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">隶属关系:</span>
-                <span class="item-value">{{
-                  getDictLabel(COMPANY_RELATION, formData.belongTo) || '-'
-                }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">机构类型:</span>
-                <span class="item-value">{{
-                  getDictLabel(ORG_TYPE, formData.institutionType) || '-'
-                }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">技术领域:</span>
-                <span class="item-value">{{
-                  getDictLabel(TEC_FIELD, formData.technicalField) || '-'
-                }}</span>
-              </div>
-              <div class="info-item">
-                <span class="item-label">控股情况:</span>
-                <span class="item-value">{{
-                  getDictLabel(COM_HOLDINGS, formData.holdingSituation) || '-'
-                }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="info-section">
-            <h3 class="section-title">单位介绍</h3>
-            <div class="info-textarea">
-              {{ formData.introduce || '暂无介绍' }}
-            </div>
-          </div>
-
-          <div class="info-section">
-            <h3 class="section-title">备注</h3>
-            <div class="info-textarea">
-              {{ formData.remark || '无' }}
-            </div>
-          </div>
+        <!-- 备注 -->
+        <div class="form-section">
+          <h3 class="section-title">备注</h3>
+          <table class="talent-table">
+            <tbody>
+              <tr>
+                <td class="label-cell" style="vertical-align: top">备注内容</td>
+                <td class="value-cell" colspan="3">{{ formData.remark || '无' }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </ASpin>
@@ -239,6 +164,7 @@ const [
   TEC_FIELD,
   COM_HOLDINGS,
   NON_PUBLIC_COM_TYPE,
+  COMPANY_NATURE,
 ] = useDict(
   'unit_type',
   'scale_size',
@@ -248,6 +174,7 @@ const [
   'tec_field',
   'com_holdings',
   'non_public_com_type',
+  'company_nature',
 )
 
 // 格式化日期
@@ -311,18 +238,15 @@ defineExpose({ open })
   --ant-modal-content-bg: #f0f7ff;
 }
 
-.company-info-card {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  border: 1px solid #e6f7ff;
+.view-form {
+  padding: 16px;
 }
 
 .card-header {
   padding: 16px 24px;
   background-color: #e6f7ff;
   border-bottom: 1px solid #bae7ff;
+  margin-bottom: 20px;
 }
 
 .card-title {
@@ -339,71 +263,68 @@ defineExpose({ open })
   color: #0050b3;
 }
 
-.card-body {
-  padding: 24px;
-  background-color: #fff;
-}
-
-.info-section {
+.form-section {
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px dashed #e8e8e8;
-}
-
-.info-section:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
 }
 
 .section-title {
-  margin: 0 0 16px;
-  padding-bottom: 8px;
-  font-size: 16px;
-  font-weight: 700;
-  color: #0050b3;
-  border-bottom: 1px solid #e6f7ff;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-.info-item {
+  padding: 12px 16px 12px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #1f2329;
+  position: relative;
   display: flex;
-  flex-direction: column;
-  padding: 8px;
-  border-radius: 4px;
-  transition: all 0.3s;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.info-item:hover {
-  background-color: #f0f7ff;
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background-color: #1890ff;
+  border-radius: 50%;
 }
 
-.item-label {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 4px;
+.talent-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-left: 1px solid #e8e8e8;
+  border-right: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  border-top: 1px dashed #b5b5b5;
+}
+
+.talent-table tr {
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.talent-table tr:last-child {
+  border-bottom: none;
+}
+
+.talent-table td {
+  padding: 12px 16px;
+  vertical-align: top;
+}
+
+.label-cell {
+  width: 20%;
+  background-color: #f5f5f5; /* 浅灰色背景 */
   font-weight: 700;
+  color: #6b6b6b;
+  text-align: left;
+  padding-right: 16px;
 }
 
-.item-value {
-  font-size: 14px;
-  color: #1f2329;
+.value-cell {
+  width: 30%;
+  padding-left: 16px;
   word-break: break-word;
-}
-
-.info-textarea {
-  padding: 12px;
-  background-color: #f0f7ff;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #1f2329;
-  min-height: 80px;
-  word-break: break-word;
-  border: 1px solid #e6f7ff;
 }
 </style>
