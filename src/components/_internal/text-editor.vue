@@ -60,7 +60,7 @@ const value = defineModel<string>('value')
 const cToolbar = computed(
   () =>
     toolbar ||
-    'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | image media link | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor | removeformat',
+    'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | table image media link | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor | removeformat',
 )
 
 const cPlugins = computed(() => plugins || 'image link media lists table wordcount quickbars')
@@ -79,8 +79,11 @@ const initOpts = {
   branding: false,
   language_url: '/tinymce/langs/zh_CN.js',
   language: 'zh_CN',
+  menubar: false,
+  object_resizing: true,
   toolbar_mode: 'sliding',
   skin: isDark.value ? 'oxide-dark' : 'oxide',
+  content_css: isDark.value ? 'dark' : 'default',
   image_advtab: true,
   file_picker_callback: filePickerCallback,
 }
