@@ -6,6 +6,7 @@
     :confirm-loading="loading"
     :after-close="resetFields"
     wrap-class-name="fullscreen-modal"
+    :body-style="{ overflowX: 'hidden', overflowY: 'auto' }"
     width="100%"
     @ok="submit"
   >
@@ -75,11 +76,46 @@
               </AFormItem>
             </ACol>
           </ARow>
+          <ARow>
+            <ACol :span="24">
+              <AFormItem label="首页图片" name="imageinfo">
+                <FileUpload
+                  v-model:value="formData.imageinfo"
+                  :client-id="27"
+                  list-type="picture-card"
+                  :accept="['jpg', 'jpeg', 'png', 'gif']"
+                  :multiple="false"
+                  :limit="1"
+                  :size-limit="10240"
+                />
+              </AFormItem>
+            </ACol>
+          </ARow>
+          <ARow>
+            <ACol :span="12">
+              <AFormItem label="附件" name="attachment">
+                <FileUpload
+                  v-model:value="formData.attachment"
+                  :client-id="28"
+                  list-type="text"
+                  :accept="['pdf', 'doc', 'docx', 'xls', 'xlsx']"
+                  :multiple="false"
+                  :limit="5"
+                  :size-limit="10240"
+                />
+              </AFormItem>
+            </ACol>
+          </ARow>
+          <ARow>
+            <ACol :span="23">
+              <AFormItem label="资讯内容" name="content">
+                <EEditor type="document" v-model:value="formData.content" />
+              </AFormItem>
+            </ACol>
+          </ARow>
         </AForm>
 
-        <div class="document-wrapper flex-grow">
-          <EEditor type="document" v-model:value="formData.content" />
-        </div>
+        <div class="document-wrapper flex-grow"></div>
       </div>
     </ASpin>
   </AModal>
@@ -96,6 +132,7 @@ import {
 } from '@/api/information/list'
 import { message, type FormInstance, type FormProps } from 'ant-design-vue'
 import EEditor from '@/components/editor/index.vue'
+import FileUpload from '@/components/upload/index.vue'
 
 const rules: FormProps['rules'] = {
   title: [{ required: true, message: '请填写标题' }],
@@ -174,5 +211,18 @@ if (props.record?.id) {
 .document-wrapper {
   background-color: var(--color-bg-layout);
   height: calc(100% - 72px);
+}
+.avatar-uploader > .ant-upload {
+  width: 128px;
+  height: 128px;
+}
+.ant-upload-select-picture-card i {
+  font-size: 32px;
+  color: #999;
+}
+
+.ant-upload-select-picture-card .ant-upload-text {
+  margin-top: 8px;
+  color: #666;
 }
 </style>

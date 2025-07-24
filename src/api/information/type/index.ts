@@ -18,6 +18,11 @@ export type InformationTypeVO = {
   updateTime?: string
 }
 
+export type InformationTypeAuditVO = {
+  id?: string
+  isAudit?: boolean
+}
+
 const prefix = '/admin-api/system/type'
 
 export const getTypeTree = (params: TypeQueryParams) => {
@@ -43,6 +48,13 @@ export const createInfoType = (data: InformationTypeVO) => {
 export const updateInfoType = (data: InformationTypeVO) => {
   return request.put({
     url: `${prefix}/update`,
+    data,
+  })
+}
+
+export const updateInfoTypeAudit = (data: InformationTypeAuditVO) => {
+  return request.put({
+    url: `${prefix}/update-audit`,
     data,
   })
 }

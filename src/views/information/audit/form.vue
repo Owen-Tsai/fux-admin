@@ -5,6 +5,7 @@
     destroy-on-close
     :confirm-loading="loading"
     :after-close="resetFields"
+    :body-style="{ overflowX: 'hidden', overflowY: 'auto' }"
     wrap-class-name="fullscreen-modal"
     width="100%"
   >
@@ -47,11 +48,73 @@
               </AFormItem>
             </ACol>
           </ARow>
+          <ARow :gutter="24">
+            <ACol :span="12">
+              <AFormItem label="链接地址" name="herfurl">
+                <AInput v-model:value="formData.herfurl" placeholder="请输入链接地址" />
+              </AFormItem>
+            </ACol>
+            <ACol :span="6">
+              <AFormItem label="发布时间" name="senddate">
+                <ADatePicker
+                  v-model:value="formData.senddate"
+                  value-format="x"
+                  show-time
+                  placeholder="发布时间"
+                />
+              </AFormItem>
+            </ACol>
+            <ACol :span="6">
+              <AFormItem label="是否首页" name="isHome">
+                <ASwitch
+                  v-model:checked="formData.isHome"
+                  :options="infraBooleanString"
+                  checked-children="是"
+                  un-checked-children="否"
+                />
+              </AFormItem>
+            </ACol>
+          </ARow>
+          <ARow>
+            <ACol :span="24">
+              <AFormItem label="首页图片" name="imageinfo">
+                <FileUpload
+                  v-model:value="formData.imageinfo"
+                  :client-id="27"
+                  list-type="picture-card"
+                  :accept="['jpg', 'jpeg', 'png', 'gif']"
+                  :multiple="false"
+                  :limit="1"
+                  :size-limit="10240"
+                  disabled
+                />
+              </AFormItem>
+            </ACol>
+          </ARow>
+          <ARow>
+            <ACol :span="12">
+              <AFormItem label="附件" name="attachment">
+                <FileUpload
+                  v-model:value="formData.attachment"
+                  :client-id="28"
+                  list-type="text"
+                  :accept="['pdf', 'doc', 'docx', 'xls', 'xlsx']"
+                  :multiple="false"
+                  :limit="5"
+                  :size-limit="10240"
+                  disabled
+                />
+              </AFormItem>
+            </ACol>
+          </ARow>
+          <ARow>
+            <ACol :span="23">
+              <AFormItem label="资讯内容" name="content">
+                <EEditor type="document" v-model:value="formData.content" />
+              </AFormItem>
+            </ACol>
+          </ARow>
         </AForm>
-
-        <div class="document-wrapper flex-grow">
-          <EEditor type="document" v-model:value="formData.content" />
-        </div>
       </div>
     </ASpin>
     <template #footer>
@@ -79,6 +142,7 @@ import {
 import { message, type FormInstance, type FormProps } from 'ant-design-vue'
 import EEditor from '@/components/editor/index.vue'
 import { permission } from '@/hooks/use-permission'
+import FileUpload from '@/components/upload/index.vue'
 
 const rules: FormProps['rules'] = {
   title: [{ required: true, message: '请填写标题' }],

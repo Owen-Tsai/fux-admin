@@ -10,10 +10,10 @@ const generateFileName = async (file: File) => {
   return `${sha256}${ext}`
 }
 
-const useUpload = () => {
+const useUpload = (clientId?: number) => {
   const uploadUrl = import.meta.env.VITE_UPLOAD_URL
   const httpRequest = async (options: UploadRequestOption) => {
-    uploadFile({ file: options.file })
+    uploadFile({ file: options.file, clientId })
       .then((res) => {
         if (res.code === 0) {
           options.onSuccess?.(res)

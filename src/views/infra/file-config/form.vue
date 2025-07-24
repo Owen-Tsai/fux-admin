@@ -147,7 +147,7 @@ const storageType = {
 const rules: FormProps['rules'] = {
   name: [{ required: true, message: '请填写配置名称' }],
   storage: [{ required: true, message: '请选择存储器' }],
-  domain: [{ required: true, message: '请填写自定义域名' }],
+  // domain: [{ required: true, message: '请填写自定义域名' }],
 }
 
 const props = defineProps<{

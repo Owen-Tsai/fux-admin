@@ -1,6 +1,7 @@
 <template>
   <AUpload
     :action="action || uploadUrl"
+    :client-id="clientId"
     :accept="accept.join(',')"
     :max-count="limit"
     :list-type="listType"
@@ -13,7 +14,10 @@
     @remove="onRemove"
   >
     <slot>
-      <AButton v-if="listType === 'text' || listType === 'picture'" :loading="loading">
+      <AButton
+        v-if="(listType === 'text' || listType === 'picture') && !disabled"
+        :loading="loading"
+      >
         <UploadOutlined />
         选择文件
       </AButton>
@@ -33,11 +37,13 @@
 import { generateId } from '@fusionx/utils'
 import { Upload, message, type UploadProps, type UploadFile } from 'ant-design-vue'
 import useUpload from '@/hooks/use-upload'
+import { number } from 'echarts'
 
 const { LIST_IGNORE } = Upload
 
 const props = defineProps({
   action: String,
+  clientId: Number,
   accept: {
     type: Array as PropType<string[]>,
     default: () => ['pdf', 'png', 'svg', 'jpg', 'doc', 'docx'],
@@ -68,7 +74,7 @@ const uploadedCount = ref<number>(0)
 const fileList = ref<UploadFile[]>([])
 const uploadList = ref<UploadFile[]>([])
 
-const { httpRequest, uploadUrl } = useUpload()
+const { httpRequest, uploadUrl } = useUpload(props.clientId)
 
 const beforeUpload: UploadProps['beforeUpload'] = (file) => {
   // check for the count

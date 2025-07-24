@@ -1,7 +1,7 @@
 import useRequest from '@/hooks/use-request'
 import {
   getTypeTree,
-  updateInfoType,
+  updateInfoTypeAudit,
   type TypeQueryParams,
   type InformationTypeVO,
 } from '@/api/information/type'
@@ -31,7 +31,7 @@ export const useTable = (formRef: Ref<FormInstance>) => {
   }
 
   const onChange = (data: InformationTypeVO) => {
-    updateInfoType({
+    updateInfoTypeAudit({
       id: data.id,
       isAudit: data.isAudit,
     })

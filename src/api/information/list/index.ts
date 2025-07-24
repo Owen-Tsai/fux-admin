@@ -9,6 +9,8 @@ export type InformationVO = {
   id?: string
   title?: string
   herfurl?: string
+  imageinfo?: string
+  attachment?: Array<string>
   sort?: number
   isTop?: boolean
   isHome?: boolean
