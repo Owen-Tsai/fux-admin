@@ -118,3 +118,13 @@ export const updateUnitStatus = (id: number, status: number) => {
     },
   })
 }
+
+// 重置单位密码
+export const resetPassword = (id: number) => {
+  return request.put({
+    url: `${prefix}/reset-password`,
+    params: {
+      id,
+    },
+  })
+}

@@ -11,75 +11,60 @@
       >
         <ARow :gutter="[0, 16]">
           <ACol :lg="8" :span="24">
-            <AFormItem label="单位名称" name="name">
-              <AInput v-model:value="queryParams.name" placeholder="请输入单位名称" allow-clear />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="8" :span="24">
             <AFormItem label="用户名" name="username">
               <AInput v-model:value="queryParams.username" placeholder="请输入用户名" allow-clear />
             </AFormItem>
           </ACol>
-
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="email" name="email">
-              <AInput v-model:value="queryParams.email" placeholder="请输入email" allow-clear />
+          <ACol :lg="8" :span="24">
+            <AFormItem label="身份证号" name="idcard">
+              <AInput v-model:value="queryParams.idcard" placeholder="请输入身份证号" allow-clear />
             </AFormItem>
           </ACol>
-
           <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="注册时间" name="regdate">
-              <ARangePicker
-                v-model:value="queryParams.regdate"
+            <AFormItem label="姓名" name="name">
+              <AInput v-model:value="queryParams.name" placeholder="请输入姓名" allow-clear />
+            </AFormItem>
+          </ACol>
+          <ACol v-show="filterExpanded" :lg="8" :span="24">
+            <AFormItem label="出生年月" name="birthday">
+              <ADatePicker
+                v-model:value="queryParams.birthday"
                 value-format="YYYY-MM-DD HH:mm:ss"
-              />
-            </AFormItem>
-          </ACol>
-
-          <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="单位编码" name="code">
-              <AInput v-model:value="queryParams.code" placeholder="请输入单位编码" allow-clear />
-            </AFormItem>
-          </ACol> -->
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="统一社会信用代码" name="creditrate">
-              <AInput
-                v-model:value="queryParams.creditrate"
-                placeholder="请输入统一社会信用代码"
-                allow-clear
+                placeholder="请选择出生年月"
               />
             </AFormItem>
           </ACol>
           <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="单位性质" name="unitnature">
+            <AFormItem label="性别" name="sex">
               <ASelect
-                v-model:value="queryParams.unitnature"
-                :options="COMPANY_NATURE"
-                placeholder="请选择单位性质"
+                v-model:value="queryParams.sex"
+                :options="USER_SEX"
+                placeholder="请选择性别"
               />
             </AFormItem>
           </ACol>
-          <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="联系人" name="contact">
-              <AInput v-model:value="queryParams.contact" placeholder="请输入联系人" allow-clear />
-            </AFormItem>
-          </ACol> -->
-          <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
+          <ACol v-show="filterExpanded" :lg="8" :span="24">
             <AFormItem label="手机号" name="mobile">
               <AInput v-model:value="queryParams.mobile" placeholder="请输入手机号" allow-clear />
             </AFormItem>
+          </ACol>
+          <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
+            <AFormItem label="email" name="email">
+              <AInput v-model:value="queryParams.email" placeholder="请输入email" allow-clear />
+            </AFormItem>
           </ACol> -->
           <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="电话" name="telphone">
-              <AInput v-model:value="queryParams.telphone" placeholder="请输入电话" allow-clear />
+            <AFormItem label="学历" name="diploma">
+              <ASelect
+                v-model:value="queryParams.diploma"
+                :options="RC_EDUCATION_LEVEL"
+                placeholder="请选择学历"
+              />
             </AFormItem>
           </ACol>
           <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
-              <AFormItem label="最后登录时间" name="lastlogondate">
-              <ARangePicker
-                v-model:value="queryParams.lastlogondate"
-                value-format="YYYY-MM-DD HH:mm:ss"
-              />
+            <AFormItem label="毕业院校" name="eduschool">
+              <AInput v-model:value="queryParams.eduschool" placeholder="请输入毕业院校" allow-clear />
             </AFormItem>
           </ACol> -->
           <ACol v-show="filterExpanded" :lg="8" :span="24">
@@ -91,15 +76,28 @@
               />
             </AFormItem>
           </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="法定代表人" name="legalrepresent">
-              <AInput
-                v-model:value="queryParams.legalrepresent"
-                placeholder="请输入法定代表人"
-                allow-clear
+          <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
+              <AFormItem label="注册时间" name="regdate">
+              <ARangePicker
+                v-model:value="queryParams.regdate"
+                value-format="YYYY-MM-DD HH:mm:ss"
               />
             </AFormItem>
-          </ACol>
+          </ACol> -->
+          <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
+            <AFormItem label="是否推荐" name="isrecommend">
+              <ASelect
+                  v-model:value="queryParams.isrecommend"
+                  :options="YES_NO"
+                  placeholder="请选择是否推荐"
+              />
+            </AFormItem>
+          </ACol> -->
+          <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
+            <AFormItem label="学位" name="degree">
+              <AInput v-model:value="queryParams.degree" placeholder="请输入学位" allow-clear />
+            </AFormItem>
+          </ACol> -->
           <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
               <AFormItem label="创建时间" name="createTime">
               <ARangePicker
@@ -108,17 +106,8 @@
               />
             </AFormItem>
           </ACol> -->
-          <!-- <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="单位类型" name="unitType">
-              <ASelect
-                  v-model:value="queryParams.unitType"
-                  :options="UNIT_TYPE"
-                  placeholder="请选择单位类型"
-              />
-            </AFormItem>
-          </ACol> -->
 
-          <ACol :lg="{ span: 8, offset: filterExpanded ? 16 : 0 }" :span="24">
+          <ACol :lg="{ span: 8, offset: filterExpanded ? 0 : 0 }" :span="24">
             <AFlex justify="end" align="center" :gap="16">
               <AButton html-type="reset" @click="onFilterReset">重置</AButton>
               <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
@@ -133,7 +122,7 @@
     </ACard>
 
     <!-- table card -->
-    <ACard title="单位信息库">
+    <ACard title="人才信息库">
       <template #extra>
         <AFlex :gap="8">
           <AButton v-if="false" type="primary" :loading="pending" @click="modal?.open()">
@@ -149,7 +138,7 @@
               </template>
             </AButton>
           </ATooltip>
-          <ATooltip v-if="permission.has('system:unit-info:export')" title="导出">
+          <ATooltip v-if="false" title="导出">
             <AButton type="text" :loading="pending">
               <template #icon>
                 <ExportOutlined />
@@ -167,27 +156,17 @@
           :pagination="pagination"
           @change="onChange"
         >
-          <template #bodyCell="scope: TableScope<UnitInfoVO>">
-            <template v-if="scope.column.key === 'regdate'">
+          <template #bodyCell="scope: TableScope<TalentInfoVO>">
+            <template v-if="scope.column.key === 'birthday'">
               {{ dayjs(scope.text).format('YYYY-MM-DD') }}
             </template>
-            <template v-if="scope.column.key === 'unitnature'">
-              <DictTag :dict-object="COMPANY_NATURE" :value="scope?.text" />
+            <template v-if="scope.column.key === 'sex'">
+              <DictTag :dict-object="USER_SEX" :value="scope?.text" />
             </template>
-            <template v-if="scope.column.key === 'lastlogondate'">
-              {{ dayjs(scope.text).format('YYYY-MM-DD') }}
+            <template v-if="scope.column.key === 'diploma'">
+              <DictTag :dict-object="RC_EDUCATION_LEVEL" :value="scope?.text" />
             </template>
             <template v-if="scope.column.key === 'isenable'">
-              <DictTag :dict-object="YES_NO" :value="scope?.text" />
-            </template>
-            <template v-if="scope.column.key === 'createTime'">
-              {{ dayjs(scope.text).format('YYYY-MM-DD') }}
-            </template>
-            <template v-if="scope.column.key === 'unitType'">
-              <DictTag :dict-object="COMPANY_NATURE" :value="scope?.text" />
-            </template>
-
-            <template v-if="scope.column.key === 'status'">
               <ASwitch
                 :checked="scope.record.isenable === 1"
                 :loading="scope.record.statusLoading"
@@ -196,10 +175,18 @@
                 un-checked-children="否"
               />
             </template>
-
+            <template v-if="scope.column.key === 'regdate'">
+              {{ dayjs(scope.text).format('YYYY-MM-DD') }}
+            </template>
+            <template v-if="scope.column.key === 'isrecommend'">
+              <DictTag :dict-object="YES_NO" :value="scope?.text" />
+            </template>
+            <template v-if="scope.column.key === 'createTime'">
+              {{ dayjs(scope.text).format('YYYY-MM-DD') }}
+            </template>
             <template v-if="scope.column.title === '操作'">
               <AFlex :gap="16">
-                <ATypographyLink @click="modal?.open({ id: scope?.record.id, isViewMode: true })">
+                <ATypographyLink @click="modal?.open(scope?.record.id)">
                   <EyeOutlined />
                   查看
                 </ATypographyLink>
@@ -207,17 +194,6 @@
                   <LockOutlined />
                   重置密码
                 </ATypographyLink>
-                <APopconfirm
-                  v-if="false"
-                  title="该操作无法撤销，确定要删除吗？"
-                  :overlay-style="{ width: '240px' }"
-                  @confirm="onDelete(scope?.record)"
-                >
-                  <ATypographyLink type="danger">
-                    <DeleteOutlined />
-                    删除
-                  </ATypographyLink>
-                </APopconfirm>
               </AFlex>
             </template>
           </template>
@@ -239,8 +215,8 @@ import useDict from '@/hooks/use-dict'
 import { useTable, columns } from './use-table'
 import useActions from './use-actions'
 import FormModal from './form.vue'
-import type { UnitInfoVO } from '@/api/member/unit/unit-info'
-import { updateUnitStatus, resetPassword } from '@/api/member/unit/unit-info'
+import type { TalentInfoVO } from '@/api/member/talent/talent-info'
+import { updateTalentStatus, resetPassword } from '@/api/member/talent/talent-info'
 import { permission } from '@/hooks/use-permission'
 
 const modal = useTemplateRef('modal')
@@ -258,12 +234,12 @@ const confirm = proxy.$confirm
 const onStatusChange = async (record, checked) => {
   confirm({
     title: '确认变更状态',
-    content: `确定要${checked ? '启用' : '禁用'}该单位的登录权限吗？`,
+    content: `确定要${checked ? '启用' : '禁用'}该人才的登录权限吗？`,
     onOk: async () => {
       record.statusLoading = true
       try {
         // 调用后端接口
-        await updateUnitStatus(record.id, checked ? 1 : 0)
+        await updateTalentStatus(record.id, checked ? 1 : 0)
         record.isenable = checked ? 1 : 0
         message.success('状态更新成功')
       } catch (error) {
@@ -282,25 +258,33 @@ const onStatusChange = async (record, checked) => {
 }
 
 const [
-  UNIT_TYPE,
-  SCALE_SIZE,
+  IDENTITY_TYPE,
+  USER_SEX,
+  RC_MARRIAGE,
+  RC_NATION,
+  RC_POLITIC,
+  RC_EDUCATION_TYPE,
+  USER_NATION_TEST,
+  USER_POLITICAL,
+  RC_EDUCATION_LEVEL,
+  PERSONAL_WORK_STATUS,
   YES_NO,
-  COMPANY_RELATION,
-  ORG_TYPE,
-  TEC_FIELD,
-  COM_HOLDINGS,
-  NON_PUBLIC_COM_TYPE,
-  COMPANY_NATURE,
+  PERSONAL_SKILL_LEVEL,
+  SYSTEM_TALENTTYPE,
 ] = useDict(
-  'unit_type',
-  'scale_size',
+  'identity_type',
+  'user_sex',
+  'rc_marriage',
+  'rc_nation',
+  'rc_politic',
+  'rc_education_type',
+  'user_nation_test',
+  'user_political',
+  'rc_education_level',
+  'personal_work_status',
   'yes_no',
-  'company_relation',
-  'org_type',
-  'tec_field',
-  'com_holdings',
-  'non_public_com_type',
-  'company_nature',
+  'personal_skill_level',
+  'system_talenttype',
 )
 
 const { data, execute, pending, queryParams, onFilter, onFilterReset, pagination, onChange } =
@@ -312,7 +296,7 @@ const { onDelete } = useActions(execute)
 const handleResetPassword = async (id: number) => {
   confirm({
     title: '确认重置密码',
-    content: '确定要重置该单位的密码吗？重置后密码将变为默认值',
+    content: '确定要重置该人才账号的密码吗？重置后密码将变为默认值',
     onOk: async () => {
       try {
         await resetPassword(id)
@@ -324,5 +308,5 @@ const handleResetPassword = async (id: number) => {
   })
 }
 
-defineOptions({ name: 'UnitInfo' })
+defineOptions({ name: 'TalentInfo' })
 </script>

@@ -1,30 +1,22 @@
 import useRequest from '@/hooks/use-request'
-import { getList, type ListQueryParams } from '@/api/member/unit/unit-info'
+import { getList, type ListQueryParams } from '@/api/member/talent/talent-info'
 import type { FormInstance, TableProps } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
 
 export const columns: TableProps['columns'] = [
-  { key: 'name', title: '单位名称', dataIndex: 'name' },
-  { key: 'unitnature', title: '单位性质', dataIndex: 'unitnature' },
   { key: 'username', title: '用户名', dataIndex: 'username' },
-  //{ key: 'email', title: 'email', dataIndex: 'email' },
-  //{ key: 'regdate', title: '注册时间', dataIndex: 'regdate' },
-  //{ key: 'code', title: '单位编码', dataIndex: 'code' },
-  { key: 'creditrate', title: '统一社会信用代码', dataIndex: 'creditrate' },
-  //{ key: 'contact', title: '联系人', dataIndex: 'contact' },
-  //{ key: 'mobile', title: '手机号', dataIndex: 'mobile' },
-  { key: 'telphone', title: '电话', dataIndex: 'telphone' },
-  //{ key: 'lastlogondate', title: '最后登录时间', dataIndex: 'lastlogondate' },
-  { key: 'legalrepresent', title: '法定代表人', dataIndex: 'legalrepresent' },
-  //{ key: 'isenable', title: '是否可用', dataIndex: 'isenable' },
-  //{ key: 'createTime', title: '创建时间', dataIndex: 'createTime' },
-  //{ key: 'unitType', title: '单位类型', dataIndex: 'unitType' },
-  {
-    title: '允许登录',
-    dataIndex: 'status',
-    key: 'status',
-    width: 100,
-  },
+  { key: 'idcard', title: '身份证号', dataIndex: 'idcard' },
+  { key: 'name', title: '姓名', dataIndex: 'name' },
+  { key: 'sex', title: '性别', dataIndex: 'sex' },
+  { key: 'birthday', title: '出生年月', dataIndex: 'birthday' },
+  { key: 'diploma', title: '学历', dataIndex: 'diploma' },
+  { key: 'mobile', title: '手机号', dataIndex: 'mobile' },
+  // { key: 'eduschool', title: '毕业院校', dataIndex: 'eduschool' },
+  { key: 'isenable', title: '允许登录', dataIndex: 'isenable' },
+  // { key: 'regdate', title: '注册时间', dataIndex: 'regdate' },
+  // { key: 'isrecommend', title: '是否推荐', dataIndex: 'isrecommend' },
+  // { key: 'degree', title: '学位', dataIndex: 'degree' },
+  // { key: 'createTime', title: '创建时间', dataIndex: 'createTime' },
   { key: 'actions', title: '操作', dataIndex: 'actions', width: 240 },
 ]
 
