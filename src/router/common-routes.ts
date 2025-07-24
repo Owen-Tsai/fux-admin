@@ -46,6 +46,11 @@ const commonRoutes: RouteRecordRaw[] = [
           activeMenuKey: '/infra/code-gen',
         },
       },
+      {
+        path: '/__demo/editor',
+        name: 'EditorDemo',
+        component: () => import('@/views/__demo/editor.vue'),
+      },
     ],
   },
   {

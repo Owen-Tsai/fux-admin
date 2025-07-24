@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { uploadFile } from '@/api/infra/file'
-import type { UploadFile, UploadProps } from 'tdesign-vue-next'
+import type { UploadFile, UploadProps, UploadInstanceFunctions } from 'tdesign-vue-next'
 
 const {
   accept,
@@ -117,10 +117,21 @@ watch(
   },
   { immediate: true },
 )
+
+const uploadRef = useTemplateRef<UploadInstanceFunctions>('uploadRef')
+
+const triggerUpload = () => {
+  uploadRef.value?.triggerUpload()
+}
+
+defineExpose({
+  triggerUpload,
+})
 </script>
 
 <template>
   <TUpload
+    ref="uploadRef"
     v-model:files="fileList"
     :accept="accept"
     :action="uploadUrl"
