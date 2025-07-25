@@ -35,7 +35,7 @@ const {
 const message = useMessage()
 
 // component modal. e.g. `<FileUpload v-model:value="data.src" />`
-const value = defineModel<string | string[]>('value')
+const value = defineModel<typeof multiple extends true ? string[] : string>('value')
 // list used to display
 const fileList = ref<UploadFile[]>([])
 // list to upload
@@ -43,7 +43,22 @@ const filesToUpload = ref<UploadFile[]>([])
 
 const uploadUrl = import.meta.env.VITE_UPLOAD_URL
 
-const emit = defineEmits(['update:value', 'start', 'success', 'error', 'finish'])
+// const emit = defineEmits(['update:value', 'start', 'success', 'error', 'finish'])
+const emit = defineEmits<{
+  (e: 'start'): void
+  (e: 'update:value', value: typeof multiple extends true ? string[] : string): void
+  (
+    e: 'success',
+    data: {
+      file?: UploadFile
+      fileList?: UploadFile[]
+      currentFiles?: UploadFile[]
+      value?: typeof multiple extends true ? string[] : string
+    },
+  ): void
+  (e: 'error', err: any): void
+  (e: 'finish'): void
+}>()
 
 const uploadFn: UploadProps['requestMethod'] = async (files) => {
   emit('start')

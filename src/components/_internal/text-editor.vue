@@ -8,21 +8,22 @@
   />
   <FileUpload
     ref="uploadRef"
-    v-model:value="fileUploadProps.url"
-    :accept="fileUploadProps.accept"
+    v-model:value="fileUrl"
+    :accept="fileAccept"
     :max="1"
     :multiple="false"
     class="hidden"
-    @success="({ value }) => onFileUploaded(value)"
+    @success="({ file, value }) => onFileUploaded(value!, file)"
   />
 </template>
 
 <script setup lang="ts">
-import tinymce from 'tinymce'
+import tinymce, { type Editor as IEditor, type EditorOptions } from 'tinymce'
 import Editor from '@tinymce/tinymce-vue'
 import useAppStore from '@/stores/app'
 import 'tinymce/skins/ui/oxide/skin'
 import 'tinymce/skins/ui/oxide-dark/skin'
+import 'tinymce/skins/ui/oxide/content'
 
 import 'tinymce/icons/default'
 import 'tinymce/models/dom'
@@ -33,24 +34,20 @@ import 'tinymce/plugins/image'
 import 'tinymce/plugins/link'
 import 'tinymce/plugins/lists'
 import 'tinymce/plugins/media'
-import 'tinymce/plugins/quickbars'
+// import 'tinymce/plugins/quickbars'
 import 'tinymce/plugins/searchreplace'
 import 'tinymce/plugins/table'
 import 'tinymce/plugins/wordcount'
 
 import FileUpload from '@/components/_internal/file-upload.vue'
+import type { UploadFile } from 'tdesign-vue-next'
 
 tinymce.init({})
 
 const { isDark } = storeToRefs(useAppStore())
 const uploadRef = useTemplateRef<InstanceType<typeof FileUpload>>('uploadRef')
 
-const {
-  theme = 'normal',
-  toolbar,
-  plugins,
-} = defineProps<{
-  theme?: 'normal' | 'document'
+const { toolbar, plugins } = defineProps<{
   toolbar?: string
   plugins?: string
 }>()
@@ -60,42 +57,61 @@ const value = defineModel<string>('value')
 const cToolbar = computed(
   () =>
     toolbar ||
-    'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | table image media link | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor | removeformat',
+    'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | table link | imageUpload media attachFile | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor | removeformat',
 )
 
-const cPlugins = computed(() => plugins || 'image link media lists table wordcount quickbars')
+const cPlugins = computed(() => plugins || 'image link media lists table wordcount')
 
-const filePickerCallbackRef = ref<(url: string) => void>()
+const filePickerCallbackRef = ref<(url: string, name?: string) => void>()
 
-const filePickerCallback = (callback: (url: string) => void, value: string, meta: any) => {
-  if (meta.filetype === 'image') {
-    filePickerCallbackRef.value = callback
-    uploadRef.value?.triggerUpload()
-  }
+const setupEditor: EditorOptions['setup'] = (editor) => {
+  const genAttachmentHTML = (url: string, name?: string) =>
+    `<div contenteditable="false" data-url="${url}">${name || url}</div>`
+
+  editor.ui.registry.addButton('imageUpload', {
+    icon: 'image',
+    tooltip: '插入图片',
+    onAction: () => {
+      fileAccept.value = 'image/*'
+      uploadRef.value?.triggerUpload()
+      filePickerCallbackRef.value = (url: string) => editor.execCommand('insertImage', false, url)
+    },
+  })
+
+  editor.ui.registry.addButton('attachFile', {
+    icon: 'duplicate',
+    tooltip: '插入附件',
+    onAction: () => {
+      fileAccept.value = '*'
+      uploadRef.value?.triggerUpload()
+      filePickerCallbackRef.value = (url: string, name?: string) => {
+        editor.execCommand('insertHTML', false, genAttachmentHTML(url, name))
+      }
+    },
+  })
 }
 
-const initOpts = {
+const initOpts: Partial<EditorOptions> = {
   promotion: false,
   branding: false,
   language_url: '/tinymce/langs/zh_CN.js',
   language: 'zh_CN',
   menubar: false,
-  object_resizing: true,
   toolbar_mode: 'sliding',
   skin: isDark.value ? 'oxide-dark' : 'oxide',
-  content_css: isDark.value ? 'dark' : 'default',
-  image_advtab: true,
-  file_picker_callback: filePickerCallback,
+  setup: setupEditor,
+  file_picker_types: 'file image media',
+  font_size_formats: '12px 14px 16px 18px 20px 22px 24px 26px 32px 40px 48px 56px 64px 72px',
+  font_family_formats:
+    '系统默认字体=sans-serif;微软雅黑=Microsoft YaHei,arial,helvetica,sans-serif;宋体=SimSun,sans-serif;仿宋=FangSong,sans-serif;楷体=KaiTi,sans-serif;黑体=SimHei,sans-serif;Arial=arial,helvetica,sans-serif;Arial Black=arial black,avant garde;',
 }
 
-const fileUploadProps = reactive({
-  url: '',
-  accept: 'image/*',
-})
+const fileUrl = ref<string>()
+const fileAccept = ref<string>('*')
 
-const onFileUploaded = (url: string) => {
+const onFileUploaded = (url: string, file?: UploadFile) => {
   if (filePickerCallbackRef.value) {
-    filePickerCallbackRef.value(url)
+    filePickerCallbackRef.value(url, file?.name)
     filePickerCallbackRef.value = undefined
   }
 }
