@@ -77,6 +77,13 @@
             </ACol>
           </ARow>
           <ARow>
+            <ACol :span="23">
+              <AFormItem label="资讯内容" name="content">
+                <EEditor type="document" v-model:value="formData.content" />
+              </AFormItem>
+            </ACol>
+          </ARow>
+          <ARow>
             <ACol :span="24">
               <AFormItem label="首页图片" name="imageinfo">
                 <FileUpload
@@ -103,13 +110,6 @@
                   :limit="5"
                   :size-limit="10240"
                 />
-              </AFormItem>
-            </ACol>
-          </ARow>
-          <ARow>
-            <ACol :span="23">
-              <AFormItem label="资讯内容" name="content">
-                <EEditor type="document" v-model:value="formData.content" />
               </AFormItem>
             </ACol>
           </ARow>
