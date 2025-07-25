@@ -57,7 +57,7 @@ const value = defineModel<string>('value')
 const cToolbar = computed(
   () =>
     toolbar ||
-    'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | table link | imageUpload media attachFile | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor | removeformat',
+    'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | table link | imageUpload videoUpload | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | forecolor backcolor | removeformat',
 )
 
 const cPlugins = computed(() => plugins || 'image link media lists table wordcount')
@@ -65,27 +65,28 @@ const cPlugins = computed(() => plugins || 'image link media lists table wordcou
 const filePickerCallbackRef = ref<(url: string, name?: string) => void>()
 
 const setupEditor: EditorOptions['setup'] = (editor) => {
-  const genAttachmentHTML = (url: string, name?: string) =>
-    `<div contenteditable="false" data-url="${url}">${name || url}</div>`
-
   editor.ui.registry.addButton('imageUpload', {
     icon: 'image',
     tooltip: '插入图片',
     onAction: () => {
       fileAccept.value = 'image/*'
-      uploadRef.value?.triggerUpload()
+      setTimeout(() => {
+        uploadRef.value?.triggerUpload()
+      }, 1)
       filePickerCallbackRef.value = (url: string) => editor.execCommand('insertImage', false, url)
     },
   })
 
-  editor.ui.registry.addButton('attachFile', {
-    icon: 'duplicate',
-    tooltip: '插入附件',
+  editor.ui.registry.addButton('videoUpload', {
+    icon: 'embed',
+    tooltip: '插入视频',
     onAction: () => {
-      fileAccept.value = '*'
-      uploadRef.value?.triggerUpload()
-      filePickerCallbackRef.value = (url: string, name?: string) => {
-        editor.execCommand('insertHTML', false, genAttachmentHTML(url, name))
+      fileAccept.value = 'video/*'
+      setTimeout(() => {
+        uploadRef.value?.triggerUpload()
+      }, 1)
+      filePickerCallbackRef.value = (url: string) => {
+        editor.execCommand('insertHTML', false, `<video src="${url}" controls></video>`)
       }
     },
   })
