@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import tinymce, { type Editor as IEditor, type EditorOptions } from 'tinymce'
+import tinymce, { type EditorOptions } from 'tinymce'
 import Editor from '@tinymce/tinymce-vue'
 import useAppStore from '@/stores/app'
 import 'tinymce/skins/ui/oxide/skin'
@@ -34,7 +34,6 @@ import 'tinymce/plugins/image'
 import 'tinymce/plugins/link'
 import 'tinymce/plugins/lists'
 import 'tinymce/plugins/media'
-// import 'tinymce/plugins/quickbars'
 import 'tinymce/plugins/searchreplace'
 import 'tinymce/plugins/table'
 import 'tinymce/plugins/wordcount'

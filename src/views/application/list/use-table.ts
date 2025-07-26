@@ -75,6 +75,7 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   const onSetPublished = async (id: string, published: boolean) => {
     pending.value = true
     await setPublished(id, published)
+    execute()
     pending.value = false
   }
 
