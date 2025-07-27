@@ -25,7 +25,7 @@ export type InfoTypeTreeVO = InfoTypeVO &
 
 const prefix = '/information/type'
 
-export const getInfoTypeTree = (params: TreeQueryParams) => {
+export const getInfoTypeTree = (params?: TreeQueryParams) => {
   return request.get<InfoTypeTreeVO>({
     url: `${prefix}/tree-list`,
     params,

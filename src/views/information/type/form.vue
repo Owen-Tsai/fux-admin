@@ -16,10 +16,7 @@ const [statusOpts, booleanOpts] = useDict('common_status', 'infra_boolean_string
 const message = useMessage()
 
 const rules: FormProps['rules'] = {
-  name: [{ required: true, message: '请填写菜单名称' }],
-  type: [{ required: true, message: '请选择菜单类型' }],
-  path: [{ required: true, message: '请填写路由地址' }],
-  component: [{ required: true, message: '请填写组件文件路径' }],
+  title: [{ required: true, message: '请填写资讯类别名称' }],
 }
 
 const visible = ref(false)
