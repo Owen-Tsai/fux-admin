@@ -17,7 +17,7 @@ export default defineComponent({
 
     const appMain = computed(() =>
       watermarkEnabled ? (
-        <Watermark watermark-content={watermarkText.value} class="h-full">
+        <Watermark watermark-content={watermarkText.value} height={80} width={160} x={80} y={100} class="h-full">
           <RouterView />
         </Watermark>
       ) : (
