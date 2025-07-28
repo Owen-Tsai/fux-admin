@@ -71,6 +71,7 @@ const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pendin
           <TButton
             v-if="permission.has('system:info-list:create')"
             theme="primary"
+            :loading="pending"
             @click="formRef?.open()"
           >
             <template #icon>
@@ -79,7 +80,7 @@ const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pendin
             发布
           </TButton>
           <TTooltip content="重新载入">
-            <TButton shape="square" variant="text" @click="execute()">
+            <TButton shape="square" variant="text" :loading="pending" @click="execute()">
               <template #icon>
                 <TIcon name="refresh" />
               </template>

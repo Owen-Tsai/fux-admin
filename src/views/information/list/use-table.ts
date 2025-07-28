@@ -1,4 +1,3 @@
-import useRequest from '@/hooks/use-request'
 import { getInfoList, deleteInfo, type ListQueryParams } from '@/api/information/list'
 import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 

@@ -73,6 +73,7 @@ const toDesignPage = (id: string) => {
           <TButton
             v-if="permission.has('system:application:create')"
             theme="primary"
+            :loading="pending"
             @click="formRef?.open()"
           >
             <template #icon>
@@ -81,7 +82,7 @@ const toDesignPage = (id: string) => {
             新增
           </TButton>
           <TTooltip content="重新载入">
-            <TButton shape="square" variant="text" @click="execute()">
+            <TButton shape="square" variant="text" :loading="pending" @click="execute()">
               <template #icon>
                 <TIcon name="refresh" />
               </template>
