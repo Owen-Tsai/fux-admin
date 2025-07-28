@@ -15,14 +15,14 @@
         <TabsView class="flex-none" />
         <RouterView v-if="routerAlive">
           <template #default="{ Component, route }">
-            <KeepAlive :include="[...keepsList]">
-              <div
-                class="min-h-0 flex-grow-1 p-4 lg:p-6 overflow-y-auto"
-                id="fux-app-scroll-container"
-              >
+            <div
+              class="min-h-0 flex-grow-1 p-4 lg:p-6 overflow-y-auto"
+              id="fux-app-scroll-container"
+            >
+              <KeepAlive :include="[...keepsList]">
                 <component :is="Component" :key="route.fullPath" />
-              </div>
-            </KeepAlive>
+              </KeepAlive>
+            </div>
           </template>
         </RouterView>
       </TContent>
