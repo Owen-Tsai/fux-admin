@@ -16,7 +16,7 @@ const [statusOpts, booleanOpts] = useDict('common_status', 'infra_boolean_string
 const message = useMessage()
 
 const rules: FormProps['rules'] = {
-  title: [{ required: true, message: '请填写资讯类别名称' }],
+  name: [{ required: true, message: '请填写资讯类别名称' }],
 }
 
 const visible = ref(false)
