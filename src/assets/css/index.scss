@@ -70,3 +70,7 @@ a.has-tag .t-tag {
 [theme-mode='dark'] {
   color-scheme: dark;
 }
+
+#nprogress .bar {
+  background: var(--td-brand-color);
+}

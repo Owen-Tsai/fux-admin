@@ -1,5 +1,6 @@
 import 'tdesign-vue-next/dist/reset.css'
 import 'tdesign-vue-next/es/style/index.css'
+import 'nprogress/nprogress.css'
 import '@/assets/css/index.scss'
 import 'virtual:uno.css'
 import TDesign from 'tdesign-vue-next'
