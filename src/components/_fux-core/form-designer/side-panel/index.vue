@@ -12,7 +12,7 @@
                 shape="square"
                 @click="activeTab = tab.value"
               >
-                <TIcon :name="tab.icon" />
+                <Icon :name="tab.icon" />
               </TButton>
             </TTooltip>
           </template>
@@ -21,17 +21,17 @@
         <div class="flex flex-col gap-2">
           <TTooltip content="管理 API" placement="right" :show-arrow="false">
             <TButton shape="square" theme="default" @click="showFuncModal('api')">
-              <TIcon name="api" />
+              <Icon name="api" />
             </TButton>
           </TTooltip>
           <TTooltip content="管理函数" placement="right" :show-arrow="false">
             <TButton shape="square" theme="default" @click="showFuncModal('func')">
-              <TIcon name="functions-1" />
+              <Icon name="functions-1" />
             </TButton>
           </TTooltip>
           <TTooltip content="预览表单" placement="right" :show-arrow="false">
             <TButton shape="square" theme="default" @click="showFuncModal('preview')">
-              <TIcon name="play" />
+              <Icon name="play" />
             </TButton>
           </TTooltip>
         </div>

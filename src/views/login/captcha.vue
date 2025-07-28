@@ -40,7 +40,7 @@
           >
             <div class="drag-progress" :style="{ left: ghostPosLeft || posLeft }">
               <div ref="dragHandleEl" :class="['drag-handle', pressed ? 'pressed' : null]">
-                <TIcon name="view-column" />
+                <Icon name="view-column" />
               </div>
               <div class="puzzle-block">
                 <img :src="`data:image/png;base64,${data?.repData.jigsawImageBase64}`" />

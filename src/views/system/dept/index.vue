@@ -60,7 +60,7 @@ defineOptions({ name: 'SystemDept' })
             @click="formRef?.open()"
           >
             <template #icon>
-              <TIcon name="add" />
+              <Icon name="add" />
             </template>
             新增
           </TButton>
@@ -68,7 +68,7 @@ defineOptions({ name: 'SystemDept' })
           <TTooltip content="全部展开/折叠">
             <TButton shape="square" variant="text" @click="toggleTableExpanded()">
               <template #icon>
-                <TIcon name="unfold-less" />
+                <Icon name="unfold-less" />
               </template>
             </TButton>
           </TTooltip>
@@ -76,7 +76,7 @@ defineOptions({ name: 'SystemDept' })
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" @click="execute()">
               <template #icon>
-                <TIcon name="refresh" />
+                <Icon name="refresh" />
               </template>
             </TButton>
           </TTooltip>
@@ -106,7 +106,7 @@ defineOptions({ name: 'SystemDept' })
             <TTooltip content="编辑">
               <TButton shape="square" theme="primary" variant="text" @click="formRef?.open(row.id)">
                 <template #icon>
-                  <TIcon name="edit-2" />
+                  <Icon name="edit-2" />
                 </template>
               </TButton>
             </TTooltip>
@@ -118,7 +118,7 @@ defineOptions({ name: 'SystemDept' })
               >
                 <TButton shape="square" theme="danger" variant="text">
                   <template #icon>
-                    <TIcon name="delete" />
+                    <Icon name="delete" />
                   </template>
                 </TButton>
               </TPopconfirm>

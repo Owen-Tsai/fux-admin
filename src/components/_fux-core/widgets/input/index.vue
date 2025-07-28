@@ -10,7 +10,7 @@
     :show-limit-number="widget.props.showCount"
   >
     <template #prefix-icon v-if="widget.props.prefixIcon">
-      <TIcon :name="widget.props.prefixIcon" />
+      <Icon :name="widget.props.prefixIcon" />
     </template>
   </TInput>
 </template>

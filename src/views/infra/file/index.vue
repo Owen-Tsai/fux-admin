@@ -55,7 +55,7 @@ defineOptions({ name: 'InfraFile' })
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" @click="execute()">
               <template #icon>
-                <TIcon name="refresh" />
+                <Icon name="refresh" />
               </template>
             </TButton>
           </TTooltip>
@@ -77,7 +77,7 @@ defineOptions({ name: 'InfraFile' })
               class="absolute top-0 left-0 right-0 bottom-0 hover:bg-black/40 flex-center group text-[var(--td-text-color-anti)] cursor-pointer"
               @click="onPreview(row.url!)"
             >
-              <TIcon name="browse" size="1.4em" class="!hidden !group-hover:block" />
+              <Icon name="browse" size="1.4em" class="!hidden !group-hover:block" />
             </div>
           </div>
         </template>
@@ -95,7 +95,7 @@ defineOptions({ name: 'InfraFile' })
                   :disabled="permission.hasNone('infra:file:delete')"
                 >
                   <template #icon>
-                    <TIcon name="edit-2" />
+                    <Icon name="edit-2" />
                   </template>
                 </TButton>
               </TTooltip>

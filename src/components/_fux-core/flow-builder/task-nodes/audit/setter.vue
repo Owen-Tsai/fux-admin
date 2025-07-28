@@ -59,7 +59,7 @@
         @click="node.fieldsOverride.splice(index, 1)"
       >
         <template #icon>
-          <TIcon name="delete" />
+          <Icon name="delete" />
         </template>
       </TButton>
     </div>

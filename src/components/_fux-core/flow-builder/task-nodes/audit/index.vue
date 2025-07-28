@@ -58,7 +58,7 @@ const onEdit = () => {
     <div class="node audit-node">
       <div class="header">
         <div class="flex items-center gap-1">
-          <TIcon name="seal" />
+          <Icon name="seal" />
           <div class="input-wrapper">
             <TInput
               v-show="isEditing"
@@ -75,7 +75,7 @@ const onEdit = () => {
           </div>
         </div>
 
-        <TIcon name="close" class="cursor-pointer" @click="emit('delete-node')" />
+        <Icon name="close" class="cursor-pointer" @click="emit('delete-node')" />
       </div>
 
       <div class="body" @click.stop="selectedNode = config">
@@ -83,7 +83,7 @@ const onEdit = () => {
           <div class="w-10/12">
             <div class="truncate">{{ actors }}</div>
           </div>
-          <TIcon name="chevron-right" />
+          <Icon name="chevron-right" />
         </div>
       </div>
     </div>

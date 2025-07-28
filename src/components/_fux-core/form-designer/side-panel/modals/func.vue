@@ -17,7 +17,7 @@
           </div>
           <TButton theme="default" block @click="createFunc">
             <template #icon>
-              <TIcon name="plus" />
+              <Icon name="plus" />
             </template>
             创建函数
           </TButton>

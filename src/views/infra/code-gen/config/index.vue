@@ -6,14 +6,14 @@
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" :loading="pending" @click="execute()">
               <template #icon>
-                <TIcon name="refresh" />
+                <Icon name="refresh" />
               </template>
             </TButton>
           </TTooltip>
           <TTooltip content="返回">
             <TButton shape="square" variant="text" @click="onReturn()">
               <template #icon>
-                <TIcon name="rollback" />
+                <Icon name="rollback" />
               </template>
             </TButton>
           </TTooltip>

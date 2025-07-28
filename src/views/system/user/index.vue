@@ -122,7 +122,7 @@ defineOptions({ name: 'SystemUser' })
             <div class="flex items-center gap-2">
               <TButton v-if="permission.has('system:user:create')" theme="primary" @click="onAdd()">
                 <template #icon>
-                  <TIcon name="add" />
+                  <Icon name="add" />
                 </template>
                 新增
               </TButton>
@@ -130,7 +130,7 @@ defineOptions({ name: 'SystemUser' })
               <TTooltip content="重新载入">
                 <TButton shape="square" variant="text" @click="execute()">
                   <template #icon>
-                    <TIcon name="refresh" />
+                    <Icon name="refresh" />
                   </template>
                 </TButton>
               </TTooltip>
@@ -166,14 +166,14 @@ defineOptions({ name: 'SystemUser' })
                     @click="form?.open(row.id)"
                   >
                     <template #icon>
-                      <TIcon name="edit-2" />
+                      <Icon name="edit-2" />
                     </template>
                   </TButton>
                 </TTooltip>
                 <TDropdown>
                   <TButton shape="square" theme="primary" variant="text">
                     <template #icon>
-                      <TIcon name="unfold-more" />
+                      <Icon name="unfold-more" />
                     </template>
                   </TButton>
                   <TDropdownMenu>

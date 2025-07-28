@@ -60,7 +60,7 @@ defineExpose({ open })
       <div ref="dragWrapper">
         <div v-for="(column, idx) in columns" :key="idx" class="flex items-center gap-2 mb-2">
           <div class="drag-handle cursor-move">
-            <TIcon name="view-list" />
+            <Icon name="view-list" />
           </div>
           <TFormItem label="列标题" :name="`columns[${idx}].title`">
             <TInput v-model:value="column.title" />
@@ -82,12 +82,12 @@ defineExpose({ open })
                 class="flex-none"
                 @click="openColumnFormatSetter(column)"
               >
-                <template #icon><TIcon name="code" /></template>
+                <template #icon><Icon name="code" /></template>
               </TButton>
             </TTooltip>
             <TTooltip content="删除列">
               <TButton shape="square" theme="default" class="flex-none" @click="deleteColumn(idx)">
-                <template #icon><TIcon name="delete" /></template>
+                <template #icon><Icon name="delete" /></template>
               </TButton>
             </TTooltip>
           </div>
@@ -95,7 +95,7 @@ defineExpose({ open })
       </div>
 
       <TButton variant="outline" block @click="addColumn">
-        <template #icon><TIcon name="add" /></template>
+        <template #icon><Icon name="add" /></template>
         添加列
       </TButton>
     </TForm>

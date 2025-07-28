@@ -59,7 +59,7 @@ defineOptions({ name: 'SystemRole' })
             @click="formRef?.open()"
           >
             <template #icon>
-              <TIcon name="add" />
+              <Icon name="add" />
             </template>
             新增
           </TButton>
@@ -67,7 +67,7 @@ defineOptions({ name: 'SystemRole' })
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" @click="execute()">
               <template #icon>
-                <TIcon name="refresh" />
+                <Icon name="refresh" />
               </template>
             </TButton>
           </TTooltip>
@@ -93,14 +93,14 @@ defineOptions({ name: 'SystemRole' })
             <TTooltip content="编辑">
               <TButton shape="square" theme="primary" variant="text" @click="formRef?.open(row.id)">
                 <template #icon>
-                  <TIcon name="edit-2" />
+                  <Icon name="edit-2" />
                 </template>
               </TButton>
             </TTooltip>
             <TDropdown>
               <TButton shape="square" theme="primary" variant="text">
                 <template #icon>
-                  <TIcon name="unfold-more" />
+                  <Icon name="unfold-more" />
                 </template>
               </TButton>
               <TDropdownMenu>

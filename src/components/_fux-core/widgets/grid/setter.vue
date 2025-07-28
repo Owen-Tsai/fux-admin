@@ -27,14 +27,14 @@
           @click="removeCol(i)"
         >
           <template #icon>
-            <TIcon name="close" />
+            <Icon name="close" />
           </template>
         </TButton>
       </div>
 
       <TButton block @click="addCol">
         <template #icon>
-          <TIcon name="add" />
+          <Icon name="add" />
           新增一项
         </template>
       </TButton>

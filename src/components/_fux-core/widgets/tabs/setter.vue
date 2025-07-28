@@ -14,14 +14,14 @@
           @click="removePane(i)"
         >
           <template #icon>
-            <TIcon name="close" />
+            <Icon name="close" />
           </template>
         </TButton>
       </div>
 
       <TButton block @click="addPane">
         <template #icon>
-          <TIcon name="add" />
+          <Icon name="add" />
           新增一项
         </template>
       </TButton>
@@ -32,7 +32,7 @@
       <div class="inline-flex items-center gap-1">
         步骤模式
         <TTooltip>
-          <TIcon name="help-circle-filled" class="text-[var(--td-text-color-disabled)]" />
+          <Icon name="help-circle-filled" class="text-[var(--td-text-color-disabled)]" />
           <template #content>
             <div class="max-w-300px">
               一个应用中只能包含一个开启步骤模式的组件。开启后，对于个人用户自行申报的应用，必须填写完第一步的表单后才可以提交剩余步骤的数据。对于非个人用户自行申报（单位开通权限）的应用，该选项无特殊作用

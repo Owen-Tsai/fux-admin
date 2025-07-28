@@ -26,12 +26,12 @@ const cloneWidget = (widget: Widget) => {
     <div
       class="flex-none relative border-b border-b-[var(--td-border-level-1-color)] border-b-solid"
     >
-      <TIcon
+      <Icon
         name="search"
         class="absolute left-2 top-1/2 -translate-y-1/2 text-sm text-[var(--td-text-level-3-color)]"
       />
       <input v-model="filterText" class="w-full border-none outline-none h-10 px-8" />
-      <TIcon
+      <Icon
         name="close"
         class="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-[var(--td-text-level-3-color)]"
       />

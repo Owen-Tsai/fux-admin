@@ -16,21 +16,21 @@
       <div class="flex items-center justify-end gap-2">
         <TButton @click="save(appDesignMode)">
           <template #icon>
-            <TIcon name="save" />
+            <Icon name="save" />
           </template>
           保存
         </TButton>
         <TTooltip content="查看 Schema">
           <TButton variant="text" shape="square" @click="drawerVisible = true">
             <template #icon>
-              <TIcon name="system-code" />
+              <Icon name="system-code" />
             </template>
           </TButton>
         </TTooltip>
         <TTooltip content="回到首页">
           <TButton variant="text" shape="square" @click="$router.push('/')">
             <template #icon>
-              <TIcon name="rollback" />
+              <Icon name="rollback" />
             </template>
           </TButton>
         </TTooltip>

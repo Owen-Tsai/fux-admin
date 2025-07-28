@@ -77,7 +77,7 @@ const [operateType] = useDict('system_operate_type')
           <TTooltip content="查看详情">
             <TButton shape="square" theme="primary" variant="text" @click="detailRef?.open(row)">
               <template #icon>
-                <TIcon name="browse" />
+                <Icon name="browse" />
               </template>
             </TButton>
           </TTooltip>

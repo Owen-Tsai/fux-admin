@@ -3,7 +3,7 @@
     <TFormItem name="username">
       <TInput v-model:value="formData.username" clearable placeholder="请输入用户名" size="large">
         <template #prefix-icon>
-          <TIcon name="user" />
+          <Icon name="user" />
         </template>
       </TInput>
     </TFormItem>
@@ -16,7 +16,7 @@
         size="large"
       >
         <template #prefix-icon>
-          <TIcon name="lock-on" />
+          <Icon name="lock-on" />
         </template>
       </TInput>
     </TFormItem>

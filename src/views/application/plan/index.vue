@@ -76,14 +76,14 @@ const toDesignPage = (id: string) => {
             @click="formRef?.open()"
           >
             <template #icon>
-              <TIcon name="add" />
+              <Icon name="add" />
             </template>
             新增
           </TButton>
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" @click="execute()">
               <template #icon>
-                <TIcon name="refresh" />
+                <Icon name="refresh" />
               </template>
             </TButton>
           </TTooltip>
@@ -126,7 +126,7 @@ const toDesignPage = (id: string) => {
                 @click="formRef?.open(row.id)"
               >
                 <template #icon>
-                  <TIcon name="edit-2" />
+                  <Icon name="edit-2" />
                 </template>
               </TButton>
             </TTooltip>
@@ -139,7 +139,7 @@ const toDesignPage = (id: string) => {
                 @click="toDesignPage(row.appId!)"
               >
                 <template #icon>
-                  <TIcon name="system-code" />
+                  <Icon name="system-code" />
                 </template>
               </TButton>
             </TTooltip>
@@ -151,7 +151,7 @@ const toDesignPage = (id: string) => {
               >
                 <TButton shape="square" theme="danger" variant="text">
                   <template #icon>
-                    <TIcon name="delete" />
+                    <Icon name="delete" />
                   </template>
                 </TButton>
               </TPopconfirm>

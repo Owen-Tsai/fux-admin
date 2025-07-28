@@ -11,7 +11,7 @@
         size="small"
         @click="copy()"
       >
-        <TIcon :name="copied ? 'check' : 'file-copy'" />
+        <Icon :name="copied ? 'check' : 'file-copy'" />
       </TButton>
     </TTooltip>
   </Scrollbar>

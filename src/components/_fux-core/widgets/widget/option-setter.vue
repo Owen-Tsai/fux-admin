@@ -27,14 +27,14 @@
             @click="removeOption(index)"
           >
             <template #icon>
-              <TIcon name="close" />
+              <Icon name="close" />
             </template>
           </TButton>
         </div>
 
         <TButton block @click="addOption">
           <template #icon>
-            <TIcon name="add" />
+            <Icon name="add" />
             新增一项
           </template>
         </TButton>

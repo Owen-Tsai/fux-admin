@@ -9,7 +9,7 @@
   >
     <TMenuItem value="/index">
       <template #icon>
-        <TIcon name="dashboard-1" />
+        <Icon name="dashboard-1" />
         工作台
       </template>
     </TMenuItem>

@@ -18,7 +18,7 @@
                   >
                     <TButton shape="circle">
                       <template #icon>
-                        <TIcon name="camera" />
+                        <Icon name="camera" />
                       </template>
                     </TButton>
                   </FileUpload>
@@ -39,15 +39,15 @@
             </div>
             <div class="mt-4">
               <div class="info">
-                <TIcon name="institution" />
+                <Icon name="institution" />
                 <div>部门：{{ data?.dept?.name || '暂无部门' }}</div>
               </div>
               <div class="info">
-                <TIcon name="mobile" />
+                <Icon name="mobile" />
                 <div>手机：{{ data?.mobile || '暂未绑定手机号码' }}</div>
               </div>
               <div class="info">
-                <TIcon name="institution" />
+                <Icon name="institution" />
                 <div>邮箱：{{ data?.email || '暂未绑定邮箱地址' }}</div>
               </div>
             </div>

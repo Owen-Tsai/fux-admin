@@ -34,15 +34,15 @@ const statistics = ref<StatisticsVO>([
         <div class="mt-6">
           <div class="grid grid-cols-2 text-secondary gap-2">
             <div class="flex items-center gap-2">
-              <TIcon name="houses-1" />
+              <Icon name="houses-1" />
               {{ depts?.find((d) => d.id === user?.deptId)?.name || '未分配部门' }}
             </div>
             <div class="flex items-center gap-2">
-              <TIcon name="mobile" />
+              <Icon name="mobile" />
               {{ user?.mobile || '未绑定手机' }}
             </div>
             <div class="flex items-center gap-2 col-end-3 col-start-1">
-              <TIcon name="time" />
+              <Icon name="time" />
               上次登录：8 小时前，山东省济南市
               <TTooltip>
                 <template #content>
@@ -51,7 +51,7 @@ const statistics = ref<StatisticsVO>([
                   </div>
                 </template>
                 <TLink size="small" theme="warning">
-                  <TIcon name="help-circle-filled" />
+                  <Icon name="help-circle-filled" />
                   有疑问
                 </TLink>
               </TTooltip>
@@ -62,7 +62,7 @@ const statistics = ref<StatisticsVO>([
         <TTooltip content="编辑个人信息">
           <TButton variant="text" shape="square" theme="primary" class="!absolute right-4 top-0">
             <template #icon>
-              <TIcon name="setting" />
+              <Icon name="setting" />
             </template>
           </TButton>
         </TTooltip>
@@ -90,7 +90,7 @@ const statistics = ref<StatisticsVO>([
         <TTooltip content="设置指标展示">
           <TButton variant="text" shape="square" theme="primary" class="!absolute right-0 bottom-0">
             <template #icon>
-              <TIcon name="data-display" />
+              <Icon name="data-display" />
             </template>
           </TButton>
         </TTooltip>

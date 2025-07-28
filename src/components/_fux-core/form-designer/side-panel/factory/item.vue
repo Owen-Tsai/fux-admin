@@ -13,7 +13,7 @@ const { widget } = defineProps<{
     <div
       class="icon-wrapper bg-[var(--td-bg-color-secondarycontainer)] rounded-lg p-4 flex-center group-hover:text-[var(--td-brand-color)]"
     >
-      <TIcon :name="widget.icon" size="24px" />
+      <Icon :name="widget.icon" size="24px" />
     </div>
     <div
       class="text-wrapper text-center mt-2 group-hover:text-[var(--td-brand-color)] font-size-[var(--td-font-size-body-small)]"

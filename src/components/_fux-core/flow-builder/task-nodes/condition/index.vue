@@ -32,7 +32,7 @@ const onEdit = () => {
     <div class="node condition-node">
       <div class="header">
         <div class="flex items-center gap-1">
-          <TIcon name="seal" />
+          <Icon name="seal" />
           <div class="input-wrapper">
             <TInput
               v-show="isEditing"
@@ -49,7 +49,7 @@ const onEdit = () => {
           </div>
         </div>
 
-        <TIcon name="close" class="cursor-pointer" @click="emit('delete-node')" />
+        <Icon name="close" class="cursor-pointer" @click="emit('delete-node')" />
       </div>
 
       <div class="body font-mono" @click="selectedNode = config">

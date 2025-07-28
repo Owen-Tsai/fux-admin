@@ -75,7 +75,7 @@ defineOptions({ name: 'SystemSmsLog' })
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" :loading="pending" @click="execute()">
               <template #icon>
-                <TIcon name="refresh" />
+                <Icon name="refresh" />
               </template>
             </TButton>
           </TTooltip>
@@ -114,7 +114,7 @@ defineOptions({ name: 'SystemSmsLog' })
           <TTooltip content="查看详情">
             <TButton shape="square" theme="primary" variant="text" @click="detailRef?.open(row)">
               <template #icon>
-                <TIcon name="browse" />
+                <Icon name="browse" />
               </template>
             </TButton>
           </TTooltip>

@@ -72,7 +72,7 @@ defineOptions({ name: 'InfraCodeGen' })
             @click="formRef?.open()"
           >
             <template #icon>
-              <TIcon name="add" />
+              <Icon name="add" />
             </template>
             导入表
           </TButton>
@@ -80,7 +80,7 @@ defineOptions({ name: 'InfraCodeGen' })
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" :loading="pending" @click="execute()">
               <template #icon>
-                <TIcon name="refresh" />
+                <Icon name="refresh" />
               </template>
             </TButton>
           </TTooltip>
@@ -115,14 +115,14 @@ defineOptions({ name: 'InfraCodeGen' })
                 @click="onEdit(row.id)"
               >
                 <template #icon>
-                  <TIcon name="edit-2" />
+                  <Icon name="edit-2" />
                 </template>
               </TButton>
             </TTooltip>
             <TDropdown>
               <TButton shape="square" theme="primary" variant="text">
                 <template #icon>
-                  <TIcon name="unfold-more" />
+                  <Icon name="unfold-more" />
                 </template>
               </TButton>
               <TDropdownMenu>

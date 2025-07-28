@@ -3,7 +3,7 @@
     <TPopup v-model:visible="visible" trigger="click" placement="right-top">
       <TButton shape="circle">
         <template #icon>
-          <TIcon name="add" />
+          <Icon name="add" />
         </template>
       </TButton>
 
@@ -11,13 +11,13 @@
         <div class="flex gap-2">
           <div class="item" @click="onClick('audit')">
             <div class="icon">
-              <TIcon name="seal" />
+              <Icon name="seal" />
             </div>
             <div class="title">审核人</div>
           </div>
           <div class="item" @click="onClick('group')">
             <div class="icon">
-              <TIcon name="git-merge" />
+              <Icon name="git-merge" />
             </div>
             <div class="title">条件分支</div>
           </div>

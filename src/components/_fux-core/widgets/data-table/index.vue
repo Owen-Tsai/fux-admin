@@ -3,7 +3,7 @@
     <div class="flex items-center gap-2">
       <TButton @click="tableDialogRef?.onAdd()">
         <template #icon>
-          <TIcon name="plus" />
+          <Icon name="plus" />
           增加
         </template>
       </TButton>
@@ -37,7 +37,7 @@
                 @click="tableDialogRef?.onEdit(row.id)"
               >
                 <template #icon>
-                  <TIcon name="edit-2" />
+                  <Icon name="edit-2" />
                 </template>
               </TButton>
             </TTooltip>
@@ -49,7 +49,7 @@
               >
                 <TButton shape="square" theme="danger" variant="text">
                   <template #icon>
-                    <TIcon name="delete" />
+                    <Icon name="delete" />
                   </template>
                 </TButton>
               </TPopconfirm>

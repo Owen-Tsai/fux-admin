@@ -15,7 +15,7 @@
             class="close-icon"
             @click.stop="tabsView.removeTab(tab[0])"
           >
-            <TIcon name="close" />
+            <Icon name="close" />
           </div>
         </div>
 

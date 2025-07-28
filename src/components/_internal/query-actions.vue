@@ -7,7 +7,7 @@
       theme="primary"
       @click="() => toggleExpanded()"
     >
-      <TIcon name="chevron-down" :class="{ 'rotate-180': expanded }" />
+      <Icon name="chevron-down" :class="{ 'rotate-180': expanded }" />
       {{ expanded ? '收起' : '展开' }}
     </TLink>
   </div>

@@ -6,7 +6,7 @@
     >
       <TInput ref="el" v-model:value="value" clearable>
         <template #prefix-icon>
-          <TIcon v-show="value" :name="value" />
+          <Icon v-show="value" :name="value" />
         </template>
       </TInput>
       <template #content>
@@ -19,7 +19,7 @@
               class="inline-flex items-center justify-center p-1 group hover:bg-[var(--td-bg-color-container-active)] rounded cursor-pointer"
               @click="onSelect(item.stem)"
             >
-              <TIcon
+              <Icon
                 :name="item.stem"
                 size="24px"
                 class="group-hover:text-[var(--td-brand-color)]"

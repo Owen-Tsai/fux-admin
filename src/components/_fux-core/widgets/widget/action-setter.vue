@@ -12,12 +12,12 @@
             <div class="flex items-center gap-1">
               <TButton variant="text" size="small" shape="square" @click="onEditAction()">
                 <template #icon>
-                  <TIcon name="code" />
+                  <Icon name="code" />
                 </template>
               </TButton>
               <TButton variant="text" size="small" shape="square" @click="onDeleteAction(evtName)">
                 <template #icon>
-                  <TIcon name="delete" />
+                  <Icon name="delete" />
                 </template>
               </TButton>
             </div>

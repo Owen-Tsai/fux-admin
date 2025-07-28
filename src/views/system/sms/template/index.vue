@@ -85,7 +85,7 @@ defineOptions({ name: 'SystemSmsTemplate' })
             @click="formRef?.open()"
           >
             <template #icon>
-              <TIcon name="add" />
+              <Icon name="add" />
             </template>
             新增
           </TButton>
@@ -93,7 +93,7 @@ defineOptions({ name: 'SystemSmsTemplate' })
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" :loading="pending" @click="execute()">
               <template #icon>
-                <TIcon name="refresh" />
+                <Icon name="refresh" />
               </template>
             </TButton>
           </TTooltip>
@@ -131,7 +131,7 @@ defineOptions({ name: 'SystemSmsTemplate' })
                 @click="formRef?.open(row.id)"
               >
                 <template #icon>
-                  <TIcon name="edit-2" />
+                  <Icon name="edit-2" />
                 </template>
               </TButton>
             </TTooltip>
@@ -148,7 +148,7 @@ defineOptions({ name: 'SystemSmsTemplate' })
                   :disabled="permission.hasNone('system:sms-channel:delete')"
                 >
                   <template #icon>
-                    <TIcon name="delete" />
+                    <Icon name="delete" />
                   </template>
                 </TButton>
               </TPopconfirm>

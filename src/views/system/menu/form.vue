@@ -135,7 +135,7 @@ defineExpose({ open })
                 content="当菜单或目录启用非默认布局时，组件内容将不再渲染到默认布局组件中。另外，当目录启用非默认布局时，其下所有子菜单都将渲染到【组件路径】字段对应的组件中作为子路由。"
                 placement="right"
               >
-                <TIcon name="help-circle-filled" />
+                <Icon name="help-circle-filled" />
               </TTooltip>
             </template>
           </TFormItem>

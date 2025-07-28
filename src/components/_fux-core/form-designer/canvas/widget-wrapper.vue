@@ -12,23 +12,23 @@
 
     <!-- 拖拽手柄 -->
     <div class="action drag-handle inline-flex absolute top-0 left-0 rounded-tl-lg cursor-move">
-      <TIcon name="drag-move" />
+      <Icon name="drag-move" />
     </div>
     <!-- caption -->
     <div class="caption">
       {{ widget.props.field.name || widget.uid }}
-      <TIcon v-if="widget.props.hide" name="browse-off-filled" />
+      <Icon v-if="widget.props.hide" name="browse-off-filled" />
     </div>
     <!-- actions -->
     <div class="actions absolute bottom-0 right-0 flex gap-1">
       <TTooltip content="复制" :show-arrow="false" placement="left">
         <div class="action cursor-pointer" @click.stop="copyWidget(widget)">
-          <TIcon name="copy-filled" />
+          <Icon name="copy-filled" />
         </div>
       </TTooltip>
       <TTooltip content="删除" :show-arrow="false" placement="right">
         <div class="action cursor-pointer rounded-br-lg" @click.stop="deleteWidget(widget.uid)">
-          <TIcon name="delete-filled" />
+          <Icon name="delete-filled" />
         </div>
       </TTooltip>
     </div>

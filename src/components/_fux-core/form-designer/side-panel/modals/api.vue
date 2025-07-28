@@ -17,7 +17,7 @@
           </div>
           <TButton theme="default" block @click="createApi">
             <template #icon>
-              <TIcon name="plus" />
+              <Icon name="plus" />
             </template>
             创建 API
           </TButton>
