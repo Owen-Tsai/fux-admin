@@ -80,7 +80,7 @@ export const getList = (params: ListQueryParams) => {
 
 export const getDetail = (id: number) => {
   return request.get<TalentInfoVO>({
-    url: `${prefix}/get?id=${id}`,
+    url: `${prefix}/get-detail?id=${id}`,
   })
 }
 

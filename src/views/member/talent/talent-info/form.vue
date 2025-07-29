@@ -3,139 +3,312 @@
     <ASpin :spinning="loading">
       <div class="view-form mt-4">
         <div class="card-header">
-          <h2 class="card-title">{{ formData.name || '人才信息' }}</h2>
-          <div class="card-subtitle">
-            {{
-              [
-                getDictLabel(RC_EDUCATION_LEVEL, formData.diploma),
-                getDictLabel(USER_SEX, formData.sex),
-                getAgeFromIdCard(formData.idcard),
-              ]
-                .filter(Boolean)
-                .join(' · ')
-            }}
+          <div class="title-container">
+            <UserOutlined class="title-icon" />
+            <h2 class="card-title">{{ formData.name || '人才信息' }}</h2>
+            <div class="card-subtitle">
+              {{
+                [
+                  getDictLabel(RC_EDUCATION_LEVEL, formData.diploma),
+                  getDictLabel(USER_SEX, formData.sex),
+                  getAgeFromIdCard(formData.idcard),
+                ]
+                  .filter(Boolean)
+                  .join(' · ')
+              }}
+            </div>
           </div>
         </div>
-        <!-- 基本信息表格 -->
-        <div class="form-section">
-          <h3 class="section-title">人才基本信息</h3>
-          <table class="talent-table">
-            <tbody>
-              <tr>
-                <td class="label-cell">用户名</td>
-                <td class="value-cell">{{ formData.username }}</td>
-                <td class="label-cell">编码</td>
-                <td class="value-cell">{{ formData.code }}</td>
-              </tr>
-              <!-- <tr>
+        <ATabs defaultActiveKey="basic" class="form-tabs">
+          <ATabPane tab="基础信息" key="basic">
+            <!-- 基础信息表格 -->
+            <div class="form-section">
+              <!-- <h3 class="section-title">基础信息</h3> -->
+              <table class="talent-table">
+                <tbody>
+                  <tr>
+                    <td class="label-cell">用户名</td>
+                    <td class="value-cell">{{ formData.username }}</td>
+                    <td class="label-cell">编码</td>
+                    <td class="value-cell">{{ formData.code }}</td>
+                  </tr>
+                  <!-- <tr>
                 <td class="label-cell">姓名</td>
                 <td class="value-cell">{{ formData.name }}</td>
                 <td class="label-cell">性别</td>
                 <td class="value-cell">{{ getDictLabel(USER_SEX, formData.sex) }}</td>
               </tr> -->
-              <tr>
-                <td class="label-cell">身份证号</td>
-                <td class="value-cell">{{ formData.idcard }}</td>
-                <td class="label-cell">出生年月</td>
-                <td class="value-cell">
-                  {{
-                    formData.birthday ? dayjs(Number(formData.birthday)).format('YYYY-MM-DD') : ''
-                  }}
-                </td>
-              </tr>
-              <tr>
-                <td class="label-cell">证件类型</td>
-                <td class="value-cell">{{ getDictLabel(IDENTITY_TYPE, formData.idtype) }}</td>
-                <td class="label-cell">英文名</td>
-                <td class="value-cell">{{ formData.englishname }}</td>
-              </tr>
-              <tr>
-                <td class="label-cell">学历</td>
-                <td class="value-cell">{{ getDictLabel(RC_EDUCATION_LEVEL, formData.diploma) }}</td>
-                <td class="label-cell">学历类型</td>
-                <td class="value-cell">
-                  {{ getDictLabel(RC_EDUCATION_TYPE, formData.diplomatype) }}
-                </td>
-              </tr>
-              <!-- <tr>
+                  <tr>
+                    <td class="label-cell">身份证号</td>
+                    <td class="value-cell">{{ formData.idcard }}</td>
+                    <td class="label-cell">出生年月</td>
+                    <td class="value-cell">
+                      {{
+                        formData.birthday
+                          ? dayjs(Number(formData.birthday)).format('YYYY-MM-DD')
+                          : ''
+                      }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">证件类型</td>
+                    <td class="value-cell">{{ getDictLabel(IDENTITY_TYPE, formData.idtype) }}</td>
+                    <td class="label-cell">英文名</td>
+                    <td class="value-cell">{{ formData.englishname }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">学历</td>
+                    <td class="value-cell">
+                      {{ getDictLabel(RC_EDUCATION_LEVEL, formData.diploma) }}
+                    </td>
+                    <td class="label-cell">学历类型</td>
+                    <td class="value-cell">
+                      {{ getDictLabel(RC_EDUCATION_TYPE, formData.diplomatype) }}
+                    </td>
+                  </tr>
+                  <!-- <tr>
                 <td class="label-cell">身高</td>
                 <td class="value-cell">{{ formData.height }}</td>
                 <td class="label-cell">体重</td>
                 <td class="value-cell">{{ formData.weight }}</td>
               </tr> -->
-              <tr>
-                <td class="label-cell">联系电话</td>
-                <td class="value-cell">{{ formData.mobile }}</td>
-                <td class="label-cell">地址</td>
-                <td class="value-cell">{{ formData.address }}</td>
-              </tr>
-              <tr>
-                <td class="label-cell">民族</td>
-                <td class="value-cell">{{ getDictLabel(USER_NATION_TEST, formData.nation) }}</td>
-                <td class="label-cell">政治面貌</td>
-                <td class="value-cell">
-                  {{ getDictLabel(USER_POLITICAL, formData.politicalstatus) }}
-                </td>
-              </tr>
-              <tr>
-                <!-- <td class="label-cell">出生地</td>
+                  <tr>
+                    <td class="label-cell">联系电话</td>
+                    <td class="value-cell">{{ formData.mobile }}</td>
+                    <td class="label-cell">地址</td>
+                    <td class="value-cell">{{ formData.address }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">民族</td>
+                    <td class="value-cell">
+                      {{ getDictLabel(USER_NATION_TEST, formData.nation) }}
+                    </td>
+                    <td class="label-cell">政治面貌</td>
+                    <td class="value-cell">
+                      {{ getDictLabel(USER_POLITICAL, formData.politicalstatus) }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <!-- <td class="label-cell">出生地</td>
                 <td class="value-cell">{{ formData.nativeplace }}</td> -->
-                <td class="label-cell">婚姻状况</td>
-                <td class="value-cell">{{ getDictLabel(RC_MARRIAGE, formData.maritalstatus) }}</td>
-                <td class="label-cell">email</td>
-                <td class="value-cell">{{ formData.email }}</td>
-              </tr>
-              <tr>
-                <td class="label-cell">自我介绍</td>
-                <td class="value-cell" colspan="3">{{ formData.selfeval }}</td>
-              </tr>
-              <tr>
-                <td class="label-cell">备注</td>
-                <td class="value-cell" colspan="3">{{ formData.remark }}</td>
-              </tr>
+                    <td class="label-cell">婚姻状况</td>
+                    <td class="value-cell">
+                      {{ getDictLabel(RC_MARRIAGE, formData.maritalstatus) }}
+                    </td>
+                    <td class="label-cell">email</td>
+                    <td class="value-cell">{{ formData.email }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">自我介绍</td>
+                    <td class="value-cell" colspan="3">{{ formData.selfeval }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">备注</td>
+                    <td class="value-cell" colspan="3">{{ formData.remark }}</td>
+                  </tr>
 
-              <!-- <tr>
+                  <!-- <tr>
                 <td class="label-cell">注册公民</td>
                 <td class="value-cell">{{ formData.registeredresidence }}</td>
                 <td class="label-cell">手机号</td>
                 <td class="value-cell">{{ formData.mobile }}</td>
               </tr> -->
-              <tr>
-                <!-- <td class="label-cell">邮编</td>
-                <td class="value-cell">{{ formData.postcode }}</td> -->
-              </tr>
-            </tbody>
-          </table>
-        </div>
 
-        <!-- 账号信息表格 -->
-        <div class="form-section">
-          <h3 class="section-title">账号信息</h3>
-          <table class="talent-table">
-            <tbody>
-              <tr>
-                <td class="label-cell">是否可用</td>
-                <td class="value-cell">{{ getDictLabel(YES_NO, formData.isenable) }}</td>
-                <td class="label-cell">注册时间</td>
-                <td class="value-cell">
-                  {{ formData.regdate ? dayjs(Number(formData.regdate)).format('YYYY-MM-DD') : '' }}
-                </td>
-              </tr>
-              <tr>
-                <td class="label-cell">最后登录IP</td>
-                <td class="value-cell">{{ formData.lastlogonip }}</td>
-                <td class="label-cell">最后登录时间</td>
-                <td class="value-cell">
-                  {{
-                    formData.lastlogondate
-                      ? dayjs(Number(formData.lastlogondate)).format('YYYY-MM-DD HH:mm:ss')
-                      : ''
-                  }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                  <tr>
+                    <td class="label-cell">是否可用</td>
+                    <td class="value-cell">{{ getDictLabel(YES_NO, formData.isenable) }}</td>
+                    <td class="label-cell">注册时间</td>
+                    <td class="value-cell">
+                      {{
+                        formData.regdate ? dayjs(Number(formData.regdate)).format('YYYY-MM-DD') : ''
+                      }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="label-cell">最后登录IP</td>
+                    <td class="value-cell">{{ formData.lastlogonip }}</td>
+                    <td class="label-cell">最后登录时间</td>
+                    <td class="value-cell">
+                      {{
+                        formData.lastlogondate
+                          ? dayjs(Number(formData.lastlogondate)).format('YYYY-MM-DD HH:mm:ss')
+                          : ''
+                      }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <!-- <td class="label-cell">邮编</td>
+                <td class="value-cell">{{ formData.postcode }}</td> -->
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ATabPane>
+          <ATabPane tab="学习经历" key="education">
+            <div class="form-section">
+              <template v-for="(item, index) in formData.educationList.slice(0, 5)" :key="index">
+                <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
+                  <tbody>
+                    <tr>
+                      <td class="label-cell">毕业院校</td>
+                      <td class="value-cell" colspan="3">{{ item.schoolName }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">专业</td>
+                      <td class="value-cell">{{ item.major }}</td>
+                      <td class="label-cell">学历</td>
+                      <td class="value-cell">
+                        {{ getDictLabel(RC_EDUCATION_LEVEL, Number(item.educationLevel)) }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">入学时间</td>
+                      <td class="value-cell">
+                        {{ item.startDate ? dayjs(Number(item.startDate)).format('YYYY-MM') : '' }}
+                      </td>
+                      <td class="label-cell">毕业时间</td>
+                      <td class="value-cell">
+                        {{ item.endDate ? dayjs(Number(item.endDate)).format('YYYY-MM') : '' }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+            </div>
+          </ATabPane>
+          <ATabPane tab="工作经历" key="work">
+            <div class="form-section">
+              <template v-for="(item, index) in qualificationData.work.slice(0, 3)" :key="index">
+                <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
+                  <tbody>
+                    <tr>
+                      <td class="label-cell">公司名称</td>
+                      <td class="value-cell" colspan="3">{{ item.company }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">职位</td>
+                      <td class="value-cell">{{ item.position }}</td>
+                      <td class="label-cell">部门</td>
+                      <td class="value-cell">{{ item.department }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">入职时间</td>
+                      <td class="value-cell">{{ item.startDate }}</td>
+                      <td class="label-cell">离职时间</td>
+                      <td class="value-cell">{{ item.endDate }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+            </div>
+          </ATabPane>
+          <ATabPane tab="技能等级" key="skills">
+            <div class="form-section">
+              <template v-for="(item, index) in qualificationData.skills.slice(0, 3)" :key="index">
+                <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
+                  <tbody>
+                    <tr>
+                      <td class="label-cell">技能名称</td>
+                      <td class="value-cell">{{ item.name }}</td>
+                      <td class="label-cell">等级</td>
+                      <td class="value-cell">{{ item.level }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">证书名称</td>
+                      <td class="value-cell" colspan="3">{{ item.certificate }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+            </div>
+          </ATabPane>
+          <ATabPane tab="专利信息" key="patents">
+            <div class="form-section">
+              <template v-for="(item, index) in qualificationData.patents.slice(0, 3)" :key="index">
+                <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
+                  <tbody>
+                    <tr>
+                      <td class="label-cell">专利名称</td>
+                      <td class="value-cell" colspan="3">{{ item.name }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">专利号</td>
+                      <td class="value-cell">{{ item.patentNo }}</td>
+                      <td class="label-cell">授权日期</td>
+                      <td class="value-cell">{{ item.authDate }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+            </div>
+          </ATabPane>
+          <ATabPane tab="荣誉奖项" key="honors">
+            <div class="form-section">
+              <template v-for="(item, index) in qualificationData.honors.slice(0, 3)" :key="index">
+                <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
+                  <tbody>
+                    <tr>
+                      <td class="label-cell">荣誉名称</td>
+                      <td class="value-cell" colspan="3">{{ item.name }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">颁发机构</td>
+                      <td class="value-cell">{{ item.issuer }}</td>
+                      <td class="label-cell">颁发日期</td>
+                      <td class="value-cell">{{ item.issueDate }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+            </div>
+          </ATabPane>
+          <ATabPane tab="著作信息" key="works">
+            <div class="form-section">
+              <template v-for="(item, index) in qualificationData.works.slice(0, 3)" :key="index">
+                <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
+                  <tbody>
+                    <tr>
+                      <td class="label-cell">著作名称</td>
+                      <td class="value-cell" colspan="3">{{ item.name }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">出版社</td>
+                      <td class="value-cell">{{ item.publisher }}</td>
+                      <td class="label-cell">出版日期</td>
+                      <td class="value-cell">{{ item.publishDate }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+            </div>
+          </ATabPane>
+          <ATabPane tab="职称信息" key="professionalTitles">
+            <div class="form-section">
+              <template
+                v-for="(item, index) in qualificationData.professionalTitles.slice(0, 3)"
+                :key="index"
+              >
+                <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
+                  <tbody>
+                    <tr>
+                      <td class="label-cell">职称名称</td>
+                      <td class="value-cell">{{ item.name }}</td>
+                      <td class="label-cell">评定机构</td>
+                      <td class="value-cell">{{ item.issuer }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">评定日期</td>
+                      <td class="value-cell">{{ item.issueDate }}</td>
+                      <td class="label-cell">有效期至</td>
+                      <td class="value-cell">{{ item.validUntil }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </template>
+            </div>
+          </ATabPane>
+        </ATabs>
 
         <!-- 其他信息表格 ，暂不显示 -->
         <div class="form-section" v-if="false">
@@ -267,7 +440,8 @@ import { message } from 'ant-design-vue'
 import logger from '@/utils/logger'
 import useDict from '@/hooks/use-dict'
 import dayjs from 'dayjs'
-import { ref, getCurrentInstance } from 'vue'
+import { ref, getCurrentInstance, reactive } from 'vue'
+import { UserOutlined } from '@ant-design/icons-vue'
 
 // 获取全局属性
 const { proxy } = getCurrentInstance()
@@ -276,6 +450,74 @@ const $message = proxy?.$message
 const visible = ref(false)
 const loading = ref(false)
 const formData = ref<TalentInfoVO>({})
+
+// 资历信息静态数据
+const qualificationData = reactive({
+  education: [
+    {
+      id: '1002',
+      idcard: '371311199201074481',
+      schoolName: '北京大学',
+      educationLevel: '6',
+      major: '软件工程',
+      startDate: 1409500800000,
+      endDate: 1498752000000,
+      remark: '硕士毕业',
+    },
+    {
+      id: '1001',
+      idcard: '371311199201074481',
+      schoolName: '山东大学',
+      educationLevel: '5',
+      major: '计算机科学与技术',
+      startDate: 1283270400000,
+      endDate: 1404057600000,
+      remark: '本科毕业',
+    },
+  ],
+  work: [
+    {
+      company: '科技有限公司',
+      position: '高级工程师',
+      department: '研发部',
+      startDate: '2014-07',
+      endDate: '至今',
+    },
+    {
+      company: '互联网公司',
+      position: '软件工程师',
+      department: '技术部',
+      startDate: '2017-07',
+      endDate: '2020-06',
+    },
+  ],
+  skills: [
+    { name: 'Java开发', level: '高级', certificate: 'Oracle认证专家' },
+    { name: '前端开发', level: '中级', certificate: 'Web前端工程师' },
+    { name: '数据库设计', level: '高级', certificate: 'MySQL认证专家' },
+  ],
+  patents: [
+    { name: '一种分布式计算方法', patentNo: 'ZL202010123456.7', authDate: '2022-05-18' },
+    { name: '一种高效的数据存储方法', patentNo: 'ZL202110345678.9', authDate: '2023-03-15' },
+  ],
+  honors: [
+    { name: '优秀员工', issuer: '科技有限公司', issueDate: '2021-12-20' },
+    { name: '技术创新奖', issuer: '行业协会', issueDate: '2022-09-10' },
+  ],
+  works: [
+    { name: 'Java编程实战', publisher: '技术出版社', publishDate: '2020-03-15' },
+    { name: '分布式系统设计', publisher: '电子工业出版社', publishDate: '2022-08-20' },
+  ],
+  professionalTitles: [
+    { name: '高级工程师', issuer: '工业和信息化部', issueDate: '2019-10-08', validUntil: '长期' },
+    {
+      name: '系统架构师',
+      issuer: '中国软件行业协会',
+      issueDate: '2021-12-01',
+      validUntil: '2026-11-30',
+    },
+  ],
+})
 
 const [
   IDENTITY_TYPE,
@@ -366,10 +608,18 @@ defineExpose({ open })
 }
 
 .card-header {
-  padding: 16px 24px;
+  padding: 4px;
   background-color: #e6f7ff;
   border-bottom: 1px solid #bae7ff;
-  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .card-title {
@@ -378,12 +628,43 @@ defineExpose({ open })
   font-weight: 700;
   color: #0050b3;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-right: 12px;
+}
+
+.title-icon {
+  font-size: 24px;
+  color: #1890ff;
+  margin-right: 8px;
+  vertical-align: middle;
+  transition: color 0.3s ease;
+}
+
+.title-container:hover .title-icon {
+  color: #0050b3;
+  transform: scale(1.1);
+  transition: all 0.3s ease;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.title-container:hover {
+  background-color: rgba(24, 144, 255, 0.1);
 }
 
 .card-subtitle {
-  margin-top: 4px;
+  margin: 0;
   font-size: 14px;
   color: #0050b3;
+  display: flex;
+  align-items: center;
 }
 .form-section {
   margin-bottom: 24px;
@@ -391,7 +672,7 @@ defineExpose({ open })
 }
 .section-title {
   padding: 12px 16px 12px 24px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   color: #1f2329;
   position: relative;
@@ -416,7 +697,7 @@ defineExpose({ open })
   border-left: 1px solid #e8e8e8;
   border-right: 1px solid #e8e8e8;
   border-bottom: 1px solid #e8e8e8;
-  border-top: 1px dashed #b5b5b5;
+  border-top: 1px solid #e8e8e8;
 }
 .talent-table tr {
   border-bottom: 1px solid #e8e8e8;
