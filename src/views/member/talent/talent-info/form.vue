@@ -179,12 +179,12 @@
           </ATabPane>
           <ATabPane tab="工作经历" key="work">
             <div class="form-section">
-              <template v-for="(item, index) in qualificationData.work.slice(0, 3)" :key="index">
+              <template v-for="(item, index) in formData.workList.slice(0, 5)" :key="index">
                 <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
                   <tbody>
                     <tr>
                       <td class="label-cell">公司名称</td>
-                      <td class="value-cell" colspan="3">{{ item.company }}</td>
+                      <td class="value-cell" colspan="3">{{ item.companyName }}</td>
                     </tr>
                     <tr>
                       <td class="label-cell">职位</td>
@@ -194,9 +194,17 @@
                     </tr>
                     <tr>
                       <td class="label-cell">入职时间</td>
-                      <td class="value-cell">{{ item.startDate }}</td>
+                      <td class="value-cell">
+                        {{ item.startDate ? dayjs(Number(item.startDate)).format('YYYY-MM') : '' }}
+                      </td>
                       <td class="label-cell">离职时间</td>
-                      <td class="value-cell">{{ item.endDate }}</td>
+                      <td class="value-cell">
+                        {{ item.endDate ? dayjs(Number(item.endDate)).format('YYYY-MM') : '' }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">工作内容描述</td>
+                      <td class="value-cell" colspan="3">{{ item.jobDescription }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -205,18 +213,24 @@
           </ATabPane>
           <ATabPane tab="技能等级" key="skills">
             <div class="form-section">
-              <template v-for="(item, index) in qualificationData.skills.slice(0, 3)" :key="index">
+              <template v-for="(item, index) in formData.skillList" :key="index">
                 <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
                   <tbody>
                     <tr>
                       <td class="label-cell">技能名称</td>
-                      <td class="value-cell">{{ item.name }}</td>
+                      <td class="value-cell">{{ item.skillName }}</td>
                       <td class="label-cell">等级</td>
-                      <td class="value-cell">{{ item.level }}</td>
+                      <td class="value-cell">
+                        {{ getDictLabel(PERSONAL_SKILL_LEVEL, Number(item.skillLevel)) }}
+                      </td>
                     </tr>
                     <tr>
-                      <td class="label-cell">证书名称</td>
-                      <td class="value-cell" colspan="3">{{ item.certificate }}</td>
+                      <td class="label-cell">技能描述</td>
+                      <td class="value-cell" colspan="3">{{ item.skillDescription }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">证书编号</td>
+                      <td class="value-cell" colspan="3">{{ item.certificateNo }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -225,18 +239,28 @@
           </ATabPane>
           <ATabPane tab="专利信息" key="patents">
             <div class="form-section">
-              <template v-for="(item, index) in qualificationData.patents.slice(0, 3)" :key="index">
+              <template v-for="(item, index) in formData.patentList" :key="index">
                 <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
                   <tbody>
                     <tr>
                       <td class="label-cell">专利名称</td>
-                      <td class="value-cell" colspan="3">{{ item.name }}</td>
+                      <td class="value-cell">{{ item.patentName }}</td>
+                      <td class="label-cell">专利类型</td>
+                      <td class="value-cell">
+                        {{ getDictLabel(PATENT_TYPE, Number(item.patentType)) }}
+                      </td>
                     </tr>
                     <tr>
                       <td class="label-cell">专利号</td>
                       <td class="value-cell">{{ item.patentNo }}</td>
                       <td class="label-cell">授权日期</td>
-                      <td class="value-cell">{{ item.authDate }}</td>
+                      <td class="value-cell">
+                        {{
+                          item.authorizationDate
+                            ? dayjs(Number(item.authorizationDate)).format('YYYY-MM')
+                            : ''
+                        }}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -245,18 +269,20 @@
           </ATabPane>
           <ATabPane tab="荣誉奖项" key="honors">
             <div class="form-section">
-              <template v-for="(item, index) in qualificationData.honors.slice(0, 3)" :key="index">
+              <template v-for="(item, index) in formData.honorList.slice(0, 5)" :key="index">
                 <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
                   <tbody>
                     <tr>
                       <td class="label-cell">荣誉名称</td>
-                      <td class="value-cell" colspan="3">{{ item.name }}</td>
+                      <td class="value-cell" colspan="3">{{ item.awardName }}</td>
                     </tr>
                     <tr>
                       <td class="label-cell">颁发机构</td>
-                      <td class="value-cell">{{ item.issuer }}</td>
+                      <td class="value-cell">{{ item.awardingOrganization }}</td>
                       <td class="label-cell">颁发日期</td>
-                      <td class="value-cell">{{ item.issueDate }}</td>
+                      <td class="value-cell">
+                        {{ item.awardDate ? dayjs(Number(item.awardDate)).format('YYYY-MM') : '' }}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -265,18 +291,32 @@
           </ATabPane>
           <ATabPane tab="著作信息" key="works">
             <div class="form-section">
-              <template v-for="(item, index) in qualificationData.works.slice(0, 3)" :key="index">
+              <template v-for="(item, index) in formData.publicationList" :key="index">
                 <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
                   <tbody>
                     <tr>
                       <td class="label-cell">著作名称</td>
-                      <td class="value-cell" colspan="3">{{ item.name }}</td>
+                      <td class="value-cell" colspan="3">{{ item.title }}</td>
                     </tr>
                     <tr>
-                      <td class="label-cell">出版社</td>
-                      <td class="value-cell">{{ item.publisher }}</td>
+                      <td class="label-cell">摘要</td>
+                      <td class="value-cell" colspan="3">{{ item.abstractContent }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">关键词</td>
+                      <td class="value-cell" colspan="3">{{ item.keywords }}</td>
+                    </tr>
+                    <tr>
+                      <td class="label-cell">期刊名称</td>
+                      <td class="value-cell">{{ item.journalName }}</td>
                       <td class="label-cell">出版日期</td>
-                      <td class="value-cell">{{ item.publishDate }}</td>
+                      <td class="value-cell">
+                        {{
+                          item.publishDate
+                            ? dayjs(Number(item.publishDate)).format('YYYY-MM-DD')
+                            : ''
+                        }}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -285,23 +325,24 @@
           </ATabPane>
           <ATabPane tab="职称信息" key="professionalTitles">
             <div class="form-section">
-              <template
-                v-for="(item, index) in qualificationData.professionalTitles.slice(0, 3)"
-                :key="index"
-              >
+              <template v-for="(item, index) in formData.titleList" :key="index">
                 <table class="talent-table" :class="index > 0 ? 'mt-4' : ''">
                   <tbody>
                     <tr>
                       <td class="label-cell">职称名称</td>
-                      <td class="value-cell">{{ item.name }}</td>
+                      <td class="value-cell">{{ item.titleName }}</td>
                       <td class="label-cell">评定机构</td>
-                      <td class="value-cell">{{ item.issuer }}</td>
+                      <td class="value-cell">{{ item.issuingAuthority }}</td>
                     </tr>
                     <tr>
+                      <td class="label-cell">证书编号</td>
+                      <td class="value-cell">{{ item.certificateNo }}</td>
                       <td class="label-cell">评定日期</td>
-                      <td class="value-cell">{{ item.issueDate }}</td>
-                      <td class="label-cell">有效期至</td>
-                      <td class="value-cell">{{ item.validUntil }}</td>
+                      <td class="value-cell">
+                        {{
+                          item.obtainDate ? dayjs(Number(item.obtainDate)).format('YYYY-MM-DD') : ''
+                        }}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -512,7 +553,7 @@ const qualificationData = reactive({
     { name: '高级工程师', issuer: '工业和信息化部', issueDate: '2019-10-08', validUntil: '长期' },
     {
       name: '系统架构师',
-      issuer: '中国软件行业协会',
+      issuer: '中国软件协会协会',
       issueDate: '2021-12-01',
       validUntil: '2026-11-30',
     },
@@ -533,6 +574,7 @@ const [
   YES_NO,
   PERSONAL_SKILL_LEVEL,
   SYSTEM_TALENTTYPE,
+  PATENT_TYPE,
 ] = useDict(
   'identity_type',
   'user_sex',
@@ -547,6 +589,7 @@ const [
   'yes_no',
   'personal_skill_level',
   'system_talenttype',
+  'patent_type',
 )
 
 // 根据字典值获取标签
@@ -707,7 +750,6 @@ defineExpose({ open })
 }
 .talent-table td {
   padding: 12px 16px;
-  vertical-align: top;
 }
 .label-cell {
   width: 20%;
@@ -719,6 +761,10 @@ defineExpose({ open })
 }
 .value-cell {
   width: 30%;
+  padding-left: 16px;
+}
+.value-cell1 {
+  width: 70%;
   padding-left: 16px;
 }
 </style>
