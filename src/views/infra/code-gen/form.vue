@@ -11,10 +11,7 @@ const { dataSourceList } = defineProps<{
   dataSourceList?: DataSourceVO[]
 }>()
 
-const formData = ref<CodeGenCreateReqVO>({
-  dataSourceConfigId: 0,
-  tableNames: [],
-})
+const tableNames = ref<string[]>([])
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 
 const { data, pending, query, execute, onQueryChange } = useTable(queryForm)
@@ -25,8 +22,8 @@ const submit = async () => {
   try {
     loading.value = true
     await createCodeGenConfig({
-      dataSourceConfigId: formData.value.dataSourceConfigId,
-      tableNames: formData.value.tableNames,
+      dataSourceConfigId: query.value.dataSourceConfigId || 0,
+      tableNames: tableNames.value,
     })
 
     visible.value = false
@@ -83,7 +80,7 @@ defineExpose({ open })
       </TForm>
 
       <TTable
-        v-model:selected-row-keys="formData.tableNames"
+        v-model:selected-row-keys="tableNames"
         :data="data"
         row-key="name"
         hover
