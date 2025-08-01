@@ -8,7 +8,22 @@
     destroy-on-close
     @confirm="close"
   >
-    <FormRenderer :app-schema="appSchema" debug :state="state" mode="preview" />
+    <div class="flex items-center justify-center">
+      <TRadioGroup
+        v-model:value="mode"
+        theme="button"
+        variant="default-filled"
+        size="large"
+        :options="[
+          { label: '表单模式', value: 0 },
+          { label: '查看模式', value: 1 },
+        ]"
+      />
+    </div>
+    <div class="mt-4">
+      <FormRenderer v-if="mode === 0" :app-schema="appSchema" debug :state="state" mode="preview" />
+      <FormRenderer v-else :app-schema="appSchema" debug :state="state" mode="archive" />
+    </div>
   </TDialog>
 </template>
 
@@ -18,6 +33,8 @@ import { useDesignerCtxInject } from '@fusionx/core/hooks'
 
 const visible = ref(false)
 const { appSchema } = useDesignerCtxInject()!
+
+const mode = ref(0)
 
 const state = ref({})
 

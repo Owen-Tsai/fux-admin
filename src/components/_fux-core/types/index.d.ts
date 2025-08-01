@@ -17,6 +17,7 @@ export interface AppSchemaGenerationInfo {
     id: number | string
   }>
   gridColumns?: false | 2 | 3
+  viewModePaginated?: boolean
 }
 export interface AppSchema {
   version: string

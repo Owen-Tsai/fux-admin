@@ -1,7 +1,7 @@
 <template>
   <div class="flex-1 min-h-0 px-6 py-4 overflow-auto">
     <div class="min-h-full bg-[var(--td-bg-color-container)] rounded-lg py-6">
-      <TForm :data="dataConfigState" class="w-5/12 min-w-500px !mx-auto" label-width="100px">
+      <TForm :data="dataConfigState" class="w-5/12 min-w-500px !mx-auto" label-width="110px">
         <TAlert v-if="appEditMode === 'update'" theme="warning" class="!mb-6">
           <template #message>
             当前应用的版本为 <b>{{ appVersion }}</b
@@ -35,10 +35,20 @@
             </TOption>
           </TSelect>
         </TFormItem>
-        <TFormItem label="表单分步" name="paginated">
+        <TFormItem label="表单分页" name="paginated">
           <TRadioGroup v-model:value="dataConfigState.paginated">
             <TRadioButton value="tabs">使用 tabs 分页</TRadioButton>
             <TRadioButton value="steps">使用 steps 分页</TRadioButton>
+            <TRadioButton :value="false">不分页</TRadioButton>
+          </TRadioGroup>
+        </TFormItem>
+        <TFormItem
+          label="阅读模式分页"
+          name="viewModePaginated"
+          help="在审核时和信息库中是否采用分页模式显示"
+        >
+          <TRadioGroup v-model:value="dataConfigState.viewModePaginated">
+            <TRadioButton :value="true">分页</TRadioButton>
             <TRadioButton :value="false">不分页</TRadioButton>
           </TRadioGroup>
         </TFormItem>

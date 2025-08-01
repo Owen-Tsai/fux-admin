@@ -112,12 +112,27 @@ export const widgetManifest = import.meta.glob('../widgets/**/index.vue', {
   eager: true,
   import: 'default',
 })
+export const viewModeWidgetManifest = import.meta.glob('../widgets/**/view.vue', {
+  eager: true,
+  import: 'default',
+})
 
 export const widgetToRender = (type: Widget['type']) => {
   for (const key in widgetManifest) {
     const name = key.split('/')[key.split('/').length - 2]
     if (camelCase(name) === type) {
       return widgetManifest[key] as any
+    }
+  }
+
+  return null
+}
+
+export const viewModeWidgetToRender = (type: Widget['type']) => {
+  for (const key in viewModeWidgetManifest) {
+    const name = key.split('/')[key.split('/').length - 2]
+    if (camelCase(name) === type) {
+      return viewModeWidgetManifest[key] as any
     }
   }
 

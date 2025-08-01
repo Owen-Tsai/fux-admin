@@ -1,6 +1,6 @@
 <template>
   <template v-if="widget.class === 'layout' && shouldShow">
-    <component :is="widgetToRender(widget.type)" :widget="widget" />
+    <component :is="viewModeWidgetToRender(widget.type)" :widget="widget" />
   </template>
   <template v-if="widget.class === 'form' && shouldShow">
     <TFormItem
@@ -12,13 +12,13 @@
       :rules="rules"
       class="w-full"
     >
-      <component :is="widgetToRender(widget.type)" :widget="widget" />
+      <component :is="viewModeWidgetToRender(widget.type)" :widget="widget" :model="fieldValue" />
     </TFormItem>
   </template>
 </template>
 
 <script setup lang="ts">
-import { widgetToRender } from '@fusionx/core/utils/widget'
+import { viewModeWidgetToRender } from '@fusionx/core/utils/widget'
 import { validation } from '@fusionx/core/utils'
 import { useRendererCtxInject } from '@fusionx/core/hooks/use-context'
 import type { Widget, FormWidget, FieldInteractivity } from '@fusionx/core/types'
@@ -26,10 +26,12 @@ import type { Widget, FormWidget, FieldInteractivity } from '@fusionx/core/types
 const ctx = useRendererCtxInject()
 
 const widget = defineModel<Widget>('widget', { required: true })
+const fieldValue = ctx?.formData.value[widget.value.props.field.name || widget.value.uid]
 
 const rules = computed(() => validation.generateRules(widget.value as FormWidget))
 
 const interactivity = computed<FieldInteractivity['config'] | undefined>(() => {
+  if (ctx?.mode === 'archive') return undefined
   if (widget.value.props.field.name) {
     const override = ctx?.fieldsInteractivity.value?.find(
       (e) => e.name === widget.value.props.field.name,
