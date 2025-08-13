@@ -1,4 +1,4 @@
-export interface FieldControlOverride {
+export interface FieldInteractivity {
   name?: string
   config?: 'shown' | 'hidden' | 'readonly' | 'writable'
 }
@@ -10,10 +10,10 @@ export interface NPropsAudit {
     text?: string
   }
   /**
-   * @deprecated use `fieldsOverride` instead
+   * @deprecated use `fieldsInteractivity` instead
    */
-  fields?: Array<FieldControlOverride>
-  fieldsOverride: Array<FieldControlOverride>
+  fields?: Array<FieldInteractivity>
+  fieldsInteractivity: Array<FieldInteractivity>
   /**
    * 是否为会签
    */

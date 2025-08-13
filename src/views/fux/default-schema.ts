@@ -20,6 +20,7 @@ const defaultSchema: AppSchema = {
     tables: [],
     gridColumns: 2,
     paginated: false,
+    viewModePaginated: false,
   },
   version: '1',
 }

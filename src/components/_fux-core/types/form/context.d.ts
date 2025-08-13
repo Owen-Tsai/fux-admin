@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
 import type { Widget } from './widget'
-import type { AppSchema } from '..'
+import type { AppSchema, FieldInteractivity } from '..'
 
 /**
  * States that must be provided by both designer and the renderer
@@ -19,6 +19,7 @@ export interface FuxDesignerCtx extends FuxCoreContext {
 export interface FuxRendererCtx extends FuxCoreContext {
   $state: Ref<Record<string, any>>
   mode: FuxRendererMode
+  fieldsInteractivity: ComputedRef<FieldInteractivity[]>
 }
 
 /**
@@ -27,6 +28,6 @@ export interface FuxRendererCtx extends FuxCoreContext {
  * prod - 表单填报模式
  * audit - 数据审核模式
  * preview - 编辑模式下的预览
- * archive - 归档模式（信息库，只读）
+ * archive - 归档模式（信息库或提交后用户查看，只读）
  */
 export type FuxRendererMode = 'dev' | 'prod' | 'audit' | 'preview' | 'archive'

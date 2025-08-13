@@ -4,5 +4,5 @@ export {
   TaskNode,
   TaskNodeConfigMap,
   TaskNodePropsMap,
-  FieldControlOverride,
+  FieldInteractivity,
 } from './task-node'

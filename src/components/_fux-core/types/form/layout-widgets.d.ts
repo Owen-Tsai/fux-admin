@@ -1,5 +1,5 @@
 import type { FormProps } from './misc'
-import type { Widget } from './widget'
+import type { ConfigOf, Widget } from './widget'
 
 interface FieldProps {
   label?: string

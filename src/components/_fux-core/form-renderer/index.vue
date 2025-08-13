@@ -9,12 +9,20 @@
       layout="vertical"
       :disabled="appSchema.form.disabled || disabled"
     >
-      <WidgetRenderer
-        v-for="widget in appSchema.form.widgets"
-        :key="widget.uid"
-        :widget="widget"
-        :field-override="fieldsControlOverride"
-      />
+      <template v-if="mode === 'dev' || mode === 'prod' || mode === 'preview'">
+        <WidgetRenderer
+          v-for="widget in appSchema.form.widgets"
+          :key="widget.uid"
+          :widget="widget"
+        />
+      </template>
+      <template v-else>
+        <ViewModeWidgetRenderer
+          v-for="widget in appSchema.form.widgets"
+          :key="widget.uid"
+          :widget="widget"
+        />
+      </template>
     </TForm>
 
     <div v-if="debug">
@@ -25,12 +33,13 @@
 
 <script setup lang="ts">
 import WidgetRenderer from '../widgets/widget/index.vue'
+import ViewModeWidgetRenderer from '../widgets/widget/view-mode.vue'
 import highlightCode from '@/utils/highlighter'
 import useAPI from './use-api'
 import useInstance from './use-instance'
 import { useRendererCtxProvide } from '@fusionx/core/hooks'
 import type { FormInstanceFunctions, FormValidateParams } from 'tdesign-vue-next'
-import type { AppSchema, FuxRendererMode, FieldControlOverride } from '@fusionx/core/types'
+import type { AppSchema, FuxRendererMode, FieldInteractivity } from '@fusionx/core/types'
 
 const {
   debug,
@@ -50,26 +59,13 @@ const state = defineModel<Record<string, any>>('state', { default: {} })
 
 const formData = ref<Record<string, any>>({})
 
-useRendererCtxProvide({
-  $state: state,
-  mode,
-  formData,
-  appSchema,
-})
-
-const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
-
-const highlighted = computedAsync(async () => {
-  return await highlightCode(JSON.stringify(formData.value, null, 2), 'json')
-})
-
-const fieldsControlOverride = computed<FieldControlOverride[]>(() => {
+const fieldsInteractivity = computed<FieldInteractivity[]>(() => {
   if (taskKey) {
     if (taskKey === 'all') {
-      const fields: FieldControlOverride[] = []
+      const fields: FieldInteractivity[] = []
       appSchema.value.flow.nodes.forEach((node) => {
         if (node.type === 'audit') {
-          node.props.fieldsOverride.forEach((field) => {
+          node.props.fieldsInteractivity.forEach((field) => {
             fields.push(field)
           })
         }
@@ -83,6 +79,20 @@ const fieldsControlOverride = computed<FieldControlOverride[]>(() => {
   }
 
   return []
+})
+
+useRendererCtxProvide({
+  $state: state,
+  mode,
+  formData,
+  appSchema,
+  fieldsInteractivity,
+})
+
+const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
+
+const highlighted = computedAsync(async () => {
+  return await highlightCode(JSON.stringify(formData.value, null, 2), 'json')
 })
 
 const instanceMethods = useInstance()
