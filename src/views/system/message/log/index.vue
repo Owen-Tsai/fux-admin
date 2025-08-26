@@ -46,22 +46,17 @@ defineOptions({ name: 'SystemSmsLog' })
         <TFormItem label="模板编码" name="templateCode" class="col">
           <TInput v-model:value="query.templateCode" placeholder="请输入模板编码" />
         </TFormItem>
-        <TFormItem label="模板类型" name="templateType" class="col">
+        <TFormItem v-show="expanded" label="模板类型" name="templateType" class="col">
           <TSelect
             v-model:value="query.templateType"
             :options="templateTypeOpts"
             placeholder="请选择模板类型"
           />
         </TFormItem>
-        <TFormItem
-          v-show="expanded"
-          label="发送时间"
-          name="sendTime"
-          :class="`col ${expanded ? 'ml-1/3' : ''}`"
-        >
+        <TFormItem v-show="expanded" label="发送时间" name="sendTime" class="col">
           <TDateRangePicker v-model:value="query.createTime" value-type="YYYY-MM-DD HH:mm:ss" />
         </TFormItem>
-        <QueryActions v-model:expanded="expanded" class="col" />
+        <QueryActions v-model:expanded="expanded" :class="`col ${expanded ? 'ml-1/3' : ''}`" />
       </TForm>
     </TCard>
 
