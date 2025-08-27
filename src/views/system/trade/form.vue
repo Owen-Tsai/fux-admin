@@ -31,24 +31,24 @@
         >
           <ARow>
             <ACol :span="24" :lg="12">
-              <AFormItem label="上级行业编号" name="pid">
+              <AFormItem label="上级产业编号" name="pid">
                 {{ formData.pid }}
               </AFormItem>
             </ACol>
             <ACol :span="24" :lg="12">
-              <AFormItem label="上级行业名称" name="pname">
+              <AFormItem label="上级产业名称" name="pname">
                 {{ formData.pname }}
               </AFormItem>
             </ACol>
           </ARow>
           <ARow>
             <ACol :span="24" :lg="12">
-              <AFormItem label="行业代码" name="code">
+              <AFormItem label="产业代码" name="code">
                 <AInput v-model:value="formData.code" />
               </AFormItem>
             </ACol>
             <ACol :span="24" :lg="12">
-              <AFormItem label="行业名称" name="name">
+              <AFormItem label="产业名称" name="name">
                 <AInput v-model:value="formData.name" />
               </AFormItem>
             </ACol>
@@ -61,7 +61,7 @@
           </div>
         </AForm>
       </ASpin>
-      <AEmpty v-else description="选择一个行业进行编辑" />
+      <AEmpty v-else description="选择一个产业进行编辑" />
     </div>
   </ACard>
 </template>
@@ -77,7 +77,7 @@ import {
 import { message, type FormProps, type FormInstance } from 'ant-design-vue'
 
 const rules: FormProps['rules'] = {
-  name: [{ required: true, message: '请填写行业名称' }],
+  name: [{ required: true, message: '请填写产业名称' }],
 }
 
 const { id } = defineProps<{
@@ -95,7 +95,7 @@ const toggle = useToggle(mode, {
 })
 
 const title = computed(() =>
-  mode.value === 'add' ? `在${formData.value.pname}下新增行业` : '编辑行业',
+  mode.value === 'add' ? `在${formData.value.pname}下新增产业` : '编辑产业',
 )
 
 const formData = ref<TradeInfoVO>({})
