@@ -1,11 +1,4 @@
-import dayjs from 'dayjs'
-import useRequest from '@/hooks/use-request'
-import {
-  getDictTypeList,
-  deleteDictType,
-  type ListQueryParams,
-  type DictTypeVO,
-} from '@/api/system/dict/type'
+import { getDictTypeList, deleteDictType, type ListQueryParams } from '@/api/system/dict/type'
 import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
