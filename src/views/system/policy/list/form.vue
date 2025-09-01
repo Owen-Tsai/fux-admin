@@ -5,7 +5,7 @@ import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
 
 const message = useMessage()
 
-const [sexOpts] = useDict('policy_label')
+const [ policyLabel, policyClassification, policyType ] = useDict('policy_label', 'policy_classification', 'policy_type')
 
 const rules: FormProps['rules'] = {
   title: [{ required: true, message: '请填写资讯标题' }],
@@ -104,17 +104,17 @@ defineExpose({ open })
           </TCol>
           <TCol :span="6">
             <TFormItem label="政策级别" name="level">
-              <TSelect v-model:value="formData.level" :options="sexOpts" />
+              <TSelect v-model:value="formData.level" :options="policyLabel" />
             </TFormItem>
           </TCol>
           <TCol :span="12">
             <TFormItem label="政策分类" name="classification">
-              <TCheckboxGroup v-model:value="formData.classification" :options="sexOpts" />
+              <TCheckboxGroup v-model:value="formData.classification" :options="policyClassification" />
             </TFormItem>
           </TCol>
           <TCol :span="12">
-            <TFormItem label="政策级别" name="type">
-              <TCheckboxGroup v-model:value="formData.type" :options="sexOpts" />
+            <TFormItem label="人才政策类型" name="type">
+              <TCheckboxGroup v-model:value="formData.type" :options="policyType" />
             </TFormItem>
           </TCol>
           <TCol :span="12" v-for="(item, i) in checkboxData" :key="i">
@@ -122,6 +122,36 @@ defineExpose({ open })
               <TCheckboxGroup v-model:value="formData.label">
                 <TCheckbox v-for="(value, j) in item.optionValue" :key="value" :value="value" :label="item.optionName?.[j]" />
               </TCheckboxGroup>
+            </TFormItem>
+          </TCol>
+          <TCol :span="12">
+            <TFormItem label="政策文件" name="document">
+              <TInput v-model:value="formData.document" placeholder="请输入政策文件" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="12">
+            <TFormItem label="支持对象" name="supportObject">
+              <TTextarea v-model:value="formData.supportObject" placeholder="请输入支持对象" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="12">
+            <TFormItem label="支持政策" name="supportPolicy">
+              <TTextarea v-model:value="formData.supportPolicy" placeholder="请输入支持政策" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="12">
+            <TFormItem label="申报条件" name="declarationConditions">
+              <TTextarea v-model:value="formData.declarationConditions" placeholder="请输入申报条件" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="12">
+            <TFormItem label="主管部门" name="competentDepartment">
+              <TInput v-model:value="formData.competentDepartment" placeholder="请输入主管部门" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="12">
+            <TFormItem label="联系方式" name="contact">
+              <TInput v-model:value="formData.contact" placeholder="请输入联系方式" />
             </TFormItem>
           </TCol>
         </TRow>
