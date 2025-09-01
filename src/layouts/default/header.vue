@@ -16,14 +16,36 @@
     <!-- actions -->
     <div>
       <div class="flex items-center gap-2">
-        <TTooltip content="通知消息" placement="bottom">
-          <TButton
-            theme="default"
-            variant="text"
-            shape="square"
-            :icon="() => h(NotificationIcon)"
-          />
-        </TTooltip>
+        <TPopup placement="bottom-right" trigger="click">
+          <TTooltip content="通知消息" placement="bottom">
+            <TBadge :count="count" size="small" :offset="[6, 6]">
+              <TButton
+                theme="default"
+                variant="text"
+                shape="square"
+                :icon="() => h(NotificationIcon)"
+              />
+            </TBadge>
+          </TTooltip>
+
+          <template #content>
+            <TLoading :loading="pending" class="w-400px p-1">
+              <div
+                v-for="(message, i) in messages"
+                :key="i"
+                class="p-[var(--td-pop-padding-m)] hover:bg-[var(--td-bg-color-container-hover)] cursor-pointer rounded-[var(--td-radius-default)]"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="font-bold">发送人：{{ message.templateNickname }}</div>
+                  <div class="text-secondary text-sm">
+                    {{ dayjs(message.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+                  </div>
+                </div>
+                <div class="line-clamp-2 mt-1">{{ message.templateContent }}</div>
+              </div>
+            </TLoading>
+          </template>
+        </TPopup>
         <TTooltip :content="isDark ? '亮色模式' : '暗黑模式'">
           <ThemeToggle />
         </TTooltip>
@@ -47,8 +69,10 @@
 
 <script setup lang="ts">
 import { h } from 'vue'
+import dayjs from 'dayjs'
 import { MenuFoldIcon, NotificationIcon } from 'tdesign-icons-vue-next'
 import ThemeToggle from '@/components/_internal/theme-toggle.vue'
+import { getUnreadList, getUnreadCount } from '@/api/system/message'
 import bps from '@/utils/breakpoints'
 import useAppStore from '@/stores/app'
 import useUserStore from '@/stores/user'
@@ -92,4 +116,14 @@ const onDropdownClick = (value?: string) => {
     })
   }
 }
+
+const { data: messages, pending, execute: getMsgList } = useRequest(getUnreadList)
+const { data: count, execute: getMsgCount } = useRequest(getUnreadCount, {
+  immediate: true,
+  onSuccess(num) {
+    if (num > 0) {
+      getMsgList()
+    }
+  },
+})
 </script>

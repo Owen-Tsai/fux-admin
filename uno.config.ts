@@ -21,6 +21,16 @@ export default defineConfig({
         'border-top-right-radius': `var(--td-radius-${v})`,
       }),
     ],
+    [
+      /^line-clamp-(.*)/,
+      ([, v]) => ({
+        overflow: v === 'none' ? 'visible' : 'hidden',
+        // 'text-overflow': 'ellipsis',
+        display: v === 'none' ? 'block' : '-webkit-box',
+        '-webkit-line-clamp': v === 'none' ? 'unset' : v,
+        '-webkit-box-orient': v === 'none' ? 'horizontal' : 'vertical',
+      }),
+    ],
   ],
   shortcuts: [
     {
