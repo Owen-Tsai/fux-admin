@@ -97,7 +97,7 @@ defineExpose({ open })
           <TTextarea v-model:value="formData.remark" />
         </TFormItem>
         <TFormItem label="禁用类型推断" name="useString" help="强制将字典数据视为字符串类型">
-          <TSwitch v-model:checked="formData.useString" />
+          <TSwitch v-model:value="formData.useString" />
         </TFormItem>
       </TForm>
     </TLoading>

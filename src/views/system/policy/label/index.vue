@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
 import Form from './form.vue'
 import { columns, useTable } from './use-table'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+const [policyLabel] = useDict('policy_label')
+const expanded = ref(false)
 
 const { permission } = usePermission()
 
@@ -25,13 +26,16 @@ const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pendin
         @submit="onQueryChange()"
         @reset="onQueryChange(true)"
       >
-        <TFormItem label="政策标题" name="title" class="col">
-          <TInput v-model:value="query.title" placeholder="请输入政策标题" clearable />
+        <TFormItem label="标签名" name="name" class="col">
+          <TInput v-model:value="query.name" placeholder="请输入标签名" clearable />
         </TFormItem>
-        <TFormItem label="创建时间" name="createTime" class="col">
+        <TFormItem label="标签类别" name="type" class="col">
+          <TSelect v-model:value="query.type" :options="policyLabel" placeholder="请选择标签类别" clearable />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="创建时间" name="createTime" class="col">
           <TDateRangePicker v-model:value="query.createTime" value-type="YYYY-MM-DD" clearable />
         </TFormItem>
-        <QueryActions :expanded="null" class="col" />
+        <QueryActions v-model:expanded="expanded" :class="`col ${expanded ? 'ml-2/3' : ''}`" />
       </TForm>
     </TCard>
 
@@ -47,7 +51,7 @@ const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pendin
             <template #icon>
               <Icon name="add" />
             </template>
-            发布
+            新增
           </TButton>
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" :loading="pending" @click="execute()">
@@ -67,18 +71,8 @@ const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pendin
         :loading="pending"
         @page-change="onPageChange"
       >
-        <template #title="{ row }">
-          <div class="w-full flex items-center gap-1">
-            <div class="truncate">
-              {{ row.title }}
-            </div>
-          </div>
-        </template>
-        <template #sendDate="{ row }">
-          {{ row.sendDate === undefined || row.sendDate === '' ? '' : dayjs(row.sendDate).format('YYYY-MM-DD') }}
-        </template>
-        <template #createTime="{ row }">
-          {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+        <template #type="{ row }">
+          <DictTag :dict-data="policyLabel" :value="row.type" />
         </template>
         <template #actions="{ row }">
           <div class="flex items-center gap-2">
