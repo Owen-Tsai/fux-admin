@@ -9,7 +9,7 @@ const { dictData, value } = defineProps<{
 
 const dictEntry = computed(() => {
   return dictData.find((item) => {
-    if (typeof value === 'boolean') {
+    if (typeof value === 'boolean' && item.useString) {
       return item.value === `${value}`
     }
 

@@ -1,30 +1,30 @@
-import { getDictTypeList, deleteDictType, type ListQueryParams } from '@/api/system/dict/type'
-import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
+import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
+import {
+  getTemplateList,
+  deleteTemplate,
+  type ListQueryParams,
+} from '@/api/system/message/template'
 
 export const columns: TableProps['columns'] = [
-  { title: '字典编号', width: 90, colKey: 'id' },
-  { title: '字典名称', colKey: 'name' },
-  { title: '字典类别', colKey: 'type' },
-  { title: '字典状态', width: 90, colKey: 'status' },
-  { title: '备注', width: 200, colKey: 'remark', ellipsis: true },
-  {
-    title: '创建时间',
-    minWidth: 120,
-    colKey: 'createTime',
-  },
-  { title: '操作', width: 150, colKey: 'actions' },
+  { colKey: 'name', title: '模板名称', fixed: 'left', width: 180, ellipsis: true },
+  { colKey: 'code', title: '模板编码', width: 180 },
+  { colKey: 'content', title: '模板内容', width: 240, ellipsis: true },
+  { colKey: 'type', title: '站内信类型', width: 100 },
+  { colKey: 'status', title: '状态', width: 100 },
+  { colKey: 'createTime', title: '创建时间', width: 160 },
+  { colKey: 'actions', title: '操作', fixed: 'right', width: 140 },
 ]
 
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const message = useMessage()
+
   const query = ref<ListQueryParams>({
-    createTime: [],
     pageNo: 1,
     pageSize: 10,
+    createTime: [],
   })
 
-  const { push } = useRouter()
-
-  const { data, execute, pending } = useRequest(() => getDictTypeList({ ...query.value }), {
+  const { data, pending, execute } = useRequest(() => getTemplateList(query.value), {
     immediate: true,
   })
 
@@ -50,23 +50,19 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   }
 
   const onDelete = async (id: number) => {
-    await deleteDictType(id)
+    await deleteTemplate(id)
+    message.success('删除成功')
     execute()
   }
 
-  const onShowData = async (type: string) => {
-    push(`/system/dict/data/${type}`)
-  }
-
   return {
+    query,
+    execute,
     data,
     pending,
-    query,
     pagination,
     onPageChange,
     onQueryChange,
-    execute,
     onDelete,
-    onShowData,
   }
 }
