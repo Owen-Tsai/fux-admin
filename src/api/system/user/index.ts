@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export type UserVO = {
   nickname?: string
-  deptId?: number
+  deptId?: string | number
   deptName?: string
   mobile?: string
   email?: string
@@ -31,7 +31,7 @@ export type SimpleUserListVO = Array<{
   nickname: string
 }>
 
-const prefix = '/admin-api/system/user'
+const prefix = '/system/user'
 
 export function getUsers(params?: ListQueryParams) {
   return request.get<PaginatedList<UserVO>>({

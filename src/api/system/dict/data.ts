@@ -27,7 +27,7 @@ export type ListQueryParams = CommonQueryParams & {
   status?: number
 }
 
-const prefix = '/admin-api/system/dict-data'
+const prefix = '/system/dict-data'
 
 /**
  * This method is used for `useDict` hooks and related components/utilities,

@@ -1,137 +1,176 @@
+<script setup lang="ts">
+import type { InfoTypeVO } from '@/api/information/type'
+import { useTable, columns } from './use-table'
+import dayjs from 'dayjs'
+import Form from './form.vue'
+import type { FormInstanceFunctions, EnhancedTableInstanceFunctions } from 'tdesign-vue-next'
+
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+const tableRef = useTemplateRef<EnhancedTableInstanceFunctions>('tableRef')
+
+const [statusOpts] = useDict('common_status')
+
+const { permission } = usePermission()
+const { query, onQueryChange, data, execute, onDelete, pending, onSetAudit } = useTable(queryForm)
+
+const [tableExpanded, toggle] = useToggle(false)
+
+const toggleTableExpanded = () => {
+  toggle()
+  if (tableExpanded.value) {
+    tableRef.value?.expandAll()
+  } else {
+    tableRef.value?.foldAll()
+  }
+}
+
+const cardBody = useTemplateRef('cardBody')
+const { height } = useElementSize(cardBody, { height: 300, width: 0 })
+
+defineOptions({ name: 'SystemMenu' })
+</script>
+
 <template>
-  <div class="view">
-    <ARow :gutter="24">
-      <ACol :span="24">
-        <ACard v-if="permission.has('system:info-type:query')" class="mb-4">
-          <AForm ref="filterFormRef" :model="queryParams" class="dense-form">
-            <ARow :gutter="24">
-              <ACol :span="24" :lg="8">
-                <AFormItem label="类别名称" name="name">
-                  <AInput
-                    v-model:value="queryParams.name"
-                    allow-clear
-                    placeholder="请输入资讯类别名称"
-                  />
-                </AFormItem>
-              </ACol>
-              <ACol :span="24" :lg="16">
-                <AFlex justify="end" align="center" :gap="16">
-                  <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-                  <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-                </AFlex>
-              </ACol>
-            </ARow>
-          </AForm>
-        </ACard>
-      </ACol>
+  <div class="view flex flex-col gap-4">
+    <TCard v-if="permission.has('system:info-type:query')" class="query-form min-h-0 flex-none">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
+      >
+        <TFormItem label="资讯类别" name="name" class="col">
+          <TInput v-model:value="query.name" placeholder="请输入资讯类别名称" />
+        </TFormItem>
+        <QueryActions :expanded="null" class="col ml-1/3" />
+      </TForm>
+    </TCard>
 
-      <ACol :span="24">
-        <ACard title="资讯类别管理" class="flex-1">
-          <template #extra>
-            <AFlex :gap="8">
-              <AButton
-                v-if="permission.has('system:info-type:create')"
-                type="primary"
-                :loading="pending"
-                @click="modal?.open('create')"
-              >
-                <template #icon>
-                  <PlusOutlined />
-                </template>
-                新增
-              </AButton>
-              <ATooltip title="重新载入">
-                <AButton type="text" :loading="pending" @click="execute">
-                  <template #icon>
-                    <ReloadOutlined />
-                  </template>
-                </AButton>
-              </ATooltip>
-            </AFlex>
-          </template>
+    <TCard title="资讯类别列表" bordered class="flex-1 menu-card">
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TButton
+            v-if="permission.has('system:info-type:create')"
+            theme="primary"
+            :loading="pending"
+            @click="formRef?.open('create')"
+          >
+            <template #icon>
+              <Icon name="add" />
+            </template>
+            新增
+          </TButton>
 
-          <ATable
-            :data-source="data"
+          <TTooltip content="全部展开/折叠">
+            <TButton
+              shape="square"
+              variant="text"
+              :loading="pending"
+              @click="toggleTableExpanded()"
+            >
+              <template #icon>
+                <Icon name="unfold-less" />
+              </template>
+            </TButton>
+          </TTooltip>
+
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" :loading="pending" @click="execute()">
+              <template #icon>
+                <Icon name="refresh" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </div>
+      </template>
+
+      <template #content>
+        <div ref="cardBody" class="flex-1">
+          <TEnhancedTable
+            ref="tableRef"
+            :data="data"
             :columns="columns"
             row-key="id"
+            :tree="{ defaultExpandAll: false }"
             :loading="pending"
-            :sticky="{ offsetHeader: 90 }"
-            :pagination="false"
+            :height="height"
+            :scroll="{ type: 'virtual' }"
           >
-            <template #bodyCell="scope: TableScope<InformationTypeVO>">
-              <template v-if="scope?.column.key === 'isAudit'">
-                <ASpace direction="vertical">
-                  <ASwitch
-                    v-model:checked="scope.record.isAudit"
-                    checked-children="是"
-                    un-checked-children="否"
-                    @change="onChange(scope.record)"
-                  />
-                </ASpace>
-              </template>
-              <template v-if="scope?.column.key === 'status'">
-                <DictTag :dict-object="commonStatus" :value="scope.text" />
-              </template>
-              <template v-if="scope?.column.key === 'createTime'">
-                {{ dayjs(scope.text).format('YYYY-MM-DD HH:mm:ss') }}
-              </template>
-              <template v-if="scope?.column.key === 'actions'">
-                <AFlex :gap="16">
-                  <ATypographyLink
-                    v-if="permission.has('system:info-type:update')"
-                    @click="modal?.open('update', scope.record.id)"
-                  >
-                    <EditOutlined />
-                    修改
-                  </ATypographyLink>
-                  <ATypographyLink
-                    v-if="permission.has('system:info-type:create')"
-                    @click="modal?.open('create', scope.record.id)"
-                  >
-                    <PlusOutlined />
-                    新增
-                  </ATypographyLink>
-                  <APopconfirm
-                    v-if="permission.has('system:info-type:delete')"
-                    title="确定要删除吗？"
-                    :overlay-inner-style="{ width: '260px' }"
-                    @confirm="onDelete(scope.record!)"
-                  >
-                    <ATypographyLink type="danger">
-                      <DeleteOutlined />
-                      删除
-                    </ATypographyLink>
-                  </APopconfirm>
-                </AFlex>
-              </template>
+            <template #status="{ row }">
+              <DictTag :dict-data="statusOpts" :value="row.status" />
             </template>
-          </ATable>
-        </ACard>
-      </ACol>
-    </ARow>
+            <template #isAudit="{ row }: TableScope<InfoTypeVO>">
+              <TSwitch
+                v-model:value="row.isAudit"
+                :label="['是', '否']"
+                @change="(v) => onSetAudit(row.id!, v as boolean)"
+              />
+            </template>
+            <template #createTime="{ row }">{{
+              dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss')
+            }}</template>
+            <template #actions="{ row }: TableScope<InfoTypeVO>">
+              <div class="flex gap-2">
+                <TTooltip content="编辑">
+                  <TButton
+                    shape="square"
+                    theme="primary"
+                    variant="text"
+                    @click="formRef?.open('update', row.id)"
+                  >
+                    <template #icon>
+                      <Icon name="edit-2" />
+                    </template>
+                  </TButton>
+                </TTooltip>
+                <TTooltip content="新增下一级">
+                  <TButton
+                    shape="square"
+                    theme="primary"
+                    variant="text"
+                    @click="formRef?.open('create', row.id)"
+                  >
+                    <template #icon>
+                      <Icon name="add" />
+                    </template>
+                  </TButton>
+                </TTooltip>
+                <TTooltip content="删除">
+                  <TPopconfirm
+                    content="确定删除吗？该操作无法撤销"
+                    theme="danger"
+                    @confirm="onDelete(row.id!)"
+                  >
+                    <TButton shape="square" theme="danger" variant="text">
+                      <template #icon>
+                        <Icon name="delete" />
+                      </template>
+                    </TButton>
+                  </TPopconfirm>
+                </TTooltip>
+              </div>
+            </template>
+          </TEnhancedTable>
+        </div>
+      </template>
+    </TCard>
 
-    <FormModal ref="modal" :tree-data="data" @success="execute" />
+    <Form ref="formRef" :tree-data="data" @success="execute()" />
   </div>
 </template>
 
-<script lang="ts" setup>
-import useDict from '@/hooks/use-dict'
-import { permission } from '@/hooks/use-permission'
-import type { InformationTypeVO } from '@/api/information/type'
-import { useTable, columns } from './use-table'
-import useActions from './use-actions'
-import FormModal from './form.vue'
-import dayjs from 'dayjs'
-
-const filterFormRef = ref()
-const modal = useTemplateRef('modal')
-
-const [commonStatus] = useDict('common_status')
-
-const { data, execute, pending, queryParams, onFilter, onFilterReset, onChange } =
-  useTable(filterFormRef)
-
-const { onDelete } = useActions(execute)
-
-defineOptions({ name: 'InformationType' })
-</script>
+<style lang="scss" scoped>
+.menu-card {
+  @apply flex flex-col;
+  :deep(.t-card__header) {
+    @apply flex-none;
+  }
+  :deep(.t-card__body) {
+    @apply flex-1 h-full flex flex-col;
+  }
+}
+</style>

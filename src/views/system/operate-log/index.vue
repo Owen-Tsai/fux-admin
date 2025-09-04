@@ -1,146 +1,90 @@
+<script setup lang="ts">
+import type { OperateLogVO } from '@/api/system/log/op-log'
+import { columns, useTable } from './use-table'
+import dayjs from 'dayjs'
+import Detail from './detail.vue'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
+
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const detailRef = useTemplateRef<InstanceType<typeof Detail>>('detailRef')
+
+const { permission } = usePermission()
+const { data, pending, query, onQueryChange, onPageChange, pagination } = useTable(queryForm)
+
+const expanded = ref(false)
+const [operateType] = useDict('system_operate_type')
+</script>
+
 <template>
   <div class="view">
-    <ACard v-if="permission.has('system:login-log:query')" class="mb-4">
-      <AForm
-        ref="filterForm"
-        :label-col="{ span: 6 }"
-        class="dense-form"
-        :class="{ expanded: filterExpanded }"
-        :model="queryParams"
+    <TCard v-if="permission.has('system:operate-log:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4 w-full"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
       >
-        <ARow :gutter="[0, 16]">
-          <ACol :lg="8" :span="24">
-            <AFormItem label="系统模块" name="module">
-              <AInput v-model:value="queryParams.module" placeholder="请输入系统模块" allow-clear />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="8" :span="24">
-            <AFormItem label="操作人员" name="userNickname">
-              <AInput
-                v-model:value="queryParams.userNickname"
-                placeholder="请输入操作人员"
-                allow-clear
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="操作类型" name="type">
-              <ASelect
-                v-model:value="queryParams.type"
-                :options="systemOperateType"
-                placeholder="请选择操作类型"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="操作状态" name="success">
-              <ASelect v-model:value="queryParams.success" allow-clear>
-                <ASelectOption value="true">成功</ASelectOption>
-                <ASelectOption value="false">失败</ASelectOption>
-              </ASelect>
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="开始时间" name="startTime">
-              <ARangePicker v-model:value="queryParams.startTime" value-format="YYYY-MM-DD" />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="{ span: 8 }" :span="24">
-            <AFlex justify="end" align="center" :gap="16">
-              <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-              <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-              <ATypographyLink @click="toggle()">
-                {{ filterExpanded ? '收起' : '展开' }}
-                <DownOutlined :class="{ 'rotate-180': filterExpanded }" />
-              </ATypographyLink>
-            </AFlex>
-          </ACol>
-        </ARow>
-      </AForm>
-    </ACard>
+        <TFormItem label="系统模块" name="module" class="col">
+          <TInput v-model:value="query.module" placeholder="请输入系统模块" clearable />
+        </TFormItem>
+        <TFormItem label="操作人" name="userNickname" class="col">
+          <TInput v-model:value="query.userNickname" placeholder="请输入操作人" clearable />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="操作类型" name="type" class="col">
+          <TSelect v-model:value="query.type" :options="operateType" placeholder="请选择操作类型" />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="开始时间" name="startTime" class="col">
+          <TDateRangePicker
+            v-model:value="query.startTime"
+            placeholder="请选择开始时间"
+            clearable
+          />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="操作结果" name="success" class="col">
+          <TSelect v-model:value="query.success" clearable>
+            <TOption value="true" label="成功" />
+            <TOption value="false" label="失败" />
+          </TSelect>
+        </TFormItem>
+        <QueryActions v-model:expanded="expanded" class="col" />
+      </TForm>
+    </TCard>
 
-    <ACard title="操作日志">
-      <template #extra>
-        <AFlex :gap="8">
-          <ATooltip v-if="permission.has('system:login-log:export')" title="导出">
-            <AButton type="text" :loading="pending">
+    <TCard title="登录日志">
+      <TTable
+        :data="data?.list"
+        row-key="id"
+        :columns="columns"
+        :pagination="pagination"
+        :loading="pending"
+        @page-change="onPageChange"
+      >
+        <template #type="{ row }: TableScope<OperateLogVO>">
+          <DictTag :dict-data="operateType" :value="row.type" />
+        </template>
+        <template #resultCode="{ row }: TableScope<OperateLogVO>">
+          <TTag v-if="row.resultCode === 0" theme="success" variant="light-outline">成功</TTag>
+          <TTag v-else theme="danger" variant="light-outline">{{ row.resultCode }}</TTag>
+        </template>
+        <template #startTime="{ row }: TableScope<OperateLogVO>">
+          {{ dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template #duration="{ row }: TableScope<OperateLogVO>"> {{ row.duration }}ms </template>
+        <template #actions="{ row }: TableScope<OperateLogVO>">
+          <TTooltip content="查看详情">
+            <TButton shape="square" theme="primary" variant="text" @click="detailRef?.open(row)">
               <template #icon>
-                <ExportOutlined />
+                <Icon name="browse" />
               </template>
-            </AButton>
-          </ATooltip>
-          <ATooltip title="重新载入">
-            <AButton type="text" :loading="pending" @click="execute">
-              <template #icon>
-                <ReloadOutlined />
-              </template>
-            </AButton>
-          </ATooltip>
-        </AFlex>
-      </template>
+            </TButton>
+          </TTooltip>
+        </template>
+      </TTable>
+    </TCard>
 
-      <div class="overflow-x-auto">
-        <ATable
-          :columns="columns"
-          :data-source="data?.list"
-          :loading="pending"
-          :pagination="pagination"
-          @change="onChange"
-        >
-          <template #bodyCell="scope">
-            <template v-if="scope!.column.dataIndex === 'type'">
-              <DictTag :dict-object="systemOperateType" :value="scope?.text" />
-            </template>
-            <template v-if="scope!.column.dataIndex === 'resultCode'">
-              <ATag v-if="scope?.text === 0" color="success">成功</ATag>
-              <ATag v-else color="error">{{ scope?.text }}</ATag>
-            </template>
-            <template v-if="scope?.column.dataIndex === 'startTime'">
-              {{ dayjs(scope.text).format('YYYY-MM-DD') }}
-            </template>
-            <template v-if="scope?.column.dataIndex === 'duration'">{{ scope.text }} ms</template>
-            <template v-if="scope!.column.title === '操作'">
-              <ATypographyLink @click="openDetail(scope!.record)">
-                <UnorderedListOutlined />
-                详情
-              </ATypographyLink>
-            </template>
-          </template>
-        </ATable>
-      </div>
-    </ACard>
-
-    <ADrawer v-model:open="visible" width="50%" title="日志详情">
-      <DetailPanel :entry="entry!" />
-    </ADrawer>
+    <Detail ref="detailRef" />
   </div>
 </template>
-
-<script lang="ts" setup>
-import dayjs from 'dayjs'
-import useDict from '@/hooks/use-dict'
-import { permission } from '@/hooks/use-permission'
-import { columns, useTable } from './use-table'
-import DetailPanel from './detail.vue'
-import type { FormInstance } from 'ant-design-vue'
-import type { OperateLogVO } from '@/api/system/operate-log'
-
-const filterForm = ref<FormInstance>()
-
-const [filterExpanded, toggle] = useToggle(false)
-
-const [systemOperateType] = useDict('system_operate_type')
-
-const { data, pending, execute, queryParams, onFilter, onChange, onFilterReset, pagination } =
-  useTable(filterForm)
-
-const entry = ref<OperateLogVO>()
-const visible = ref(false)
-
-const openDetail = (row: OperateLogVO) => {
-  entry.value = row
-  visible.value = true
-}
-
-defineOptions({ name: 'SystemOperateLog' })
-</script>

@@ -1,54 +1,53 @@
 <template>
-  <div>
-    <ADescriptions bordered :column="2" size="middle" :label-style="{ width: '120px' }">
-      <ADescriptionsItem label="日志主键">{{ entry.id }}</ADescriptionsItem>
-      <ADescriptionsItem label="发送方名称">{{ entry.templateNickname }}</ADescriptionsItem>
-      <ADescriptionsItem label="接收方ID">{{ entry.userId }}</ADescriptionsItem>
-      <ADescriptionsItem label="用户类型">
-        <DictTag :dict-object="systemUserType" :value="entry.userType!" />
-      </ADescriptionsItem>
-      <ADescriptionsItem label="站内信模板">
-        {{ entry.templateId }}
-        <ADivider type="vertical" />
-        {{ entry.templateCode }}
-      </ADescriptionsItem>
-      <ADescriptionsItem label="模板类型">
-        <DictTag :dict-object="systemNotifyTemplateType" :value="entry.templateType!" />
-      </ADescriptionsItem>
-      <ADescriptionsItem label="站内信内容" :span="2">
-        {{ entry.templateContent }}
-      </ADescriptionsItem>
-      <ADescriptionsItem label="站内信参数" :span="2">
-        <pre>{{ entry.templateParams }}</pre>
-      </ADescriptionsItem>
-      <ADescriptionsItem label="发送时间" :span="2">
+  <TDrawer v-model:visible="visible" size="40%" header="日志详情">
+    <template #footer>
+      <TButton @click="visible = false">关 闭</TButton>
+    </template>
+
+    <TDescriptions v-if="entry" bordered :column="2" :label-style="{ width: '120px' }">
+      <TDescriptionsItem label="发送方">{{ entry.templateNickname }}</TDescriptionsItem>
+      <TDescriptionsItem label="接收人">
+        {{
+          entry.userType === 2
+            ? userList?.find((item) => item.id === entry?.userId)?.nickname
+            : entry.userId
+        }}
+      </TDescriptionsItem>
+      <TDescriptionsItem label="站内信模板" :span="2">
+        {{ entry.templateId }}- {{ entry.templateCode }}
+        <DictTag :dict-data="templateTypeOpts" :value="entry.templateType!" />
+      </TDescriptionsItem>
+      <TDescriptionsItem label="发送时间">
         {{ dayjs(entry.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-      </ADescriptionsItem>
-      <ADescriptionsItem label="阅读状态">
-        <DictTag :dict-object="infraBooleanString" :value="entry.readStatus!.toString()" />
-      </ADescriptionsItem>
-      <ADescriptionsItem label="阅读时间">
-        {{ dayjs(entry.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-      </ADescriptionsItem>
-    </ADescriptions>
-  </div>
+      </TDescriptionsItem>
+      <TDescriptionsItem label="阅读时间">
+        {{ entry.readStatus ? dayjs(entry.readTime).format('YYYY-MM-DD HH:mm:ss') : '未读' }}
+      </TDescriptionsItem>
+      <TDescriptionsItem label="模板内容" :span="2">{{ entry.templateContent }}</TDescriptionsItem>
+      <TDescriptionsItem label="实发参数" :span="2">
+        <div class="font-mono break-all">{{ entry.templateParams }}</div>
+      </TDescriptionsItem>
+    </TDescriptions>
+  </TDrawer>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import dayjs from 'dayjs'
-import useDict from '@/hooks/use-dict'
-import type { LogVO } from '@/api/system/message/log'
+import { getSimpleUserList } from '@/api/system/user'
+import type { MessageVO } from '@/api/system/message'
 
-defineProps({
-  entry: {
-    type: Object as PropType<LogVO>,
-    required: true,
-  },
-})
+const entry = ref<MessageVO>()
 
-const [infraBooleanString, systemUserType, systemNotifyTemplateType] = useDict(
-  'infra_boolean_string',
-  'system_user_type',
-  'system_notify_template_type',
-)
+const [templateTypeOpts] = useDict('system_sms_template_type')
+
+const { data: userList } = useRequest(getSimpleUserList, { immediate: true })
+
+const visible = ref(false)
+
+const open = (record: MessageVO) => {
+  visible.value = true
+  entry.value = record
+}
+
+defineExpose({ open })
 </script>

@@ -1,63 +1,57 @@
-import useRequest from '@/hooks/use-request'
-import type { TableProps, FormInstance, TablePaginationConfig } from 'ant-design-vue'
+import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
 import { getList, type ListQueryParams } from '@/api/system/sms/log'
 
 export const columns: TableProps['columns'] = [
-  { key: 'id', title: '编号', dataIndex: 'id', width: 60 },
-  { key: 'mobile', title: '手机号', dataIndex: 'mobile', width: 140 },
-  { title: '模板内容', dataIndex: 'templateContent', width: 240, ellipsis: true },
-  { key: 'sendStatus', title: '发送状态', dataIndex: 'sendStatus' },
-  { key: 'channelCode', title: '短信渠道', dataIndex: 'channelCode' },
-  { key: 'templateCode', title: '模板编号', dataIndex: 'templateCode' },
-  { key: 'sendTime', title: '发送时间', dataIndex: 'sendTime' },
-  { key: 'templateType', title: '短信类型', dataIndex: 'templateType' },
-  { key: 'actions', title: '操作', fixed: 'right', width: 80 },
+  { colKey: 'id', title: '编号', width: 60 },
+  { colKey: 'mobile', title: '手机号', width: 140 },
+  { colKey: 'templateContent', title: '模板内容', width: 240, ellipsis: true },
+  { colKey: 'sendStatus', title: '发送状态', width: 100 },
+  { colKey: 'channelCode', title: '短信渠道', width: 120 },
+  { colKey: 'templateCode', title: '模板编号', width: 120 },
+  { colKey: 'sendTime', title: '发送时间', width: 160 },
+  { colKey: 'templateType', title: '短信类型', width: 100 },
+  { colKey: 'actions', title: '操作', fixed: 'right', width: 80 },
 ]
 
-export const useTable = (formRef: Ref<FormInstance>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const query = ref<ListQueryParams>({
+    pageNo: 1,
+    pageSize: 10,
+    sendTime: [],
+  })
 
-  const { data, pending, execute } = useRequest(() => getList(queryParams.value), {
+  const { data, pending, execute } = useRequest(() => getList(query.value), {
     immediate: true,
   })
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
-    execute()
-  }
-
-  const onFilterReset = () => {
-    queryParams.value.pageNo = 1
-    formRef.value?.resetFields()
-    execute()
-  }
-
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
 
+    execute()
+  }
+
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
   return {
+    query,
+    execute,
     data,
     pending,
-    execute,
     pagination,
-    queryParams,
-    onChange,
-    onFilter,
-    onFilterReset,
+    onPageChange,
+    onQueryChange,
   }
 }

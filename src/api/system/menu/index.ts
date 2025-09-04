@@ -6,7 +6,7 @@ export type TreeQueryParams = {
   type?: string
 }
 
-export type MenuLiteVO = {
+export type SimpleMenuVO = {
   id: number
   name: string
   parentId: number
@@ -22,6 +22,7 @@ export type MenuVO = {
   sort?: number
   parentId?: number
   icon?: string
+  tdIcon?: string
   component?: string
   componentName?: string
   status?: number
@@ -34,7 +35,7 @@ export type MenuVO = {
   skipProcess?: boolean
 }
 
-const prefix = '/admin-api/system/menu'
+const prefix = '/system/menu'
 
 export const getMenuTree = (params?: TreeQueryParams) => {
   return request.get<MenuVO[]>({
@@ -76,7 +77,7 @@ export const deleteMenuWithChildren = (id: number) => {
 }
 
 export const getSimpleMenuList = () => {
-  return request.get<MenuLiteVO[]>({
+  return request.get<SimpleMenuVO[]>({
     url: `${prefix}/list-all-simple`,
   })
 }

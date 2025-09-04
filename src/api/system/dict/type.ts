@@ -16,7 +16,7 @@ export type DictTypeVO = {
   useString?: boolean
 }
 
-const prefix = '/admin-api/system/dict-type'
+const prefix = '/system/dict-type'
 
 export const getDictTypeList = (params?: ListQueryParams) => {
   return request.get<PaginatedList<DictTypeVO>>({
@@ -25,7 +25,7 @@ export const getDictTypeList = (params?: ListQueryParams) => {
   })
 }
 
-export const getPlainDictTypeList = () => {
+export const getSimpleDictTypeList = () => {
   return request.get<DictTypeVO[]>({
     url: `${prefix}/list-all-simple`,
   })

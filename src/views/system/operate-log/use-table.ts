@@ -1,52 +1,47 @@
-import useRequest from '@/hooks/use-request'
-import type { TableProps, FormInstance, TablePaginationConfig } from 'ant-design-vue'
-import { getOperateLogPage, type ListQueryParams } from '@/api/system/operate-log'
+import { getOperateLogPage, type ListQueryParams } from '@/api/system/log/op-log'
+import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { key: 'id', title: '日志编号', dataIndex: 'id', width: 90 },
-  { key: 'module', title: '操作模块', dataIndex: 'module', ellipsis: true },
-  { key: 'name', title: '操作名', dataIndex: 'name', minWidth: 140 },
-  { key: 'type', title: '操作类型', dataIndex: 'type', width: 90 },
-  { key: 'userNickname', title: '操作人', dataIndex: 'userNickname', ellipsis: true, width: 90 },
-  { key: 'resultCode', title: '操作结果', dataIndex: 'resultCode', width: 90 },
-  { key: 'startTime', title: '操作时间', dataIndex: 'startTime', width: 120 },
-  { key: 'duration', title: '执行时长', dataIndex: 'duration', width: 90 },
-  { key: 'actions', title: '操作', width: 90 },
+  { colKey: 'id', title: '日志编号', width: 90 },
+  { colKey: 'module', title: '操作模块', ellipsis: true },
+  { colKey: 'name', title: '操作名', minWidth: 140 },
+  { colKey: 'type', title: '操作类型', width: 90 },
+  { colKey: 'userNickname', title: '操作人', ellipsis: true, width: 90 },
+  { colKey: 'resultCode', title: '操作结果', width: 90 },
+  { colKey: 'startTime', title: '操作时间', width: 120 },
+  { colKey: 'duration', title: '执行时长', width: 90 },
+  { colKey: 'actions', title: '操作', width: 90 },
 ]
 
-export const useTable = (formRef: Ref<FormInstance | undefined>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const query = ref<ListQueryParams>({
+    pageNo: 1,
+    pageSize: 10,
+    startTime: [],
+  })
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
-    total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
-  }))
-
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
-
-    execute()
-  }
-
-  const { data, pending, execute } = useRequest(() => getOperateLogPage(queryParams.value), {
+  const { data, pending, execute } = useRequest(() => getOperateLogPage(query.value), {
     immediate: true,
   })
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
+    total: data.value?.total,
+  }))
+
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
+
     execute()
   }
 
-  const onFilterReset = () => {
-    queryParams.value.pageNo = 1
-    formRef.value?.resetFields()
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
@@ -54,10 +49,9 @@ export const useTable = (formRef: Ref<FormInstance | undefined>) => {
     data,
     pending,
     execute,
-    queryParams,
-    onFilter,
-    onFilterReset,
+    query,
+    onQueryChange,
     pagination,
-    onChange,
+    onPageChange,
   }
 }

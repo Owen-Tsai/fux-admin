@@ -16,11 +16,15 @@ export type ProfileVO = {
     id?: number
     name?: string
   }>
+  roles?: Array<{
+    id?: number
+    name?: string
+  }>
   sex?: number
   username?: string
 }
 
-const prefix = '/admin-api/system/user/profile'
+const prefix = '/system/user/profile'
 
 export const getProfile = () => {
   return request.get<ProfileVO>({

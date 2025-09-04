@@ -1,164 +1,166 @@
+<script setup lang="ts">
+import dayjs from 'dayjs'
+import Form from './form.vue'
+import { columns, useTable } from './use-table'
+import { getApplicationSimpleList } from '@/api/app/app'
+import type { PlanVO } from '@/api/app/plan'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
+
+const { resolve } = useRouter()
+
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+
+const { permission } = usePermission()
+const expanded = ref(false)
+
+const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pending, query } =
+  useTable(queryForm)
+
+const { data: appList } = useRequest(getApplicationSimpleList, { immediate: true })
+
+const toDesignPage = (id: string) => {
+  const { href } = resolve({ path: `/app-design/${id}` })
+  window.open(href, '_blank')
+}
+</script>
+
 <template>
   <div class="view">
-    <ACard v-if="permission.has('system:apply-plan:query')" class="mb-4">
-      <AForm
-        ref="filterForm"
-        :label-col="{ span: 6 }"
-        class="dense-form"
-        :class="{ expanded: filterExpanded }"
-        :model="queryParams"
+    <TCard v-if="permission.has('system:apply-plan:query')" class="!mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="query-form flex flex-wrap gap-y-4 w-full"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
       >
-        <ARow :gutter="[0, 16]">
-          <ACol :lg="8" :span="24">
-            <AFormItem label="计划名称" name="item">
-              <AInput v-model:value="queryParams.item" placeholder="请输入计划名称" allow-clear />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="8" :span="24">
-            <AFormItem label="所属应用" name="appId">
-              <ASelect
-                v-model:value="queryParams.appId"
-                :options="appOpts"
-                allow-clear
-                :field-names="{ label: 'name', value: 'id' }"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <!-- <AFormItem label="开始时间" name="startTime">
-              <ADatePicker v-model:value="queryParams.startTime" value-format="YYYY-MM-DD" />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="截止时间" name="endTime">
-              <ADatePicker v-model:value="queryParams.endTime" value-format="YYYY-MM-DD" />
-            </AFormItem> -->
-            <AFormItem label="起止时间" name="startTime">
-              <ARangePicker v-model:value="queryParams.startTime" value-format="YYYY-MM-DD" />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="{ span: 8, offset: filterExpanded ? 8 : 0 }" :span="24">
-            <AFlex justify="end" align="center" :gap="16">
-              <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-              <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-              <ATypographyLink @click="toggle()">
-                {{ filterExpanded ? '收起' : '展开' }}
-                <DownOutlined :class="{ 'rotate-180': filterExpanded }" />
-              </ATypographyLink>
-            </AFlex>
-          </ACol>
-        </ARow>
-      </AForm>
-    </ACard>
+        <TFormItem label="计划名称" name="item" class="col">
+          <TInput v-model:value="query.item" placeholder="请输入计划名称" />
+        </TFormItem>
+        <TFormItem label="应用名称" name="appId" class="col">
+          <TSelect
+            v-model:value="query.appId"
+            :options="appList"
+            filterable
+            clearable
+            :keys="{ label: 'name', value: 'id' }"
+          />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="开始时间" name="createTime" class="col">
+          <TDateRangePicker
+            v-model:value="query.createTime"
+            enable-time-picker
+            value-type="YYYY-MM-DD HH:mm:ss"
+          />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="截止时间" name="endTime" class="col">
+          <TDateRangePicker
+            v-model:value="query.endTime"
+            enable-time-picker
+            value-type="YYYY-MM-DD HH:mm:ss"
+          />
+        </TFormItem>
+        <QueryActions v-model:expanded="expanded" :class="`col ${expanded ? 'ml-1/3' : ''}`" />
+      </TForm>
+    </TCard>
 
-    <ACard title="申报计划">
-      <template #extra>
-        <AFlex :gap="8">
-          <AButton
+    <TCard title="申报计划">
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TButton
             v-if="permission.has('system:apply-plan:create')"
-            type="primary"
-            :loading="pending"
-            @click="onEdit()"
+            theme="primary"
+            @click="formRef?.open()"
           >
             <template #icon>
-              <PlusOutlined />
+              <Icon name="add" />
             </template>
             新增
-          </AButton>
-          <ATooltip title="重新载入">
-            <AButton type="text" :loading="pending" @click="execute">
+          </TButton>
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" @click="execute()">
               <template #icon>
-                <ReloadOutlined />
+                <Icon name="refresh" />
               </template>
-            </AButton>
-          </ATooltip>
-        </AFlex>
+            </TButton>
+          </TTooltip>
+        </div>
       </template>
 
-      <div class="overflow-x-auto">
-        <ATable
-          :columns="columns"
-          :data-source="data?.list"
-          :loading="pending"
-          :pagination="pagination"
-          @change="onChange"
-        >
-          <template #bodyCell="scope: TableScope<PlanVO>">
-            <template v-if="scope?.column.key === 'appId'">{{ scope.record.appName }}</template>
-            <template v-if="scope?.column.key === 'startTime'">
-              {{ dayjs(scope.text).format('YYYY-MM-DD HH:mm') }}
-            </template>
-            <template v-if="scope?.column.key === 'endTime'">
-              {{
-                scope.text == 4070908800000
-                  ? '常态化'
-                  : dayjs(scope.text).format('YYYY-MM-DD HH:mm')
-              }}
-            </template>
-            <template v-if="scope?.column.title === '操作'">
-              <AFlex :gap="16">
-                <ATypographyLink
-                  v-if="permission.has('system:apply-plan:update')"
-                  @click="onEdit(scope!.record)"
-                >
-                  <EditOutlined />
-                  编辑
-                </ATypographyLink>
-                <ATypographyLink @click="toDesignPage(scope!.record)">
-                  <CodeOutlined />
-                  设计应用
-                </ATypographyLink>
-                <APopconfirm
-                  v-if="permission.has('system:apply-plan:delete')"
-                  title="该操作无法撤销，确定要删除吗？"
-                  :overlay-style="{ width: '240px' }"
-                  @confirm="onDelete(scope!.record)"
-                >
-                  <ATypographyLink type="danger">
-                    <DeleteOutlined />
-                    删除
-                  </ATypographyLink>
-                </APopconfirm>
-              </AFlex>
-            </template>
-          </template>
-        </ATable>
-      </div>
-    </ACard>
+      <TTable
+        :data="data?.list"
+        row-key="id"
+        :columns="columns"
+        :pagination="pagination"
+        :loading="pending"
+        @page-change="onPageChange"
+      >
+        <template #startTime="{ row }">
+          {{
+            dayjs(row.endTime).year() >= 2099
+              ? '常态化'
+              : dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss')
+          }}
+        </template>
+        <template #endTime="{ row }">
+          {{
+            dayjs(row.endTime).year() >= 2099
+              ? '常态化'
+              : dayjs(row.endTime).format('YYYY-MM-DD HH:mm:ss')
+          }}
+        </template>
+        <template #appId="{ row }">
+          {{ appList?.find((item) => item.id === row.appId)?.name }}
+        </template>
+        <template #actions="{ row }: TableScope<PlanVO>">
+          <div class="flex items-center gap-2">
+            <TTooltip content="编辑">
+              <TButton
+                shape="square"
+                theme="primary"
+                variant="text"
+                :disabled="permission.hasNone('system:apply-plan:update')"
+                @click="formRef?.open(row.id)"
+              >
+                <template #icon>
+                  <Icon name="edit-2" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TTooltip content="设计应用">
+              <TButton
+                shape="square"
+                theme="primary"
+                variant="text"
+                :disabled="permission.hasNone('system:application:design')"
+                @click="toDesignPage(row.appId!)"
+              >
+                <template #icon>
+                  <Icon name="system-code" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TTooltip v-if="permission.has('system:apply-plan:delete')" content="删除">
+              <TPopconfirm
+                content="确定删除吗？该操作无法撤销，请确认该计划没有正在进行中的申报流程"
+                theme="danger"
+                @confirm="onDelete(row.id!)"
+              >
+                <TButton shape="square" theme="danger" variant="text">
+                  <template #icon>
+                    <Icon name="delete" />
+                  </template>
+                </TButton>
+              </TPopconfirm>
+            </TTooltip>
+          </div>
+        </template>
+      </TTable>
+    </TCard>
 
-    <FormModal v-if="visible" :record="entry" @success="execute" @close="visible = false" />
+    <Form ref="formRef" :app-list="appList" @success="execute" />
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-import dayjs from 'dayjs'
-import { useToggle } from '@vueuse/core'
-import useRequest from '@/hooks/use-request'
-import {
-  DownOutlined,
-  ReloadOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  CodeOutlined,
-} from '@ant-design/icons-vue'
-import { permission } from '@/hooks/use-permission'
-import { useTable, columns } from './use-table'
-import useActions from './use-action'
-import FormModal from './form.vue'
-import type { FormInstance } from 'ant-design-vue'
-import type { PlanVO } from '@/api/application/plan'
-import { getApplicationSimpleList } from '@/api/application'
-
-const filterForm = ref<FormInstance>()
-
-const [filterExpanded, toggle] = useToggle(false)
-
-const { data, pending, execute, queryParams, onFilter, onChange, onFilterReset, pagination } =
-  useTable(filterForm)
-
-const { entry, visible, onDelete, onEdit, toDesignPage } = useActions(execute)
-const { data: appOpts } = useRequest(getApplicationSimpleList, { immediate: true })
-defineOptions({ name: 'SystemService' })
-</script>

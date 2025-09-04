@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { fixedRoutes } from './fixed-routes'
+import commonRoutes from './common-routes'
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: fixedRoutes,
+  routes: commonRoutes,
 })
 
 export default router

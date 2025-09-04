@@ -1,0 +1,76 @@
+@use './fux-core.scss' as *;
+@import './theme.css';
+// @import './var.css';
+
+:root,
+:root[theme-mode='light'] {
+  --bg-color-blur: rgba(255, 255, 255, 0.8);
+}
+
+:root,
+:root[theme-mode='dark'] {
+  --bg-color-blur: rgba(0, 0, 0, 0.8);
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  color: var(--td-text-color-primary);
+}
+
+.scrollbar__thumb {
+  background-color: var(--td-scrollbar-hover-color) !important;
+}
+
+.view {
+  @apply min-h-full;
+}
+
+.query-form {
+  .col {
+    @apply w-full lg:flex-[0_0_1/3] lg:max-w-1/3 !mr-0 px-2;
+  }
+}
+
+a.has-tag .t-tag {
+  pointer-events: none;
+}
+
+.echart-tooltip {
+  background-color: rgba(#{var(--td-bg-color-container)}, 0.8) !important;
+  backdrop-filter: blur(8px);
+  border-color: var(--td-border-level-1-color) !important;
+  border-radius: 8px !important;
+}
+
+.t-table thead > tr {
+  background-color: var(--td-bg-color-secondarycontainer);
+
+  & > th {
+    color: var(--td-text-color-primary);
+    font-weight: 600;
+  }
+}
+
+.t-form:not(.t-form-inline) .t-form__item:last-of-type {
+  margin-bottom: var(--td-comp-margin-xxl) !important;
+}
+
+.t-input-number,
+.t-date-picker,
+.t-date-range-picker {
+  width: 100% !important;
+}
+
+[theme-mode='dark'] {
+  color-scheme: dark;
+}
+
+#nprogress .bar {
+  background: var(--td-brand-color);
+}

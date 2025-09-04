@@ -1,80 +1,74 @@
 <template>
-  <AModal v-model:open="isOpen" title="代码预览" wrap-class-name="fullscreen-modal" width="100%">
+  <TDialog
+    v-model:visible="visible"
+    mode="full-screen"
+    header="生成代码预览"
+    class="code-gen-preview-modal"
+  >
     <template #footer>
-      <AButton type="primary" @click="emit('update:open', false)">关闭</AButton>
+      <TButton @click="visible = false">关闭</TButton>
     </template>
-    <div class="modal-content-wrapper">
-      <ARow :gutter="40" class="h-full">
-        <ACol :lg="7" class="h-full">
-          <Scrollbar :auto-expand="false" :throttle-wait="0" wrapper-class="h-full" class="h-full">
-            <ATree
-              :tree-data="filePathTree"
-              default-expand-all
-              :key="renderKey"
-              :selected-keys="selectedKeys"
-              class="h-full"
-              @select="(keys) => onSelect(keys)"
-            />
-          </Scrollbar>
-        </ACol>
-        <ACol :lg="17" class="h-full">
-          <ATabs v-model:active-key="selectedKeys![0]" class="h-full code-tabs-pane">
-            <ATabPane
-              v-for="file in data!"
-              :key="file.filePath"
-              :tab="last(file.filePath.split('/'))"
-              class="h-full"
-            >
-              <Scrollbar
-                :auto-expand="false"
-                :throttle-wait="50"
-                wrapper-class="h-full"
-                class="h-full"
-              >
-                <div class="h-full" v-html="code" />
-              </Scrollbar>
-            </ATabPane>
-          </ATabs>
-        </ACol>
-      </ARow>
+
+    <div class="flex h-full gap-6">
+      <div
+        ref="treeWrapper"
+        class="w-7/24 h-full border-r border-r-solid border-[var(--td-border-level-1-color)] pr-4"
+      >
+        <TTree
+          v-model:actived="actived"
+          activable
+          :data="filePathTree"
+          expand-all
+          :height="height"
+          :scroll="{ type: 'virtual' }"
+          class="!p-4"
+        />
+      </div>
+      <div class="bg-[var(--td-bg-color-container)] w-17/24 h-full">
+        <TTabs v-model:value="actived[0]" class="code-tabs">
+          <TTabPanel
+            v-for="file in data!"
+            :key="file.filePath"
+            :label="last(file.filePath.split('/'))"
+            :value="file.filePath"
+          >
+            <div class="h-full" v-html="code" />
+          </TTabPanel>
+        </TTabs>
+      </div>
     </div>
-  </AModal>
+  </TDialog>
 </template>
 
-<script lang="ts" setup>
-import { last } from 'lodash-es'
-import useModalOpen from '@/hooks/use-modal'
+<script setup lang="ts">
 import { previewCode, type CodePreviewVO } from '@/api/infra/code-gen'
-import useHighlighter from '@/hooks/use-highlighter'
-import type { BundledLanguage } from 'shiki/langs'
+import highlight from '@/utils/highlighter'
+import { last } from 'lodash-es'
+
+const visible = defineModel<boolean>('visible')
 
 type FileNode = {
-  key: string
-  title: string
+  value: string
+  label: string
   pKey?: string | null
   children?: FileNode[]
 }
 
-const props = defineProps<{
-  id?: number
-  open?: boolean
-}>()
+const treeWrapper = useTemplateRef('treeWrapper')
+const { height } = useElementSize(treeWrapper, { height: 100, width: 0 })
 
-const emit = defineEmits(['update:open'])
-
-const isOpen = useModalOpen(props, emit)
-
-const renderKey = ref(0)
 const data = ref<CodePreviewVO>()
-const selectedKeys = ref<string[]>([])
+const actived = ref<string[]>([])
+
 const loading = ref(true)
 
-const code = computed<string>(() => {
-  const entry = data.value?.find((e) => e.filePath === selectedKeys.value[0])
+const code = computedAsync<string>(async () => {
+  const entry = data.value?.find((e) => e.filePath === actived.value[0])
   if (!entry) return ''
   const snippet = entry.code
   const lang = last(entry.filePath.split('/'))?.split('.')[1]
-  return useHighlighter(snippet, (lang as BundledLanguage) || 'txt')
+  const highlighted = await highlight(snippet, lang || 'txt')
+  return highlighted
 })
 
 const filePathTree = computed<FileNode[]>(() => {
@@ -136,8 +130,8 @@ const filePathTree = computed<FileNode[]>(() => {
       // 添加到 files 中
       existedMap[fullPath] = true
       files.push({
-        key: fullPath,
-        title: pathFrags[i],
+        value: fullPath,
+        label: pathFrags[i],
         pKey: oldFullPath || '/', // `/` -> root node
       })
     }
@@ -151,7 +145,7 @@ const constructTree = (files: FileNode[]) => {
 
   const treeData = clonedData.filter((parent) => {
     const branchArr = clonedData.filter((child) => {
-      return parent.key === child.pKey
+      return parent.value === child.pKey
     })
 
     if (branchArr.length > 0) {
@@ -163,25 +157,36 @@ const constructTree = (files: FileNode[]) => {
   return treeData
 }
 
-const onSelect = (keys: (string | number)[]) => {
-  selectedKeys.value = keys as string[]
+const loadData = async (id: number) => {
+  loading.value = true
+  const res = await previewCode(id)
+  data.value = res
+  actived.value[0] = data.value[0].filePath
+  loading.value = false
 }
 
-watch(
-  () => props.id,
-  (val) => {
-    previewCode(val!).then((res) => {
-      data.value = res
-      renderKey.value++
-      selectedKeys.value[0] = data.value[0].filePath
-      loading.value = false
-    })
-  },
-)
+const open = (id: number) => {
+  visible.value = true
+  loadData(id)
+}
+
+defineExpose({ open })
 </script>
 
-<style lang="scss">
-.code-tabs-pane .ant-tabs-content {
-  height: 100%;
+<style lang="scss" scoped>
+.code-tabs {
+  @apply flex flex-col h-full;
+  :deep(.t-tabs__header) {
+    @apply flex-none min-h-0;
+  }
+  :deep(.t-tabs__content) {
+    @apply flex-1 min-h-0 overflow-y-auto;
+  }
+}
+
+.code-gen-preview-modal {
+  :global(.t-dialog__position_fullscreen) {
+    height: 100% !important;
+  }
 }
 </style>

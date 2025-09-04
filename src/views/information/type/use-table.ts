@@ -1,61 +1,64 @@
 import useRequest from '@/hooks/use-request'
 import {
-  getTypeTree,
+  getInfoTypeTree,
+  deleteInfoType,
   updateInfoTypeAudit,
-  type TypeQueryParams,
-  type InformationTypeVO,
+  type TreeQueryParams,
 } from '@/api/information/type'
-import type { TableProps, FormInstance } from 'ant-design-vue'
+import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { key: 'name', title: '类别名称', dataIndex: 'name', width: '220px' },
-  { key: 'sort', title: '排序', dataIndex: 'sort' },
-  { key: 'isAudit', title: '是否需要审核', dataIndex: 'isAudit' },
-  { key: 'status', title: '状态', dataIndex: 'status' },
-  { key: 'creator', title: '创建者', dataIndex: 'creator' },
-  { key: 'createTime', title: '创建时间', dataIndex: 'createTime', width: '220px' },
-  { key: 'actions', title: '操作', width: '220px' },
+  { title: '资讯类别', colKey: 'name', ellipsis: true },
+  { title: '排序', colKey: 'sort', width: 64 },
+  { title: '需要审核', colKey: 'isAudit', width: 160 },
+  { title: '状态', colKey: 'status', width: 100 },
+  {
+    title: '创建时间',
+    width: 180,
+    colKey: 'createTime',
+  },
+  { title: '操作', width: 160, colKey: 'actions' },
 ]
 
-export const useTable = (formRef: Ref<FormInstance>) => {
-  const { data, pending, execute } = useRequest(() => getTypeTree(queryParams.value), {
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const query = ref<TreeQueryParams>({
+    name: '',
+  })
+
+  const message = useMessage()
+
+  const { data, execute, pending } = useRequest(() => getInfoTypeTree(query.value), {
     immediate: true,
   })
 
-  // execute()
-
-  const queryParams = ref<TypeQueryParams>({})
-
-  const onFilter = () => {
+  const onQueryChange = (reset?: boolean) => {
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
-  const onChange = (data: InformationTypeVO) => {
-    updateInfoTypeAudit({
-      id: data.id,
-      isAudit: data.isAudit,
-    })
-      .then(() => {
-        execute()
-      })
-      .catch(() => {
-        data.isAudit = !data.isAudit
-      })
-  }
-
-  const onFilterReset = () => {
-    formRef.value?.resetFields()
+  const onDelete = async (id: string) => {
+    await deleteInfoType(id)
+    message.success('删除成功')
     execute()
   }
-  // onMounted(() => execute())
+
+  const onSetAudit = async (id: string, isAudit: boolean) => {
+    pending.value = true
+    await updateInfoTypeAudit(id, isAudit)
+    message.success('操作成功')
+    execute()
+    pending.value = false
+  }
 
   return {
     data,
     pending,
+    query,
+    onQueryChange,
     execute,
-    queryParams,
-    onFilter,
-    onFilterReset,
-    onChange,
+    onDelete,
+    onSetAudit,
   }
 }

@@ -1,55 +1,37 @@
-import useRequest from '@/hooks/use-request'
 import { getDeptTree } from '@/api/system/dept'
-import type { ListQueryParams } from '@/api/system/user'
-import { filterTree, type Tree } from '@/utils/tree'
+import type { TreeProps } from 'tdesign-vue-next'
 
-const useDeptTree = (queryParams: Ref<ListQueryParams>, requestData: () => void) => {
-  const filteredTreeData = ref<Tree[]>()
-  const selectedKeys = ref<number[]>([])
-  const currentDeptName = ref('全部')
-  const searchText = ref('')
+const useDeptTree = () => {
+  const filterText = ref('')
+  const filter = ref<TreeProps['filter']>()
+  const activeNodes = ref<number[]>([])
 
-  let oldSelectedKey: number | string | undefined = undefined
+  const { data, pending } = useRequest(getDeptTree, { immediate: true })
 
-  const { data, pending } = useRequest(getDeptTree, {
-    immediate: true,
-    onSuccess(data) {
-      filteredTreeData.value = data
-    },
-  })
-
-  watch(searchText, () => {
-    const filtered: Tree[] = []
-    data.value?.forEach((tree) => {
-      const result = filterTree(tree as any, searchText.value)
-      if (result) {
-        filtered.push(result)
+  watchDebounced(
+    filterText,
+    (val) => {
+      if (val) {
+        filter.value = (node) => {
+          const rs = (node.label as string).indexOf(val) >= 0
+          // 命中的节点会强制展示
+          // 命中节点的路径节点会锁定展示
+          // 未命中的节点会隐藏
+          return rs
+        }
+      } else {
+        filter.value = undefined
       }
-    })
-
-    filteredTreeData.value = filtered
-  })
-
-  const onTreeNodeSelect = (node: Tree) => {
-    const hasSelected = node.key === oldSelectedKey
-    if (!hasSelected) {
-      oldSelectedKey = node.key
-    } else {
-      oldSelectedKey = undefined
-    }
-    currentDeptName.value = hasSelected ? '全部' : node.name
-    queryParams.value.deptId = hasSelected ? undefined : node.key.toString()
-    requestData()
-  }
+    },
+    { debounce: 200 },
+  )
 
   return {
+    filterText,
     deptTree: data,
-    deptTreeLoading: pending,
-    filteredTreeData,
-    selectedKeys,
-    currentDeptName,
-    searchText,
-    onTreeNodeSelect,
+    deptLoading: pending,
+    filter,
+    activeNodes,
   }
 }
 

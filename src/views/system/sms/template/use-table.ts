@@ -1,62 +1,65 @@
-import useRequest from '@/hooks/use-request'
-import type { TableProps, FormInstance, TablePaginationConfig } from 'ant-design-vue'
-import { getTemplateList, type ListQueryParams } from '@/api/system/sms/template'
+import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
+import { getTemplateList, deleteTemplate, type ListQueryParams } from '@/api/system/sms/template'
 
 export const columns: TableProps['columns'] = [
-  { key: 'name', title: '模板名称', dataIndex: 'name', fixed: 'left', width: 160 },
-  { key: 'code', title: '模板编码', dataIndex: 'code', width: 180 },
-  { title: '模板内容', dataIndex: 'content', width: 220, ellipsis: true },
-  { key: 'type', title: '短信类型', dataIndex: 'type' },
-  { key: 'status', title: '状态', dataIndex: 'status' },
-  { key: 'channelCode', title: '短信渠道', dataIndex: 'channelCode', width: 160 },
-  { key: 'createTime', title: '创建时间', dataIndex: 'createTime' },
-  { key: 'actions', title: '操作', fixed: 'right', width: 140 },
+  { colKey: 'name', title: '模板名称', fixed: 'left', width: 180, ellipsis: true },
+  { colKey: 'code', title: '模板编码', width: 180 },
+  { colKey: 'content', title: '模板内容', width: 240, ellipsis: true },
+  { colKey: 'type', title: '模板类型', width: 100 },
+  { colKey: 'status', title: '状态', width: 100 },
+  { colKey: 'channelCode', title: '短信渠道', width: 120 },
+  { colKey: 'createTime', title: '创建时间', width: 160 },
+  { colKey: 'actions', title: '操作', fixed: 'right', width: 140 },
 ]
 
-export const useTable = (formRef: Ref<FormInstance>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const message = useMessage()
 
-  const { data, pending, execute } = useRequest(() => getTemplateList(queryParams.value), {
+  const query = ref<ListQueryParams>({
+    pageNo: 1,
+    pageSize: 10,
+    createTime: [],
+  })
+
+  const { data, pending, execute } = useRequest(() => getTemplateList(query.value), {
     immediate: true,
   })
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
-    execute()
-  }
-
-  const onFilterReset = () => {
-    queryParams.value.pageNo = 1
-    formRef.value?.resetFields()
-    execute()
-  }
-
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
 
+    execute()
+  }
+
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
+    execute()
+  }
+
+  const onDelete = async (id: number) => {
+    await deleteTemplate(id)
+    message.success('删除成功')
     execute()
   }
 
   return {
+    query,
+    execute,
     data,
     pending,
-    execute,
     pagination,
-    queryParams,
-    onChange,
-    onFilter,
-    onFilterReset,
+    onPageChange,
+    onQueryChange,
+    onDelete,
   }
 }

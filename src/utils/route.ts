@@ -1,4 +1,4 @@
-import DefaultLayout from '@/layouts'
+import { DefaultLayout } from '@/layouts'
 import type { RouteRecordRaw } from 'vue-router'
 import type { MenuVO } from '@/api/system/menu'
 

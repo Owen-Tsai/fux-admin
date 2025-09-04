@@ -1,63 +1,27 @@
-import useStorage from '@/hooks/use-storage'
+import { localCache } from '@/utils/storage'
 
 type Token = {
   accessToken: string
   refreshToken: string
 }
 
-const storage = useStorage()
+const ACCESS_TOKEN = 'access-token'
+const REFRESH_TOKEN = 'refresh-token'
 
-const tokenKey = 'access-token'
-const refreshTokenKey = 'refresh-token'
-
-// tenant, which is a useless feature we probably will never use
-const tenantIdKey = 'tenant-id'
-const tenantNameKey = 'tenant-name'
-
-export const getToken = (): string => {
-  return storage.get(tokenKey)
+export const getToken = (): string | null => {
+  return localCache.get(ACCESS_TOKEN)
 }
 
-export const getRefreshToken = (): string => {
-  return storage.get(refreshTokenKey)
+export const getRefreshToken = (): string | null => {
+  return localCache.get(REFRESH_TOKEN)
 }
 
 export const setToken = (token: Token) => {
-  storage.set(tokenKey, token.accessToken)
-  storage.set(refreshTokenKey, token.refreshToken)
+  localCache.set(ACCESS_TOKEN, token.accessToken)
+  localCache.set(REFRESH_TOKEN, token.refreshToken)
 }
 
 export const removeToken = () => {
-  storage.delete(tokenKey)
-  storage.delete(refreshTokenKey)
-}
-
-export const getFormattedToken = (raw?: string) => {
-  const token = raw || getToken()
-  if (!token) return null
-  return `Bearer ${token}`
-}
-
-export const getTenantName = (): string => {
-  return storage.get(tenantNameKey)
-}
-
-export const setTenantName = (username: string) => {
-  storage.set(tenantNameKey, username, { exp: 30 * 24 * 3600 })
-}
-
-export const removeTenantName = () => {
-  storage.delete(tenantNameKey)
-}
-
-export const getTenantId = (): string => {
-  return storage.get(tenantIdKey)
-}
-
-export const setTenantId = (username: string) => {
-  storage.set(tenantIdKey, username)
-}
-
-export const removeTenantId = () => {
-  storage.delete(tenantIdKey)
+  localCache.delete(ACCESS_TOKEN)
+  localCache.delete(REFRESH_TOKEN)
 }

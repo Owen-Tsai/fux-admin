@@ -26,39 +26,39 @@ export type FileUploadVO = {
   file: File
 }
 
-const url = '/admin-api/infra/file'
+const prefix = '/infra/file'
 
 export const getFileList = (params?: ListQueryParams) => {
   return request.get<PaginatedList<FileVO>>({
-    url: `${url}/page`,
+    url: `${prefix}/page`,
     params,
   })
 }
 
 export const createFile = (data: FileVO) => {
   return request.post({
-    url: `${url}/create`,
+    url: `${prefix}/create`,
     data,
   })
 }
 
-export const uploadFile = (data: any) => {
+export const uploadFile = (data: FileUploadVO) => {
   return request.upload({
-    url: `${url}/upload`,
+    url: `${prefix}/upload`,
     data,
   })
 }
 
 export const deleteFile = (id?: number) => {
   return request.delete({
-    url: `${url}/delete?id=${id}`,
+    url: `${prefix}/delete?id=${id}`,
   })
 }
 
 // 获取文件预签名地址
 export const getFilePresignedUrl = (path: string) => {
   return request.get<FilePresignedRespVO>({
-    url: `${url}/presigned-url`,
+    url: `${prefix}/presigned-url`,
     params: {
       path,
     },

@@ -1,6 +1,3 @@
-import { ref, type Ref } from 'vue'
-import { useDebounceFn } from '@vueuse/core'
-
 export type UseRequestOptions<T> = {
   /**
    * Whether or not the request should be executed immediately
@@ -15,7 +12,7 @@ export type UseRequestOptions<T> = {
    * @param raw response data
    * @returns transformed response data
    */
-  transformer?: (raw: Ref<T | undefined>) => T | undefined
+  transformer?: (raw: any) => T | undefined
   onSuccess?: (data: T) => void
   onError?: (err: unknown) => void
   onFinish?: () => void
@@ -36,7 +33,7 @@ const useRequest = <T>(service: () => Promise<T>, options?: UseRequestOptions<T>
     try {
       const response = await service()
       if (transformer) {
-        data.value = transformer(data)
+        data.value = transformer(response)
       } else {
         data.value = response
       }
@@ -57,11 +54,9 @@ const useRequest = <T>(service: () => Promise<T>, options?: UseRequestOptions<T>
     }
   }
 
-  nextTick(() => {
-    if (immediate) {
-      execute()
-    }
-  })
+  if (immediate) {
+    execute()
+  }
 
   const debouncedExecute = useDebounceFn(execute, debounceTime)
 

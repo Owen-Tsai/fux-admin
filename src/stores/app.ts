@@ -1,30 +1,22 @@
-type Theme = 'light' | 'dark'
-
-const isDark = useDark({ storageKey: 'milestoneTheme' })
-
 export default defineStore('app', () => {
-  const device = ref<'desktop' | 'mobile'>('desktop')
-  const title = useTitle()
-
-  const theme = computed(() => (isDark.value ? 'dark' : 'light'))
-
-  const setTheme = (val: Theme) => {
-    isDark.value = val === 'dark'
-    document.documentElement.style.setProperty('color-scheme', val)
-  }
-
-  const setTitle = (val: string) => {
-    title.value = `${val} | ${import.meta.env.VITE_APP_SHORT_TITLE}`
-  }
-
-  onMounted(() => {
-    setTheme(theme.value)
+  const isDark = useDark({
+    selector: 'html',
+    attribute: 'theme-mode',
+    storageKey: 'fux-theme-mode',
   })
 
+  const toggleDark = useToggle(isDark)
+
+  const htmlTitle = useTitle()
+
+  const setTitle = (val: string) => {
+    htmlTitle.value = `${val} | ${import.meta.env.VITE_APP_TITLE_SHORT}`
+  }
+
   return {
-    theme,
-    device,
-    setTheme,
+    isDark,
+    toggleDark,
+    htmlTitle,
     setTitle,
   }
 })

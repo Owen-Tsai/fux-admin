@@ -1,124 +1,59 @@
-<template>
-  <AModal
-    v-model:open="visible"
-    :title="mode === 'create' ? '新增资讯类别' : '编辑资讯类别'"
-    :confirm-loading="loading"
-    width="550px"
-    @ok="submit"
-  >
-    <AForm
-      ref="formRef"
-      :model="formData"
-      :rules="rules"
-      :label-col="{ style: { width: '120px' } }"
-      class="mt-4"
-    >
-      <ASpin :spinning="loading">
-        <AFormItem label="上级资讯类别" name="parentId">
-          <ATreeSelect
-            v-model:value="formData.parentId"
-            show-search
-            allow-clear
-            :dropdown-style="{ maxHeight: '300px', overflow: 'auto' }"
-            tree-default-expand-all
-            :tree-data="treeData"
-            :field-names="{ label: 'name', value: 'id' }"
-            @clear="() => (formData.parentId = '0')"
-          />
-        </AFormItem>
-        <AFormItem label="资讯类别名称" name="name">
-          <AInput v-model:value="formData.name" placeholder="请输入资讯类别名称" />
-        </AFormItem>
-        <ARow>
-          <ACol :span="12">
-            <AFormItem label="排序" name="sort">
-              <AInputNumber v-model:value="formData.sort" class="w-full" />
-            </AFormItem>
-          </ACol>
-          <ACol :span="12">
-            <AFormItem label="启用状态" name="status">
-              <ARadioGroup
-                v-model:value="formData.status"
-                :options="commonStatus"
-                option-type="button"
-              />
-            </AFormItem>
-          </ACol>
-        </ARow>
-        <ARow>
-          <ACol :span="12">
-            <AFormItem label="是否需要审核" name="isAudit">
-              <ARadioGroup
-                v-model:value="formData.isAudit"
-                :options="infraBooleanString"
-                option-type="button"
-              />
-            </AFormItem>
-          </ACol>
-        </ARow>
-      </ASpin>
-    </AForm>
-  </AModal>
-</template>
-
-<script lang="ts" setup>
-import { message, type FormInstance, type TreeSelectProps, type FormProps } from 'ant-design-vue'
+<script setup lang="ts">
 import {
-  getInfoTypeDetail,
   createInfoType,
   updateInfoType,
-  type InformationTypeVO,
+  getInfoTypeDetail,
+  type InfoTypeVO,
 } from '@/api/information/type'
-import useDict from '@/hooks/use-dict'
-import logger from '@/utils/logger'
-
-const [commonStatus, infraBooleanString] = useDict('common_status', 'infra_boolean_string')
-
-const rules: FormProps['rules'] = {
-  name: [{ required: true, message: '请填写菜单名称' }],
-  sort: [{ required: true, message: '请填写排序' }],
-}
+import type { FormProps, TreeSelectProps, FormInstanceFunctions } from 'tdesign-vue-next'
 
 const { treeData } = defineProps<{
-  treeData: TreeSelectProps['treeData']
+  treeData: TreeSelectProps['data']
 }>()
+const emit = defineEmits(['success'])
+
+const [statusOpts, booleanOpts] = useDict('common_status', 'infra_boolean_string')
+const message = useMessage()
+
+const rules: FormProps['rules'] = {
+  name: [{ required: true, message: '请填写资讯类别名称' }],
+}
 
 const visible = ref(false)
 const loading = ref(false)
 
 const mode = ref<'create' | 'update'>('create')
-const formRef = ref<FormInstance>()
-const emit = defineEmits(['success'])
+const formRef = ref<FormInstanceFunctions>()
 
-const isCustomLayout = ref(false)
-
-const formData = ref<InformationTypeVO>({
-  status: 0,
+const formData = ref<InfoTypeVO>({
+  id: undefined,
   sort: 1,
-  isInMobile: true,
-  isAudit: true,
+  isAudit: false,
+  parentId: undefined,
+  status: 0,
 })
 
 const submit = async () => {
   loading.value = true
   try {
-    await formRef.value?.validate()
-    if (formData.value.parentId === undefined) {
-      formData.value.parentId = '0'
-    }
-    if (mode.value === 'create') {
-      // add
-      await createInfoType(formData.value)
-    } else {
-      // edit
-      await updateInfoType(formData.value)
-    }
+    const result = await formRef.value?.validate()
+    if (result === true) {
+      if (formData.value.parentId === undefined) {
+        formData.value.parentId = '0'
+      }
 
-    message.success('保存成功')
-    visible.value = false
-    emit('success')
-  } catch (e) {
-    logger.error(import.meta.url, '表单提交失败。', e)
+      if (mode.value === 'create') {
+        await createInfoType(formData.value)
+      } else {
+        await updateInfoType(formData.value)
+      }
+
+      emit('success')
+      visible.value = false
+      message.success('操作成功')
+    }
+  } catch (error) {
+    console.error(error)
   } finally {
     loading.value = false
   }
@@ -131,18 +66,19 @@ const loadData = async (id: string) => {
     data.parentId = undefined
   }
   formData.value = data
-  isCustomLayout.value = !!data.customLayout
   loading.value = false
 }
 
 const open = (type: 'create' | 'update', id?: string) => {
-  formRef.value?.resetFields()
+  formRef.value?.reset({ type: 'initial' })
   mode.value = type
 
-  if (type === 'create' && id) {
+  if (type === 'create') {
     // add sub menu
-    formData.value.parentId = id
     formData.value.id = undefined
+    if (id !== undefined) {
+      formData.value.parentId = id
+    }
   }
 
   if (type === 'update') {
@@ -154,3 +90,48 @@ const open = (type: 'create' | 'update', id?: string) => {
 
 defineExpose({ open })
 </script>
+
+<template>
+  <TDialog
+    v-model:visible="visible"
+    :header="mode === 'create' ? '新增资讯类别' : '编辑资讯类别'"
+    :confirm-loading="loading"
+    width="680px"
+    @confirm="submit"
+  >
+    <TLoading :loading="loading">
+      <TForm ref="formRef" :data="formData" :rules="rules" :label-width="120">
+        <TFormItem label="上级资讯类别" name="parentId">
+          <TTreeSelect
+            v-model:value="formData.parentId"
+            :data="treeData"
+            :keys="{ label: 'name', value: 'id' }"
+            clearable
+          />
+        </TFormItem>
+        <TFormItem label="资讯类别名称" name="name">
+          <TInput v-model:value="formData.name" placeholder="请输入资讯类别名称" />
+        </TFormItem>
+        <TFormItem label="需要审核" name="isAudit" help="开启后，发布该类型的资讯需要审核">
+          <TRadioGroup v-model:value="formData.isAudit" :options="booleanOpts" variant="outline" />
+        </TFormItem>
+        <TRow>
+          <TCol :span="12" :lg="6">
+            <TFormItem label="显示排序" name="sort">
+              <TInputNumber v-model:value="formData.sort" theme="column" class="w-full" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="12" :lg="6">
+            <TFormItem label="启用状态" name="status">
+              <TRadioGroup v-model:value="formData.status">
+                <TRadioButton v-for="opt in statusOpts" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </TRadioButton>
+              </TRadioGroup>
+            </TFormItem>
+          </TCol>
+        </TRow>
+      </TForm>
+    </TLoading>
+  </TDialog>
+</template>

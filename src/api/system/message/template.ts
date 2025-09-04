@@ -20,9 +20,16 @@ export type ListQueryParams = CommonQueryParams & {
   type?: number
 }
 
-const prefix = '/admin-api/system/notify-template'
+export type MessageSendReqVO = {
+  templateCode?: string
+  templateParams?: Record<string, string>
+  userType?: number
+  userId?: number
+}
 
-export const getTemplateList = (params: ListQueryParams) => {
+const prefix = '/system/notify-template'
+
+export const getTemplateList = (params?: ListQueryParams) => {
   return request.get<PaginatedList<TemplateVO>>({
     url: `${prefix}/page`,
     params,
@@ -35,7 +42,7 @@ export const getTemplateDetail = (id: number) => {
   })
 }
 
-export const addTemplate = (data: TemplateVO) => {
+export const createTemplate = (data: TemplateVO) => {
   return request.post({
     url: `${prefix}/create`,
     data,
@@ -50,7 +57,14 @@ export const updateTemplate = (data: TemplateVO) => {
 }
 
 export const deleteTemplate = (id: number) => {
-  return request.delete<TemplateVO>({
+  return request.delete({
     url: `${prefix}/delete?id=${id}`,
+  })
+}
+
+export const sendMessage = (data: MessageSendReqVO) => {
+  return request.post({
+    url: `${prefix}/send-notify`,
+    data,
   })
 }

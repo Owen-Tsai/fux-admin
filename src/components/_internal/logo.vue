@@ -4,19 +4,19 @@
 
 <script setup lang="ts">
 import useAppStore from '@/stores/app'
-import logoSimple from '~img/logo-simple.svg'
-import logoSimpleD from '~img/logo-simple-d.svg'
-import logofull from '~img/logo-full.svg'
-import logofullD from '~img/logo-full-d.svg'
+import logoSimple from '@/assets/brand/logo-simple.svg'
+import logoSimpleD from '@/assets/brand/logo-simple-d.svg'
+import logofull from '@/assets/brand/logo-full.svg'
+import logofullD from '@/assets/brand/logo-full-d.svg'
+
+const { isDark } = storeToRefs(useAppStore())
 
 const { type = 'simple' } = defineProps<{
   type?: 'full' | 'simple'
 }>()
 
-const { theme } = storeToRefs(useAppStore())
-
 const logo = computed(() => {
-  return theme.value === 'dark'
+  return isDark.value === true
     ? type === 'full'
       ? logofullD
       : logoSimpleD

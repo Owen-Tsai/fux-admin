@@ -17,7 +17,7 @@ export type ListQueryParams = CommonQueryParams & {
   signature?: string
 }
 
-const prefix = '/admin-api/system/sms-channel'
+const prefix = '/system/sms-channel'
 
 export type ChannelListLiteVO = Array<Pick<ChannelVO, 'id' | 'code' | 'signature'>>
 
@@ -51,5 +51,5 @@ export const updateChannel = (data: ChannelVO) => {
 }
 
 export const deleteChannel = (id: number) => {
-  return request.delete({ url: `${prefix}/get?id=${id}` })
+  return request.delete({ url: `${prefix}/delete?id=${id}` })
 }

@@ -1,77 +1,61 @@
 import { saveAs } from 'file-saver'
-import buildService from './service'
-import { createLoader, destroyLoader } from '@/components/loading'
-import { serializerGETReq } from './serializer'
-import type { AxiosInstance, AxiosRequestConfig } from 'axios'
+import service from './service'
+import { LoadingPlugin } from 'tdesign-vue-next'
+import type { AxiosRequestConfig } from 'axios'
 
-const commonSerializer = {
-  timeout: 30000,
-  paramsSerializer: {
-    indexes: null,
-    serialize: serializerGETReq,
-  },
-}
+const request = <T = any>(options: AxiosRequestConfig) => {
+  const { url, method, data, params, responseType, ...rest } = options
 
-const service = buildService({
-  ...commonSerializer,
-  baseURL: import.meta.env.VITE_API_URL,
-})
-
-const buildHandler = <T>(options: AxiosRequestConfig, instance: AxiosInstance) => {
-  const { url, method, data, params, responseType, ...config } = options
-
-  return instance<T>({
+  return service<T>({
     url,
     method,
-    params,
     data,
+    params,
     responseType,
-    ...config,
+    ...rest,
   })
 }
 
-const handler = <T>(options: AxiosRequestConfig) => buildHandler<T>(options, service)
-
 export default {
   get: async <T = any>(options: AxiosRequestConfig) => {
-    const res = await handler({ method: 'get', ...options })
-    return res.data as T
+    const res = await request<T>({ ...options, method: 'GET' })
+    return res.data
   },
   getRaw: async <T = any>(options: AxiosRequestConfig) => {
-    const res = await handler({ method: 'get', ...options })
-    return res as T
-  },
-  post: async <T = any>(options: AxiosRequestConfig) => {
-    const res = await handler({ method: 'post', ...options })
-    return res.data as T
-  },
-  postRaw: async <T = any>(options: AxiosRequestConfig) => {
-    const res = await handler({ method: 'post', ...options })
-    return res as T
-  },
-  delete: async <T = any>(options: AxiosRequestConfig) => {
-    const res = await handler({ method: 'delete', ...options })
-    return res.data as T
-  },
-  put: async <T = any>(options: AxiosRequestConfig) => {
-    const res = await handler({ method: 'put', ...options })
-    return res.data as T
-  },
-  download: async (options: AxiosRequestConfig & { filename?: string }) => {
-    createLoader()
-    const res = await handler({ method: 'get', responseType: 'blob', ...options })
-    const blob = new Blob([res as unknown as ArrayBuffer])
-    saveAs(blob, options.filename)
-    destroyLoader()
+    const res = await request<T>({ ...options, method: 'GET' })
     return res
   },
-  upload: async <T = string>(options: AxiosRequestConfig) => {
-    const res = await handler<{ code: number; data: T; msg?: string }>({
-      method: 'post',
+  post: async <T = any>(options: AxiosRequestConfig) => {
+    const res = await request<T>({ ...options, method: 'POST' })
+    return res.data
+  },
+  postRaw: async <T = any>(options: AxiosRequestConfig) => {
+    const res = await request<T>({ ...options, method: 'POST' })
+    return res as T
+  },
+  put: async <T = any>(options: AxiosRequestConfig) => {
+    const res = await request<T>({ ...options, method: 'PUT' })
+    return res.data
+  },
+  delete: async <T = any>(options: AxiosRequestConfig) => {
+    const res = await request<T>({ ...options, method: 'DELETE' })
+    return res.data
+  },
+  download: async (options: AxiosRequestConfig & { filename?: string }) => {
+    LoadingPlugin(true)
+    const res = await request({ ...options, method: 'GET', responseType: 'blob' })
+    const blob = new Blob([res as unknown as ArrayBuffer])
+    saveAs(blob, options.filename)
+    LoadingPlugin(false)
+    return res
+  },
+  upload: async <T = any>(options: AxiosRequestConfig) => {
+    const res = await request({
+      ...options,
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      ...options,
+      method: 'POST',
     })
     return res as unknown as Promise<{ code: number; data: T; msg?: string }>
   },

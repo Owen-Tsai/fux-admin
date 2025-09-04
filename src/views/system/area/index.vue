@@ -1,83 +1,121 @@
 <template>
-  <div class="view">
-    <ARow :gutter="24">
-      <ACol :span="24" :lg="6">
-        <ACard
-          ref="wrapper"
-          :body-style="{
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-          }"
-          class="tree-card"
-        >
-          <AInput
-            ref="input"
-            v-model:value="searchText"
-            class="mb-4"
-            placeholder="输入关键字过滤"
-            allow-clear
-          >
-            <template #suffix>
-              <SearchOutlined />
-            </template>
-          </AInput>
-          <div class="flex-grow">
-            <a-spin :spinning="loading">
-              <ATree
-                v-model:selected-keys="selectedKeys"
-                :tree-data="filteredTreeData"
-                :field-names="{ key: 'id', title: 'name' }"
-                :height="treeH"
-                @select="(key, { node }) => onTreeNodeSelect(node)"
-              />
-            </a-spin>
+  <div class="view h-full">
+    <div class="h-full grid grid-cols-3 gap-4">
+      <TCard class="tree-card h-full">
+        <template #content>
+          <div class="flex-1 flex flex-col">
+            <div class="flex-none flex items-center gap-2">
+              <TInput
+                v-model:value="filterText"
+                placeholder="输入区域名称过滤"
+                clearable
+                class="flex-1"
+              >
+                <template #suffixIcon>
+                  <TIcon name="search" />
+                </template>
+              </TInput>
+              <TTooltip content="新增顶级条目">
+                <TButton shape="square" class="flex-none" @click="onAppend">
+                  <template #icon>
+                    <Icon name="add" />
+                  </template>
+                </TButton>
+              </TTooltip>
+            </div>
+
+            <TLoading ref="treeWrapperEl" :loading="areaLoading" class="flex-1 mt-4 min-h-0">
+              <TTree
+                ref="treeRef"
+                v-model:actived="activeNodes"
+                :keys="{ label: 'name', value: 'id' }"
+                :data="areaTree"
+                :filter="filter"
+                activable
+                :height="height"
+                :scroll="{ type: 'lazy' }"
+                @active="(value, context) => formRef?.onActive(value, context)"
+              >
+                <template #operations="{ node }">
+                  <div class="flex items-center gap-1 pl-2">
+                    <TTooltip content="新增下一级">
+                      <TButton
+                        shape="square"
+                        theme="primary"
+                        variant="text"
+                        size="small"
+                        @click="formRef?.onAdd(node)"
+                      >
+                        <template #icon>
+                          <Icon name="add" />
+                        </template>
+                      </TButton>
+                    </TTooltip>
+                    <TPopconfirm
+                      content="确定要删除该区域吗？该操作无法撤销"
+                      theme="danger"
+                      @confirm="onDelete(node.data.id)"
+                    >
+                      <TTooltip content="删除">
+                        <TButton shape="square" theme="danger" variant="text" size="small">
+                          <template #icon>
+                            <Icon name="close" />
+                          </template>
+                        </TButton>
+                      </TTooltip>
+                    </TPopconfirm>
+                  </div>
+                </template>
+              </TTree>
+            </TLoading>
           </div>
-        </ACard>
-      </ACol>
-      <ACol :span="24" :lg="18">
-        <!-- <Details :id="selectedKeys[0]" /> -->
-        <Form v-model:id="selectedKeys[0]" @success="execute" />
-      </ACol>
-    </ARow>
+        </template>
+      </TCard>
+      <Form ref="formRef" v-model:activeNodes="activeNodes" @success="execute" />
+    </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import useAreaTree from './use-area-tree'
+<script setup lang="ts">
+import { deleteArea, addArea, type AreaVO } from '@/api/system/area'
+import useAreaTree from './use-tree'
 import Form from './form.vue'
+import type { TreeInstanceFunctions } from 'tdesign-vue-next'
 
-// layout specific
-const layout = import.meta.env.VITE_APP_LAYOUT
-const style = ref<{ height: string; top: string }>(
-  layout === 'default'
-    ? {
-        height: 'calc(100vh - 130px)',
-        top: '110px',
-      }
-    : {
-        height: 'calc(100vh - 68px)',
-        top: '52px',
-      },
-)
+const { filterText, areaTree, areaLoading, filter, activeNodes, execute } = useAreaTree()
 
-const wrapper = useTemplateRef('wrapper')
-const input = useTemplateRef('input')
-const { height: wrapperH } = useElementSize(wrapper)
-const { height: inputH } = useElementSize(input)
-const treeH = computed(() => wrapperH.value - inputH.value - 56)
+const treeWrapperEl = useTemplateRef('treeWrapperEl')
+const formRef = useTemplateRef('formRef')
+const treeRef = useTemplateRef<TreeInstanceFunctions>('treeRef')
 
-const { loading, execute, filteredTreeData, searchText, selectedKeys, onTreeNodeSelect } =
-  useAreaTree()
+const { height } = useElementSize(treeWrapperEl)
 
-defineOptions({ name: 'SystemArea' })
+const onDelete = async (id: string) => {
+  areaLoading.value = true
+  await deleteArea(id)
+  activeNodes.value = []
+  execute()
+}
+
+const onAppend = async () => {
+  const newAreaData: AreaVO = {
+    name: '新区域',
+    pid: '-1',
+  }
+  areaLoading.value = true
+  await addArea(newAreaData)
+  execute()
+}
 </script>
 
 <style lang="scss" scoped>
 .tree-card {
-  @apply sticky;
-  top: v-bind('style.top');
-  height: v-bind('style.height');
+  @apply flex flex-col;
+  :deep(.t-card__header) {
+    @apply flex-none;
+  }
+  :deep(.t-card__body) {
+    @apply flex-1 h-full flex flex-col;
+  }
 }
 </style>
