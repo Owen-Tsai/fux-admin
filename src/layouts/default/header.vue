@@ -37,7 +37,7 @@
               >
                 <div class="flex items-center justify-between">
                   <div class="font-bold">发送人：{{ message.templateNickname }}</div>
-                  <div class="text-secondary text-sm">
+                  <div class="text-secondary text-xs">
                     {{ dayjs(message.createTime).format('YYYY-MM-DD HH:mm:ss') }}
                   </div>
                 </div>
