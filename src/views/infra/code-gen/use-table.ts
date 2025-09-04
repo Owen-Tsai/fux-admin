@@ -1,87 +1,96 @@
-import { ref, computed, type Ref } from 'vue'
-import useRequest from '@/hooks/use-request'
-import { getCodeGenConfigList, type ListQueryParams, type ConfigVO } from '@/api/infra/code-gen'
-import type { FormInstance, TableProps } from 'ant-design-vue'
-import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
+import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
+import {
+  getCodeGenConfigList,
+  deleteCodeGenConfig,
+  downloadCode,
+  type ListQueryParams,
+} from '@/api/infra/code-gen'
 
 export const columns: TableProps['columns'] = [
-  { key: 'dataSourceConfigId', title: '数据源', width: 90, dataIndex: 'dataSourceConfigId' },
-  { key: 'tableName', title: '表名称', dataIndex: 'tableName' },
-  { key: 'tableComment', title: '表描述', dataIndex: 'tableComment' },
-  { key: 'className', title: '实体', dataIndex: 'className' },
+  { colKey: 'dataSourceConfigId', title: '数据源', width: 90 },
+  { colKey: 'tableName', title: '表名称' },
+  { colKey: 'tableComment', title: '表描述' },
+  { colKey: 'className', title: '实体' },
   {
-    key: 'createTime',
+    colKey: 'createTime',
     title: '创建时间',
     minWidth: 140,
-    dataIndex: 'createTime',
-    sortDirections: ['ascend', 'descend'],
-    sorter: (a: ConfigVO, b: ConfigVO) => {
-      return b.createTime! - a.createTime!
-    },
   },
   {
-    key: 'updateTime',
+    colKey: 'updateTime',
     title: '更新时间',
     minWidth: 140,
-    dataIndex: 'updateTime',
-    sortDirections: ['ascend', 'descend'],
-    sorter: (a: ConfigVO, b: ConfigVO) => {
-      return b.updateTime! - a.updateTime!
-    },
   },
-  { key: 'actions', title: '操作', width: 240 },
+  { colKey: 'actions', title: '操作', width: 140 },
 ]
 
-export const useTable = (formRef: Ref<FormInstance | undefined>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const message = useMessage()
+  const dialog = useDialog()
+  const { push } = useRouter()
 
-  const { data, execute, pending } = useRequest(
-    () =>
-      getCodeGenConfigList({
-        ...queryParams.value,
-      }),
-    {
-      immediate: true,
-    },
-  )
+  const query = ref<ListQueryParams>({
+    pageNo: 1,
+    pageSize: 10,
+    createTime: [],
+  })
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const { data, pending, execute } = useRequest(() => getCodeGenConfigList(query.value), {
+    immediate: true,
+  })
+
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
+
     execute()
   }
 
-  const onFilterReset = () => {
-    formRef.value?.resetFields()
-    queryParams.value.pageNo = 1
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
+  const onDelete = (id: number) => {
+    const instance = dialog.confirm({
+      header: '删除代码生成配置',
+      body: '确定要删除吗？该操作无法恢复',
+      onConfirm: async () => {
+        await deleteCodeGenConfig(id)
+        message.success('删除成功')
+        execute()
+        instance.destroy()
+      },
+    })
+  }
 
-    execute()
+  const onEdit = (id?: number) => {
+    push(`/infra/code-gen/edit?id=${id}`)
+  }
+
+  const onDownload = (id: number) => {
+    downloadCode(id)
   }
 
   return {
-    data,
+    query,
     execute,
+    data,
     pending,
-    queryParams,
-    onChange,
     pagination,
-    onFilter,
-    onFilterReset,
+    onPageChange,
+    onQueryChange,
+    onDelete,
+    onEdit,
+    onDownload,
   }
 }

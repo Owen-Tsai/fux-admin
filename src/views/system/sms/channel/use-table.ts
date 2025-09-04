@@ -1,61 +1,65 @@
-import useRequest from '@/hooks/use-request'
-import type { TableProps, FormInstance, TablePaginationConfig } from 'ant-design-vue'
-import { getChannelList, type ListQueryParams } from '@/api/system/sms/channel'
+import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
+import { getChannelList, deleteChannel, type ListQueryParams } from '@/api/system/sms/channel'
 
 export const columns: TableProps['columns'] = [
-  { key: 'id', title: '编号', dataIndex: 'id' },
-  { key: 'signature', title: '渠道名称', dataIndex: 'signature' },
-  { key: 'code', title: '渠道编码', dataIndex: 'code' },
-  { key: 'status', title: '状态', dataIndex: 'status' },
-  { title: 'API Key', dataIndex: 'apiKey', ellipsis: true },
-  { key: 'createTime', title: '创建时间', dataIndex: 'createTime' },
-  { key: 'actions', title: '操作' },
+  { colKey: 'id', title: '编号', width: 64 },
+  { colKey: 'signature', title: '渠道名称' },
+  { colKey: 'code', title: '渠道编码' },
+  { colKey: 'status', title: '状态' },
+  { colKey: 'apiKey', title: 'API Key', ellipsis: true },
+  { colKey: 'createTime', title: '创建时间' },
+  { colKey: 'actions', title: '操作' },
 ]
 
-export const useTable = (formRef: Ref<FormInstance>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const message = useMessage()
 
-  const { data, pending, execute } = useRequest(() => getChannelList(queryParams.value), {
+  const query = ref<ListQueryParams>({
+    pageNo: 1,
+    pageSize: 10,
+    status: 0,
+    createTime: [],
+  })
+
+  const { data, pending, execute } = useRequest(() => getChannelList(query.value), {
     immediate: true,
   })
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
-    execute()
-  }
-
-  const onFilterReset = () => {
-    queryParams.value.pageNo = 1
-    formRef.value?.resetFields()
-    execute()
-  }
-
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
 
+    execute()
+  }
+
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
+    execute()
+  }
+
+  const onDelete = async (id: number) => {
+    await deleteChannel(id)
+    message.success('删除成功')
     execute()
   }
 
   return {
+    query,
+    execute,
     data,
     pending,
-    execute,
     pagination,
-    queryParams,
-    onChange,
-    onFilter,
-    onFilterReset,
+    onPageChange,
+    onQueryChange,
+    onDelete,
   }
 }

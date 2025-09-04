@@ -1,181 +1,152 @@
-<template>
-  <div class="view">
-    <ACard v-if="permission.has('infra:code-gen:query')" class="mb-4">
-      <AForm
-        ref="filterForm"
-        :label-col="{ span: 6 }"
-        class="dense-form"
-        :class="{ expanded: filterExpanded }"
-        :model="queryParams"
-      >
-        <ARow :gutter="[0, 16]">
-          <ACol :lg="8" :span="24">
-            <AFormItem label="表名称" name="tableName">
-              <AInput
-                v-model:value="queryParams.tableName"
-                placeholder="请输入表名称"
-                allow-clear
-              />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="8" :span="24">
-            <AFormItem label="表描述" name="tableComment">
-              <AInput
-                v-model:value="queryParams.tableComment"
-                placeholder="请输入表描述"
-                allow-clear
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="创建时间">
-              <ARangePicker
-                v-model:value="queryParams.createTime"
-                value-format="YYYY-MM-DD HH:mm:ss"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="{ span: 8, offset: filterExpanded ? 16 : 0 }" :span="24">
-            <AFlex justify="end" align="center" :gap="16">
-              <AButton @click="onFilterReset">重置</AButton>
-              <AButton type="primary" @click="onFilter">查询</AButton>
-              <ATypographyLink @click="toggle()">
-                {{ filterExpanded ? '收起' : '展开' }}
-                <DownOutlined :class="{ 'rotate-180': filterExpanded }" />
-              </ATypographyLink>
-            </AFlex>
-          </ACol>
-        </ARow>
-      </AForm>
-    </ACard>
-
-    <ACard title="代码生成配置">
-      <template #extra>
-        <AFlex :gap="8">
-          <AButton
-            v-if="permission.has('infra:code-gen:create')"
-            type="primary"
-            :loading="pending"
-            @click="onImport()"
-          >
-            <template #icon>
-              <PlusOutlined />
-            </template>
-            导入
-          </AButton>
-          <ATooltip title="重新载入">
-            <AButton type="text" :loading="pending" @click="execute">
-              <template #icon>
-                <ReloadOutlined />
-              </template>
-            </AButton>
-          </ATooltip>
-        </AFlex>
-      </template>
-
-      <div class="overflow-x-auto">
-        <ATable
-          :columns="columns"
-          :data-source="data?.list"
-          :loading="pending"
-          :pagination="pagination"
-          @change="onChange"
-        >
-          <template #bodyCell="scope: TableScope<ConfigVO>">
-            <template v-if="scope?.column.key === 'dataSourceConfigId'">
-              {{ dataSources.find((e) => e.id === scope.text)?.name }}
-            </template>
-            <template v-if="scope?.column.key === 'createTime'">
-              {{ dayjs(scope.record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-            </template>
-            <template v-if="scope?.column.key === 'updateTime'">
-              {{ dayjs(scope.record.updateTime).format('YYYY-MM-DD HH:mm:ss') }}
-            </template>
-            <template v-if="scope?.column.key === 'actions'">
-              <AFlex :gap="16">
-                <ATypographyLink
-                  v-if="permission.has('infra:code-gen:update')"
-                  @click="onEdit(scope.record)"
-                >
-                  <EditOutlined />
-                  编辑
-                </ATypographyLink>
-                <ADropdown
-                  v-if="permission.hasOne('infra:code-gen:preview', 'infra:code-gen:download')"
-                >
-                  <ATypographyLink>
-                    <DownOutlined />
-                    更多
-                  </ATypographyLink>
-                  <template #overlay>
-                    <AMenu>
-                      <AMenuItem
-                        :disabled="!permission.has('infra:code-gen:preview')"
-                        @click="onPreview(scope.record)"
-                      >
-                        预览生成的代码
-                      </AMenuItem>
-                      <AMenuItem
-                        :disabled="!permission.has('infra:code-gen:download')"
-                        @click="onDownload(scope.record)"
-                      >
-                        生成并下载代码
-                      </AMenuItem>
-                      <AMenuItem @click="onSync(scope.record)">同步表结构</AMenuItem>
-                    </AMenu>
-                  </template>
-                </ADropdown>
-                <APopconfirm
-                  v-if="permission.has('infra:code-gen:delete')"
-                  title="该操作无法撤销，确定删除吗？"
-                  :overlay-style="{ width: '260px' }"
-                  @confirm="onDelete(scope.record)"
-                >
-                  <ATypographyLink type="danger">
-                    <DeleteOutlined />
-                    删除
-                  </ATypographyLink>
-                </APopconfirm>
-              </AFlex>
-            </template>
-          </template>
-        </ATable>
-      </div>
-    </ACard>
-
-    <!-- import form modal -->
-    <FormModal v-model:open="visible.import" :data-sources="dataSources" @success="execute" />
-
-    <!-- preview modal -->
-    <PreviewModal v-model:open="visible.preview" :id="entry?.id" />
-  </div>
-</template>
-
-<script lang="ts" setup>
+<script setup lang="ts">
+import cn from 'classnames'
 import dayjs from 'dayjs'
-import { permission } from '@/hooks/use-permission'
-import { type ConfigVO } from '@/api/infra/code-gen'
-import { getDataSourceList, type DataSourceVO } from '@/api/infra/data-source'
-import FormModal from './form.vue'
-import PreviewModal from './preview.vue'
 import { columns, useTable } from './use-table'
-import useActions from './use-actions'
-import { message, type FormInstance } from 'ant-design-vue'
+import Form from './form.vue'
+import PreviewModal from './preview.vue'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
+import { getDataSourceList } from '@/api/infra/data-source'
+import type { ConfigVO } from '@/api/infra/code-gen'
 
-const filterForm = ref<FormInstance>()
-const dataSources = ref<DataSourceVO[]>([])
+const { permission } = usePermission()
 
-const [filterExpanded, toggle] = useToggle(false)
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+const previewModalRef = useTemplateRef<InstanceType<typeof PreviewModal>>('previewModalRef')
 
-const { data, pending, execute, queryParams, onFilter, onChange, onFilterReset, pagination } =
-  useTable(filterForm)
+const {
+  query,
+  data,
+  pending,
+  execute,
+  pagination,
+  onPageChange,
+  onQueryChange,
+  onDelete,
+  onEdit,
+  onDownload,
+} = useTable(queryForm)
+const { data: dataSourceList } = useRequest(getDataSourceList, { immediate: true })
 
-const { entry, visible, onDelete, onDownload, onEdit, onImport, onPreview, onSync } =
-  useActions(execute)
+const expanded = ref(false)
 
-getDataSourceList().then((res) => {
-  dataSources.value = res
-})
+const onPreview = (id: number) => {
+  previewModalRef.value?.open(id)
+}
 
 defineOptions({ name: 'InfraCodeGen' })
 </script>
+
+<template>
+  <div class="view">
+    <TCard v-if="permission.has('infra:code-gen:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4 w-full"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
+      >
+        <TFormItem label="表名称" name="tableName" class="col">
+          <TInput v-model:value="query.tableName" placeholder="请输入表名称" clearable />
+        </TFormItem>
+        <TFormItem label="表描述" name="tableComment" class="col">
+          <TInput v-model:value="query.tableComment" placeholder="请输入表描述" clearable />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="创建时间" name="createTime" class="col">
+          <TDateRangePicker v-model:value="query.createTime" value-type="YYYY-MM-DD HH:mm:ss" />
+        </TFormItem>
+        <QueryActions v-model:expanded="expanded" :class="cn('col', { 'ml-2/3': expanded })" />
+      </TForm>
+    </TCard>
+
+    <TCard title="代码生成配置">
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TButton
+            v-if="permission.has('infra:code-gen:create')"
+            theme="primary"
+            :loading="pending"
+            @click="formRef?.open()"
+          >
+            <template #icon>
+              <Icon name="add" />
+            </template>
+            导入表
+          </TButton>
+
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" :loading="pending" @click="execute()">
+              <template #icon>
+                <Icon name="refresh" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </div>
+      </template>
+
+      <TTable
+        :data="data?.list"
+        row-key="id"
+        :columns="columns"
+        :pagination="pagination"
+        :loading="pending"
+        @page-change="onPageChange"
+      >
+        <template #dataSourceConfigId="{ row }: TableScope<ConfigVO>">
+          {{ dataSourceList?.find((item) => item.id === row.dataSourceConfigId)?.name }}
+        </template>
+        <template #createTime="{ row }: TableScope<ConfigVO>">
+          {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template #updateTime="{ row }: TableScope<ConfigVO>">
+          {{ dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template #actions="{ row }: TableScope<ConfigVO>">
+          <div class="flex items-center gap-2">
+            <TTooltip content="编辑">
+              <TButton
+                shape="square"
+                theme="primary"
+                variant="text"
+                :disabled="permission.hasNone('infra:code-gen:update')"
+                @click="onEdit(row.id)"
+              >
+                <template #icon>
+                  <Icon name="edit-2" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TDropdown>
+              <TButton shape="square" theme="primary" variant="text">
+                <template #icon>
+                  <Icon name="unfold-more" />
+                </template>
+              </TButton>
+              <TDropdownMenu>
+                <TDropdownItem
+                  :disabled="!permission.has('infra:code-gen:preview')"
+                  @click="onPreview(row.id!)"
+                  >生成代码预览</TDropdownItem
+                >
+                <TDropdownItem
+                  :disabled="!permission.has('infra:code-gen:download')"
+                  divider
+                  @click="onDownload(row.id!)"
+                  >生成并下载代码</TDropdownItem
+                >
+                <TDropdownItem divider>同步表结构</TDropdownItem>
+                <TDropdownItem theme="error" @click="onDelete(row.id!)">删除配置</TDropdownItem>
+              </TDropdownMenu>
+            </TDropdown>
+          </div>
+        </template>
+      </TTable>
+    </TCard>
+
+    <Form ref="formRef" :data-source-list="dataSourceList" @success="execute()" />
+    <PreviewModal ref="previewModalRef" />
+  </div>
+</template>

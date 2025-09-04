@@ -1,5 +1,5 @@
 import nProgress from 'nprogress'
-import { message } from 'ant-design-vue'
+import { MessagePlugin } from 'tdesign-vue-next'
 import { reloginHint } from '@/utils/request/service'
 import { getToken } from '@/utils/auth'
 import useUserStore from '@/stores/user'
@@ -22,7 +22,7 @@ router.beforeEach((to, from, next) => {
     } else if (guardWhiteList.includes(to.path)) {
       next()
     } else {
-      if (!userStore.isUserInfoSet) {
+      if (!userStore.isUserInfoReady) {
         reloginHint.show = true
         userStore
           .getUserInfo()
@@ -49,7 +49,7 @@ router.beforeEach((to, from, next) => {
           .catch((err) => {
             console.log(err)
             userStore.logout().then(() => {
-              message.error(err)
+              MessagePlugin.error(err)
               next({ path: '/' })
             })
           })

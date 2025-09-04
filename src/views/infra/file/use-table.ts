@@ -1,74 +1,69 @@
-import { ref, computed, type Ref } from 'vue'
 import useRequest from '@/hooks/use-request'
-import { getFileList, type ListQueryParams } from '@/api/infra/file'
-import type { FormInstance, TableProps } from 'ant-design-vue'
-import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
+import { getFileList, deleteFile, type ListQueryParams } from '@/api/infra/file'
+import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { title: '文件ID', dataIndex: 'id', width: 120 },
-  { title: '文件名', ellipsis: true, dataIndex: 'name' },
-  { title: '文件路径', ellipsis: true, dataIndex: 'path' },
-  { title: '文件类型', dataIndex: 'type', width: 120 },
-  { title: '预览', width: 160, key: 'preview' },
+  { title: '文件ID', colKey: 'id', width: 60, ellipsis: true },
+  { title: '文件名', colKey: 'name', width: 120, ellipsis: true },
+  { title: '文件路径', colKey: 'path', width: 120, ellipsis: true },
+  { title: '文件类型', colKey: 'type', width: 100, ellipsis: true },
+  { title: '预览', colKey: 'preview', width: 120 },
   {
     title: '创建时间',
-    width: 160,
-    dataIndex: 'createTime',
-    key: 'createTime',
+    width: 180,
+    colKey: 'createTime',
   },
-  { title: '操作', width: 90 },
+  { title: '操作', width: 80, colKey: 'actions' },
 ]
 
-export const useTable = (formRef: Ref<FormInstance | undefined>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const message = useMessage()
 
-  const { data, execute, pending } = useRequest(
-    () =>
-      getFileList({
-        ...queryParams.value,
-      }),
-    {
-      immediate: true,
-    },
-  )
+  const query = ref<ListQueryParams>({
+    pageNo: 1,
+    pageSize: 10,
+  })
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const { data, execute, pending } = useRequest(() => getFileList(query.value), {
+    immediate: true,
+  })
+
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
+
     execute()
   }
 
-  const onFilterReset = () => {
-    formRef.value?.resetFields()
-    queryParams.value.pageNo = 1
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
-
+  const onDelete = async (id: number) => {
+    pending.value = true
+    await deleteFile(id)
+    message.success('删除成功')
     execute()
   }
 
   return {
     data,
-    execute,
     pending,
-    queryParams,
-    onChange,
+    query,
     pagination,
-    onFilter,
-    onFilterReset,
+    onPageChange,
+    onQueryChange,
+    execute,
+    onDelete,
   }
 }

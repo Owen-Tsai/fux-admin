@@ -34,16 +34,7 @@ export type TreeQueryParams = {
   leaderUserId?: number
 }
 
-// 新增地区树节点类型
-export type RegionTreeNode = {
-  code: string
-  name: string
-  isLeaf?: boolean
-  children?: RegionTreeNode[]
-}
-
-const prefix = '/admin-api/system/dept'
-const regionPrefix = '/admin-api/system/area'
+const prefix = '/system/dept'
 
 // 部门接口
 export const getDeptTree = (params?: TreeQueryParams) => {

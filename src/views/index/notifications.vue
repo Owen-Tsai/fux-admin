@@ -1,52 +1,31 @@
 <template>
-  <ACard title="通知公告">
-    <template #extra>
-      <ATypographyLink @click="toNotificationList">查看全部</ATypographyLink>
+  <TCard title="通知公告">
+    <template #actions>
+      <TLink theme="primary">查看全部</TLink>
     </template>
-    <div>
-      <ASpin :spinning="pending">
-        <div class="min-h-20">
-          <RouterLink
-            v-for="item in data?.list"
-            :key="item.id"
-            :to="`/system/notice/${item.id}`"
-            class="item"
-          >
-            <DictTag :dict-object="systemNoticeType" :value="item.type!" />
-            <div class="truncate flex-grow-1">{{ item.title }}</div>
-          </RouterLink>
-        </div>
-      </ASpin>
-    </div>
-  </ACard>
+
+    <TLoading :loading="pending">
+      <div class="flex flex-col gap-2 min-h-140px">
+        <RouterLink
+          v-for="item in data?.list"
+          :key="item.id"
+          :to="`/system/notification/${item.id}`"
+          class="flex items-center gap-2 decoration-none text-inherit has-tag py-1 px-2 group"
+        >
+          <DictTag :dict-data="systemNoticeType" :value="item.type" />
+          <div class="text-truncate group-hover:text-[var(--td-brand-color)]">{{ item.title }}</div>
+        </RouterLink>
+      </div>
+    </TLoading>
+  </TCard>
 </template>
 
-<script lang="ts" setup>
-import { useRouter } from 'vue-router'
-import useDict from '@/hooks/use-dict'
-import useRequest from '@/hooks/use-request'
+<script setup lang="ts">
 import { getNotificationList } from '@/api/system/notification'
-
-const { push } = useRouter()
 
 const [systemNoticeType] = useDict('system_notice_type')
 
 const { data, pending } = useRequest(() => getNotificationList({ pageNo: 1, pageSize: 5 }), {
   immediate: true,
 })
-
-const toNotificationList = () => {
-  push('/system/notice')
-}
 </script>
-
-<style lang="scss" scoped>
-.item {
-  @apply flex items-center gap-1 mt-2 first:mt-0;
-  color: var(--color-text-secondary);
-
-  &:hover {
-    color: var(--color-text);
-  }
-}
-</style>

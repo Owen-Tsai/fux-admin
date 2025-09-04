@@ -1,165 +1,127 @@
+<script setup lang="ts">
+import dayjs from 'dayjs'
+import { columns, useTable } from './use-table'
+import Detail from './detail.vue'
+import { getSimpleChannelList } from '@/api/system/sms/channel'
+import type { LogVO } from '@/api/system/sms/log'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
+
+const { permission } = usePermission()
+const [receiveStatusOpts, sendStatusOpts, channelCodeOpts, templateTypeOpts] = useDict(
+  'system_sms_receive_status',
+  'system_sms_send_status',
+  'system_sms_channel_code',
+  'system_sms_template_type',
+)
+
+const expanded = ref(false)
+
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const detailRef = useTemplateRef<InstanceType<typeof Detail>>('detailRef')
+
+const { data: channelList } = useRequest(getSimpleChannelList, {
+  immediate: true,
+})
+
+const { query, data, pending, execute, pagination, onPageChange, onQueryChange } =
+  useTable(queryForm)
+
+defineOptions({ name: 'SystemSmsLog' })
+</script>
+
 <template>
   <div class="view">
-    <ACard v-if="permission.has('system:sms-log:query')" class="mb-4">
-      <AForm ref="filterFormRef" :model="queryParams" class="dense-form">
-        <ARow :gutter="[24, 16]">
-          <ACol :span="24" :lg="8">
-            <AFormItem label="手机号" name="mobile">
-              <AInput v-model:value="queryParams.mobile" placeholder="请输入接收手机号" />
-            </AFormItem>
-          </ACol>
-          <ACol :span="24" :lg="8">
-            <AFormItem label="模板编码" name="templateCode">
-              <AInput v-model:value="queryParams.templateCode" placeholder="请输入短信模板编码" />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :span="24" :lg="8">
-            <AFormItem label="短信渠道" name="channelId">
-              <ASelect
-                v-model:value="queryParams.channelId"
-                :options="channelList"
-                :field-names="{ label: 'signature', value: 'id' }"
-                placeholder="请选择短信渠道"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :span="24" :lg="8">
-            <AFormItem label="发送状态" name="sendStatus">
-              <ASelect
-                v-model:value="queryParams.sendStatus"
-                :options="systemSmsSendStatus"
-                placeholder="请选择发送状态"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :span="24" :lg="8">
-            <AFormItem label="发送时间" name="sendTime">
-              <ARangePicker v-model:value="queryParams.sendTime" value-format="YYYY-MM-DD" />
-            </AFormItem>
-          </ACol>
+    <TCard v-if="permission.has('system:sms-log:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4 w-full"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
+      >
+        <TFormItem label="手机号" name="mobile" class="col">
+          <TInput v-model:value="query.mobile" placeholder="请输入接收手机号" />
+        </TFormItem>
+        <TFormItem label="模板编码" name="templateCode" class="col">
+          <TInput v-model:value="query.templateCode" placeholder="请输入短信模板编码" />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="短信渠道" name="channelId" class="col">
+          <TSelect
+            v-model:value="query.channelId"
+            :options="channelList"
+            :keys="{ label: 'signature', value: 'id' }"
+            placeholder="请选择短信渠道"
+          />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="发送状态" name="sendStatus" class="col">
+          <TSelect
+            v-model:value="query.sendStatus"
+            :options="sendStatusOpts"
+            placeholder="请选择发送状态"
+          />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="发送时间" name="sendTime" class="col">
+          <TDateRangePicker v-model:value="query.sendTime" value-type="YYYY-MM-DD HH:mm:ss" />
+        </TFormItem>
+        <QueryActions v-model:expanded="expanded" class="col" />
+      </TForm>
+    </TCard>
 
-          <ACol :span="24" :lg="8">
-            <AFlex justify="end" align="center" :gap="16">
-              <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-              <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-              <ATypographyLink @click="toggle()">
-                {{ filterExpanded ? '收起' : '展开' }}
-                <DownOutlined :class="{ 'rotate-180': filterExpanded }" />
-              </ATypographyLink>
-            </AFlex>
-          </ACol>
-        </ARow>
-      </AForm>
-    </ACard>
-
-    <ACard title="短信渠道">
-      <template #extra>
-        <AFlex :gap="8">
-          <ATooltip v-if="permission.has('system:sms-log:export')" title="导出">
-            <AButton type="text" :loading="pending">
+    <TCard title="短信日志列表">
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" :loading="pending" @click="execute()">
               <template #icon>
-                <ExportOutlined />
+                <Icon name="refresh" />
               </template>
-            </AButton>
-          </ATooltip>
-          <ATooltip title="重新载入">
-            <AButton type="text" :loading="pending" @click="execute">
-              <template #icon>
-                <ReloadOutlined />
-              </template>
-            </AButton>
-          </ATooltip>
-        </AFlex>
+            </TButton>
+          </TTooltip>
+        </div>
       </template>
 
-      <ATable
+      <TTable
+        :data="data?.list"
+        row-key="id"
         :columns="columns"
-        :data-source="data?.list"
-        :loading="pending"
         :pagination="pagination"
-        :scroll="{ x: 1200 }"
-        :sticky="{ offsetHeader: 90 }"
-        @change="onChange"
+        :loading="pending"
+        @page-change="onPageChange"
       >
-        <template #bodyCell="scope: TableScope<LogVO>">
-          <template v-if="scope?.column.key === 'templateType'">
-            <DictTag :dict-object="systemSmsTemplateType" :value="scope.text" />
-          </template>
-          <template v-if="scope?.column.key === 'sendStatus'">
-            <DictTag :dict-object="systemSmsSendStatus" :value="scope.text" />
-          </template>
-          <template v-if="scope?.column.key === 'receiveStatus'">
-            <DictTag :dict-object="systemSmsReceiveStatus" :value="scope.text" />
-          </template>
-          <template v-if="scope?.column.key === 'channelCode'">
-            <div>
-              {{ channelList.find((e) => e.id === scope.record.channelId)?.signature }}
-            </div>
-            <div>
-              <DictTag :dict-object="systemSmsChannelCode" :value="scope.text" />
-            </div>
-          </template>
-          <template v-if="scope?.column.key === 'sendTime'">
-            {{ formatDate(scope.text) }}
-          </template>
-          <template v-if="scope?.column.key === 'actions'">
-            <AFlex :gap="16">
-              <ATypographyLink @click="showDialog(scope.record)">
-                <UnorderedListOutlined />
-                详情
-              </ATypographyLink>
-            </AFlex>
-          </template>
+        <template #templateType="{ row }: TableScope<LogVO>">
+          <DictTag :dict-data="templateTypeOpts" :value="row.templateType" />
         </template>
-      </ATable>
-    </ACard>
+        <template #sendStatus="{ row }: TableScope<LogVO>">
+          <DictTag :dict-data="sendStatusOpts" :value="row.sendStatus" />
+        </template>
+        <template #receiveStatus="{ row }: TableScope<LogVO>">
+          <DictTag :dict-data="receiveStatusOpts" :value="row.receiveStatus" />
+        </template>
+        <template #channelCode="{ row }: TableScope<LogVO>">
+          <div>
+            {{ channelList?.find((e) => e.id === row.channelId)?.signature }}
+          </div>
+          <div>
+            <DictTag :dict-data="channelCodeOpts" :value="row.channelCode" />
+          </div>
+        </template>
+        <template #sendTime="{ row }: TableScope<LogVO>">
+          {{ dayjs(row.sendTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template #actions="{ row }: TableScope<LogVO>">
+          <TTooltip content="查看详情">
+            <TButton shape="square" theme="primary" variant="text" @click="detailRef?.open(row)">
+              <template #icon>
+                <Icon name="browse" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </template>
+      </TTable>
+    </TCard>
 
-    <ADrawer v-model:open="visible" width="50%" title="日志详情">
-      <DetailPanel :entry="entry!" />
-    </ADrawer>
+    <Detail ref="detailRef" />
   </div>
 </template>
-
-<script lang="ts" setup>
-import dayjs from 'dayjs'
-import { permission } from '@/hooks/use-permission'
-import useDict from '@/hooks/use-dict'
-import { getSimpleChannelList, type ChannelListLiteVO } from '@/api/system/sms/channel'
-import { type LogVO } from '@/api/system/sms/log'
-import { useToggle } from '@vueuse/core'
-import { useTable, columns } from './use-table'
-
-const filterFormRef = ref()
-
-const [filterExpanded, toggle] = useToggle()
-
-const [systemSmsReceiveStatus, systemSmsSendStatus, systemSmsChannelCode, systemSmsTemplateType] =
-  useDict(
-    'system_sms_receive_status',
-    'system_sms_send_status',
-    'system_sms_channel_code',
-    'system_sms_template_type',
-  )
-
-const visible = ref(false)
-// current entry for editing
-const entry = ref()
-
-const channelList = ref<ChannelListLiteVO>([])
-
-const showDialog = (record?: LogVO) => {
-  entry.value = record
-  visible.value = true
-}
-
-const formatDate = (date: number) => {
-  return dayjs(date).format('YYYY-MM-DD HH:mm:ss')
-}
-
-const { data, execute, onChange, onFilter, onFilterReset, pagination, pending, queryParams } =
-  useTable(filterFormRef)
-
-getSimpleChannelList().then((res) => {
-  channelList.value = res
-})
-</script>

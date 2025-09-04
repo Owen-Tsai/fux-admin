@@ -1,160 +1,130 @@
 <template>
-  <ACard :title="title">
-    <template #extra>
-      <div class="flex gap-4">
-        <AButton
-          :type="mode === 'edit' ? 'primary' : undefined"
-          :disabled="id === undefined"
-          :loading="loading"
-          @click="switchMode"
-        >
-          <template v-if="mode === 'edit'" #icon><PlusOutlined /></template>
-          {{ mode === 'edit' ? '新增下级' : '取消新增' }}
-        </AButton>
-        <APopconfirm
-          v-show="mode === 'edit'"
-          :title="`确定要删除${formData.name}吗？该操作无法恢复`"
-          placement="bottomRight"
-          @confirm="onDelete"
-        >
-          <AButton :disabled="id === undefined" danger :loading="loading">删除本级</AButton>
-        </APopconfirm>
-      </div>
-    </template>
-    <div>
-      <ASpin v-if="id" :spinning="loading">
-        <AForm
-          ref="form"
-          :model="formData"
-          :label-col="{ style: { width: '120px' } }"
-          :rules="rules"
-        >
-          <ARow>
-            <ACol :span="24" :lg="12">
-              <AFormItem label="上级区划编号" name="pid">
-                {{ formData.pid }}
-              </AFormItem>
-            </ACol>
-            <ACol :span="24" :lg="12">
-              <AFormItem label="上级区划名称" name="pname">
-                {{ formData.pname }}
-              </AFormItem>
-            </ACol>
-          </ARow>
-          <ARow>
-            <ACol :span="24" :lg="12">
-              <AFormItem label="行政区划代码" name="code">
-                <AInput v-model:value="formData.code" />
-              </AFormItem>
-            </ACol>
-            <ACol :span="24" :lg="12">
-              <AFormItem label="行政区划名称" name="name">
-                <AInput v-model:value="formData.name" />
-              </AFormItem>
-            </ACol>
-          </ARow>
+  <TCard :title="formTitle" class="col-start-2 col-end-4">
+    <TEmpty v-show="activeNodes.length <= 0" />
 
-          <div class="flex items-center justify-end">
-            <AButton type="primary" html-type="submit" @click="submit">
-              {{ mode === 'add' ? '新增' : '保存' }}
-            </AButton>
-          </div>
-        </AForm>
-      </ASpin>
-      <AEmpty v-else description="选择一个行政区域进行编辑" />
-    </div>
-  </ACard>
+    <TForm
+      v-show="activeNodes.length > 0"
+      ref="formRef"
+      :data="formData"
+      :rules="rules"
+      :label-width="140"
+    >
+      <TLoading :loading="loading">
+        <TRow>
+          <TCol :span="6">
+            <TFormItem label="上级区划名称" name="pname">
+              {{ formData.pname || '无' }}
+            </TFormItem>
+          </TCol>
+          <TCol :span="6">
+            <TFormItem label="上级区划 ID" name="pid">
+              {{ formData.pid || '无' }}
+            </TFormItem>
+          </TCol>
+        </TRow>
+        <TFormItem label="行政区划名称" name="name">
+          <TInput v-model:value="formData.name" placeholder="如：济南市" />
+        </TFormItem>
+        <TFormItem label="区域编码" name="code">
+          <TInput v-model:value="formData.code" placeholder="如：370100" />
+        </TFormItem>
+        <TFormItem label="排序" name="sort">
+          <TInputNumber v-model:value="formData.sort" />
+        </TFormItem>
+        <div class="flex items-center justify-end gap-2">
+          <TButton v-if="mode === 'add'" tyoe="button" theme="default" @click="cancel"
+            >取消新增</TButton
+          >
+          <TButton type="submit" theme="primary" @click="submit">提交</TButton>
+        </div>
+      </TLoading>
+    </TForm>
+  </TCard>
 </template>
 
 <script setup lang="ts">
-import { addArea, updateArea, getAreaInfo, deleteArea, type AreaVO } from '@/api/system/area'
-import { message, type FormProps, type FormInstance } from 'ant-design-vue'
+import { addArea, updateArea, getAreaDetail, type AreaVO } from '@/api/system/area'
+import type { FormProps, FormInstanceFunctions, TreeProps, TreeNodeModel } from 'tdesign-vue-next'
 
-const rules: FormProps['rules'] = {
-  name: [{ required: true, message: '请填写行政区划名称' }],
-}
+const activeNodes = defineModel<number[]>('activeNodes', { default: [] })
 
-const { id } = defineProps<{
-  id?: string
-}>()
+const emit = defineEmits(['success'])
 
-const emit = defineEmits(['success', 'update:id'])
-
-const loading = ref(false)
-const formRef = useTemplateRef<FormInstance>('form')
 const mode = ref<'add' | 'edit'>('edit')
 const toggle = useToggle(mode, {
   falsyValue: 'add',
   truthyValue: 'edit',
 })
-
-const title = computed(() =>
-  mode.value === 'add' ? `在${formData.value.pname}下新增行政区划` : '编辑行政区划',
-)
-
 const formData = ref<AreaVO>({})
+const loading = ref(false)
+
+const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
+
+const message = useMessage()
+
+const rules: FormProps['rules'] = {
+  name: [{ required: true, message: '请输入行政区划名称' }],
+}
+
+const formTitle = computed(() => {
+  if (!activeNodes.value || activeNodes.value.length <= 0) {
+    return '编辑行政区划'
+  }
+  return mode.value === 'add'
+    ? `在${formData.value?.pname}下新增行政区划`
+    : `${formData.value?.name}`
+})
+
+const onActive: TreeProps['onActive'] = async (value) => {
+  toggle('edit')
+  if (value.length <= 0) {
+    formData.value = {}
+    return
+  }
+  loading.value = true
+  const data = await getAreaDetail(value[0] as string)
+  formData.value = data
+  loading.value = false
+}
+
+const onAdd = (node: TreeNodeModel<AreaVO>) => {
+  toggle('add')
+  formData.value = {
+    pid: node.data.id,
+    pname: node.data.name,
+    name: '',
+    code: '',
+    sort: 0,
+    id: '',
+  }
+}
 
 const submit = async () => {
   loading.value = true
   try {
-    await formRef.value?.validate()
-    if (mode.value === 'add') {
-      const id = await addArea(formData.value)
-      emit('update:id', id)
-      mode.value = 'edit'
-    } else {
-      await updateArea(formData.value)
+    const res = await formRef.value?.validate()
+    if (res === true) {
+      if (mode.value === 'add') {
+        await addArea(formData.value)
+      } else {
+        await updateArea(formData.value)
+      }
+      emit('success')
+      message.success('保存成功')
     }
-    emit('success')
-    message.success('保存成功')
-  } catch (e) {
-    console.log(e)
+  } catch (error) {
+    console.log(error)
   } finally {
     loading.value = false
   }
 }
 
-const loadNodeData = (id: string) => {
-  loading.value = true
-  getAreaInfo(id).then((res) => {
-    formData.value = res
-    loading.value = false
-  })
+const cancel = () => {
+  activeNodes.value = []
 }
 
-const switchMode = () => {
-  toggle()
-  formRef.value?.clearValidate()
-  if (mode.value === 'add') {
-    formData.value.pname = formData.value.name
-    formData.value.pid = formData.value.id
-    formData.value.code = ''
-    formData.value.name = ''
-    formData.value.sort = 1
-  } else {
-    loadNodeData(id!)
-  }
-}
-
-const onDelete = async () => {
-  loading.value = true
-  try {
-    await deleteArea(id!)
-    message.success('删除成功')
-    emit('success')
-  } catch (e) {
-  } finally {
-    emit('update:id', undefined)
-    loading.value = false
-  }
-}
-
-watch(
-  () => id,
-  (val) => {
-    if (val) {
-      loadNodeData(val)
-    }
-  },
-)
+defineExpose({
+  onAdd,
+  onActive,
+})
 </script>

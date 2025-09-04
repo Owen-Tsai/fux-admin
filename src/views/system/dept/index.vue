@@ -1,130 +1,133 @@
-<template>
-  <div class="view">
-    <ARow :gutter="24">
-      <ACol :span="24">
-        <ACard v-if="permission.has('system:dept:query')" class="mb-4">
-          <AForm ref="filterFormRef" :model="queryParams" class="dense-form">
-            <ARow :gutter="24">
-              <ACol :span="24" :lg="8">
-                <AFormItem label="部门名称" name="name">
-                  <AInput v-model:value="queryParams.name" placeholder="请输入部门名称" />
-                </AFormItem>
-              </ACol>
-              <ACol :span="24" :lg="8">
-                <AFormItem label="部门状态" name="status">
-                  <ASelect
-                    v-model:value="queryParams.status"
-                    :options="commonStatus"
-                    placeholder="请选择部门状态"
-                  />
-                </AFormItem>
-              </ACol>
-              <ACol :span="24" :lg="8">
-                <AFlex justify="end" align="center" :gap="16">
-                  <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-                  <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-                </AFlex>
-              </ACol>
-            </ARow>
-          </AForm>
-        </ACard>
-      </ACol>
-
-      <ACol :span="24">
-        <ACard title="部门管理" class="mt-4 flex-1">
-          <template #extra>
-            <AFlex :gap="8">
-              <AButton
-                v-if="permission.has('system:dept:create')"
-                type="primary"
-                :loading="pending"
-                @click="modal?.open()"
-              >
-                <template #icon>
-                  <PlusOutlined />
-                </template>
-                新增
-              </AButton>
-              <ATooltip title="重新载入">
-                <AButton type="text" :loading="pending" @click="execute">
-                  <template #icon>
-                    <ReloadOutlined />
-                  </template>
-                </AButton>
-              </ATooltip>
-            </AFlex>
-          </template>
-
-          <ATable
-            :data-source="data"
-            :pagination="false"
-            :columns="columns"
-            row-key="id"
-            :loading="pending"
-            default-expand-all-rows
-            :key="`data-${pending}`"
-          >
-            <template #bodyCell="scope: TableScope<DeptVO>">
-              <template v-if="scope?.column.key === 'leaderUserId'">
-                {{ userList?.find((e) => e.id === scope.record.leaderUserId)?.nickname }}
-              </template>
-              <template v-if="scope?.column.key === 'status'">
-                <DictTag :value="scope.text" :dict-object="commonStatus" />
-              </template>
-              <template v-if="scope?.column.key === 'createTime'">
-                {{ dayjs(scope.record.createTime).format('YYYY-MM-DD') }}
-              </template>
-              <template v-if="scope?.column.key === 'actions'">
-                <AFlex :gap="16">
-                  <ATypographyLink
-                    v-if="permission.has('system:dept:update')"
-                    @click="modal?.open(scope.record.id)"
-                  >
-                    <EditOutlined />
-                    修改
-                  </ATypographyLink>
-                  <APopconfirm
-                    v-if="permission.has('system:dept:delete')"
-                    title="此操作不可撤销，确定要删除吗？"
-                    trigger="click"
-                    :overlay-style="{ maxWidth: '280px' }"
-                    @confirm="onDelete(scope.record)"
-                  >
-                    <ATypographyLink type="danger">
-                      <DeleteOutlined />
-                      删除
-                    </ATypographyLink>
-                  </APopconfirm>
-                </AFlex>
-              </template>
-            </template>
-          </ATable>
-        </ACard>
-      </ACol>
-    </ARow>
-
-    <FormModal ref="modal" :tree-data="data" :user-data="userList" @success="execute" />
-  </div>
-</template>
-
-<script lang="ts" setup>
+<script setup lang="ts">
 import dayjs from 'dayjs'
 import useDict from '@/hooks/use-dict'
 import { useTable, columns } from './use-table'
-import useActions from './use-actions'
-import FormModal from './form.vue'
+import Form from './form.vue'
 import { type DeptVO } from '@/api/system/dept'
-import { permission } from '@/hooks/use-permission'
+import type { FormInstanceFunctions, EnhancedTableInstanceFunctions } from 'tdesign-vue-next'
 
-const filterFormRef = ref()
-const modal = useTemplateRef('modal')
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+const tableRef = useTemplateRef<EnhancedTableInstanceFunctions>('tableRef')
 
-const [commonStatus] = useDict('common_status')
+const [statusOpts] = useDict('common_status')
 
-const { data, execute, pending, queryParams, userList, onFilter, onFilterReset } =
-  useTable(filterFormRef)
+const { permission } = usePermission()
+const { query, onQueryChange, data, execute, onDelete, userList, pending } = useTable(queryForm)
 
-const { onDelete } = useActions(execute)
+const [tableExpanded, toggle] = useToggle(true)
+
+const toggleTableExpanded = () => {
+  toggle()
+  if (tableExpanded.value) {
+    tableRef.value?.expandAll()
+  } else {
+    tableRef.value?.foldAll()
+  }
+}
 
 defineOptions({ name: 'SystemDept' })
 </script>
+
+<template>
+  <div class="view">
+    <TCard v-if="permission.has('system:dept:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
+      >
+        <TFormItem label="部门名称" name="name" class="col">
+          <TInput v-model:value="query.name" placeholder="请输入部门名称" />
+        </TFormItem>
+        <TFormItem label="部门状态" name="status" class="col">
+          <TSelect v-model:value="query.status" :options="statusOpts" clearable />
+        </TFormItem>
+        <QueryActions :expanded="null" class="col" />
+      </TForm>
+    </TCard>
+
+    <TCard title="部门列表" bordered>
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TButton
+            v-if="permission.has('system:dept:create')"
+            theme="primary"
+            @click="formRef?.open()"
+          >
+            <template #icon>
+              <Icon name="add" />
+            </template>
+            新增
+          </TButton>
+
+          <TTooltip content="全部展开/折叠">
+            <TButton shape="square" variant="text" @click="toggleTableExpanded()">
+              <template #icon>
+                <Icon name="unfold-less" />
+              </template>
+            </TButton>
+          </TTooltip>
+
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" @click="execute()">
+              <template #icon>
+                <Icon name="refresh" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </div>
+      </template>
+
+      <TEnhancedTable
+        ref="tableRef"
+        :data="data"
+        :columns="columns"
+        row-key="id"
+        :tree="{ defaultExpandAll: true }"
+        :loading="pending"
+        :key="pending + ''"
+      >
+        <template #leaderUserId="{ row }: TableScope<DeptVO>">
+          {{ userList?.find((e) => e.id === row.leaderUserId)?.nickname }}
+        </template>
+        <template #status="{ row }">
+          <DictTag :dict-data="statusOpts" :value="row.status" />
+        </template>
+        <template #createTime="{ row }: TableScope<DeptVO>">
+          {{ dayjs(row.createTime).format('YYYY-MM-DD') }}
+        </template>
+        <template #actions="{ row }: TableScope<DeptVO>">
+          <div class="flex gap-2">
+            <TTooltip content="编辑">
+              <TButton shape="square" theme="primary" variant="text" @click="formRef?.open(row.id)">
+                <template #icon>
+                  <Icon name="edit-2" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TTooltip content="删除">
+              <TPopconfirm
+                content="确定删除吗？该操作无法撤销"
+                theme="danger"
+                @confirm="onDelete(row.id!)"
+              >
+                <TButton shape="square" theme="danger" variant="text">
+                  <template #icon>
+                    <Icon name="delete" />
+                  </template>
+                </TButton>
+              </TPopconfirm>
+            </TTooltip>
+          </div>
+        </template>
+      </TEnhancedTable>
+    </TCard>
+
+    <Form ref="formRef" :tree-data="data" :user-data="userList" @success="execute()" />
+  </div>
+</template>

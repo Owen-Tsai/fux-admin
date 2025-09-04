@@ -1,177 +1,162 @@
-<template>
-  <div class="view">
-    <ACard v-if="permission.has('system:sms-template:query')" class="mb-4">
-      <AForm ref="filterFormRef" :model="queryParams" class="dense-form">
-        <ARow :gutter="[24, 16]">
-          <ACol :span="24" :lg="8">
-            <AFormItem label="模板名称" name="name">
-              <AInput v-model:value="queryParams.name" placeholder="请输入短信模板名称" />
-            </AFormItem>
-          </ACol>
-          <ACol :span="24" :lg="8">
-            <AFormItem label="模板编码" name="code">
-              <AInput v-model:value="queryParams.code" placeholder="请输入短信模板编码" />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :span="24" :lg="8">
-            <AFormItem label="短信类型" name="type">
-              <ASelect
-                v-model:value="queryParams.type"
-                :options="systemSmsTemplateType"
-                placeholder="请选择短信类型"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :span="24" :lg="8">
-            <AFormItem label="短信渠道" name="channelId">
-              <ASelect
-                v-model:value="queryParams.channelId"
-                :options="channelList"
-                :field-names="{ label: 'signature', value: 'id' }"
-                placeholder="请选择启用状态"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :span="24" :lg="8">
-            <AFormItem label="启用状态" name="status">
-              <ASelect
-                v-model:value="queryParams.status"
-                :options="commonStatus"
-                placeholder="请选择启用状态"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol :span="24" :lg="8">
-            <AFlex justify="end" align="center" :gap="16">
-              <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-              <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-              <ATypographyLink @click="toggle()">
-                {{ filterExpanded ? '收起' : '展开' }}
-                <DownOutlined :class="{ 'rotate-180': filterExpanded }" />
-              </ATypographyLink>
-            </AFlex>
-          </ACol>
-        </ARow>
-      </AForm>
-    </ACard>
-
-    <ACard title="短信模板">
-      <template #extra>
-        <AFlex :gap="8">
-          <AButton
-            v-if="permission.has('system:sms-template:create')"
-            type="primary"
-            :loading="pending"
-            @click="onEdit()"
-          >
-            <template #icon>
-              <PlusOutlined />
-            </template>
-            新增
-          </AButton>
-          <ATooltip title="重新载入">
-            <AButton type="text" :loading="pending" @click="execute">
-              <template #icon>
-                <ReloadOutlined />
-              </template>
-            </AButton>
-          </ATooltip>
-        </AFlex>
-      </template>
-
-      <ATable
-        :columns="columns"
-        :data-source="data?.list"
-        :loading="pending"
-        :pagination="pagination"
-        :scroll="{ x: 1200 }"
-        :sticky="{ offsetHeader: 90 }"
-        @change="onChange"
-      >
-        <template #bodyCell="scope: TableScope<TemplateVO>">
-          <template v-if="scope?.column.key === 'type'">
-            <DictTag :dict-object="systemSmsTemplateType" :value="scope.text" />
-          </template>
-          <template v-if="scope?.column.key === 'status'">
-            <DictTag :dict-object="commonStatus" :value="scope.text" />
-          </template>
-          <template v-if="scope?.column.key === 'channelCode'">
-            <div>
-              {{ channelList.find((e) => e.id === scope.record.channelId)?.signature }}
-            </div>
-            <div>
-              <DictTag :dict-object="systemSmsChannelCode" :value="scope.text" />
-            </div>
-          </template>
-          <template v-if="scope?.column.key === 'createTime'">
-            {{ dayjs(scope.text).format('YYYY-MM-DD') }}
-          </template>
-          <template v-if="scope?.column.key === 'actions'">
-            <AFlex :gap="16">
-              <ATypographyLink
-                v-if="permission.has('system:sms-template:update')"
-                @click="onEdit(scope.record)"
-              >
-                <EditOutlined />
-                修改
-              </ATypographyLink>
-              <APopconfirm
-                v-if="permission.has('system:sms-template:delete')"
-                title="此操作不可撤销，确定要删除吗？"
-                trigger="click"
-                :overlay-style="{ maxWidth: '280px' }"
-                @confirm="onDelete(scope.record)"
-              >
-                <ATypographyLink type="danger">
-                  <DeleteOutlined />
-                  删除
-                </ATypographyLink>
-              </APopconfirm>
-            </AFlex>
-          </template>
-        </template>
-      </ATable>
-    </ACard>
-
-    <FormModal
-      v-if="visible"
-      :record="entry"
-      :channel-data="channelList"
-      @success="execute"
-      @close="visible = false"
-    />
-  </div>
-</template>
-
-<script lang="ts" setup>
+<script setup lang="ts">
 import dayjs from 'dayjs'
-import { permission } from '@/hooks/use-permission'
-import useDict from '@/hooks/use-dict'
-import { getSimpleChannelList, type ChannelListLiteVO } from '@/api/system/sms/channel'
-import { useToggle } from '@vueuse/core'
-import { useTable, columns } from './use-table'
-import FormModal from './form.vue'
-import useActions from './use-actions'
-import type { TemplateVO } from '@/api/system/sms/template'
+import cn from 'classnames'
+import { columns, useTable } from './use-table'
+import Form from './form.vue'
+import { getSimpleChannelList } from '@/api/system/sms/channel'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
-const filterFormRef = ref()
-
-const [filterExpanded, toggle] = useToggle()
-
-const [commonStatus, systemSmsChannelCode, systemSmsTemplateType] = useDict(
+const { permission } = usePermission()
+const [statusOpts, smsTypeOpts, smsChannelOpts] = useDict(
   'common_status',
-  'system_sms_channel_code',
   'system_sms_template_type',
+  'system_sms_channel_code',
 )
 
-const channelList = ref<ChannelListLiteVO>([])
+const expanded = ref(false)
 
-const { data, execute, onChange, onFilter, onFilterReset, pagination, pending, queryParams } =
-  useTable(filterFormRef)
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
 
-const { entry, visible, onDelete, onEdit } = useActions(execute)
-
-getSimpleChannelList().then((res) => {
-  channelList.value = res
+const { data: channelList } = useRequest(getSimpleChannelList, {
+  immediate: true,
 })
+
+const { query, data, pending, execute, pagination, onPageChange, onQueryChange, onDelete } =
+  useTable(queryForm)
+
+defineOptions({ name: 'SystemSmsTemplate' })
 </script>
+
+<template>
+  <div class="view">
+    <TCard v-if="permission.has('system:sms-template:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4 w-full"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
+      >
+        <TFormItem label="模板名称" name="name" class="col">
+          <TInput v-model:value="query.name" placeholder="请输入模板名称" clearable />
+        </TFormItem>
+        <TFormItem label="模板编码" name="code" class="col">
+          <TInput v-model:value="query.code" placeholder="请输入模板编码" clearable />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="模板类型" name="type" class="col">
+          <TSelect
+            v-model:value="query.type"
+            :options="smsTypeOpts"
+            placeholder="请选择短信模板类型"
+          />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="短信渠道" name="channelId" class="col">
+          <TSelect
+            v-model:value="query.channelId"
+            :options="channelList"
+            :keys="{ label: 'signature', value: 'id' }"
+            placeholder="请选择短信渠道"
+          />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="启用状态" name="status" class="col">
+          <TSelect
+            v-model:value="query.status"
+            :options="statusOpts"
+            placeholder="请选择启用状态"
+          />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="创建时间" name="createTime" class="col">
+          <TDateRangePicker v-model:value="query.createTime" value-format="YYYY-MM-DD HH:mm:ss" />
+        </TFormItem>
+        <QueryActions v-model:expanded="expanded" :class="cn('col', { 'ml-2/3': expanded })" />
+      </TForm>
+    </TCard>
+
+    <TCard title="短信模板列表">
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TButton
+            v-if="permission.has('system:sms-channel:create')"
+            theme="primary"
+            :loading="pending"
+            @click="formRef?.open()"
+          >
+            <template #icon>
+              <Icon name="add" />
+            </template>
+            新增
+          </TButton>
+
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" :loading="pending" @click="execute()">
+              <template #icon>
+                <Icon name="refresh" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </div>
+      </template>
+
+      <TTable
+        :data="data?.list"
+        row-key="id"
+        :columns="columns"
+        :pagination="pagination"
+        :loading="pending"
+        @page-change="onPageChange"
+      >
+        <template #status="{ row }">
+          <DictTag :dict-data="statusOpts" :value="row.status" />
+        </template>
+        <template #type="{ row }">
+          <DictTag :dict-data="smsTypeOpts" :value="row.type" />
+        </template>
+        <template #channelCode="{ row }">
+          <DictTag :dict-data="smsChannelOpts" :value="row.channelCode" />
+        </template>
+        <template #createTime="{ row }">
+          {{ dayjs(row.createTime).format('YYYY-MM-DD') }}
+        </template>
+        <template #actions="{ row }">
+          <div class="flex items-center gap-2">
+            <TTooltip content="编辑">
+              <TButton
+                shape="square"
+                theme="primary"
+                variant="text"
+                :disabled="permission.hasNone('system:sms-channel:update')"
+                @click="formRef?.open(row.id)"
+              >
+                <template #icon>
+                  <Icon name="edit-2" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TTooltip content="删除">
+              <TPopconfirm
+                content="确定删除吗？该操作无法撤销"
+                theme="danger"
+                @confirm="onDelete(row.id!)"
+              >
+                <TButton
+                  shape="square"
+                  theme="danger"
+                  variant="text"
+                  :disabled="permission.hasNone('system:sms-channel:delete')"
+                >
+                  <template #icon>
+                    <Icon name="delete" />
+                  </template>
+                </TButton>
+              </TPopconfirm>
+            </TTooltip>
+          </div>
+        </template>
+      </TTable>
+    </TCard>
+    <Form ref="formRef" :channel-list="channelList" @success="execute()" />
+  </div>
+</template>

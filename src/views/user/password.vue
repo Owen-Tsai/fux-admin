@@ -1,40 +1,21 @@
-<template>
-  <AForm
-    :model="formData"
-    :label-col="{ style: { width: '100px' } }"
-    :rules="rules"
-    @submit="submit"
-  >
-    <ASpin :spinning="loading">
-      <AFormItem label="旧密码" name="oldPassword">
-        <AInputPassword v-model:value="formData.oldPassword" />
-      </AFormItem>
-      <AFormItem label="新密码" name="newPassword">
-        <AInputPassword v-model:value="formData.newPassword" />
-      </AFormItem>
-      <AFormItem label="确认新密码" name="newPasswordConfirm">
-        <AInputPassword v-model:value="formData.newPasswordConfirm" />
-      </AFormItem>
-
-      <div class="ml-100px">
-        <AButton type="primary" html-type="submit">保存</AButton>
-      </div>
-    </ASpin>
-  </AForm>
-</template>
-
-<script lang="ts" setup>
-import { ref } from 'vue'
-import { message, type FormProps } from 'ant-design-vue'
-import useUserStore from '@/stores/user'
+<script setup lang="ts">
 import { updatePassword } from '@/api/system/user/profile'
+import useUserStore from '@/stores/user'
+import type { FormProps, FormInstanceFunctions, CustomValidator } from 'tdesign-vue-next'
 
-const passValidator = async (_rule: any, value: string) => {
-  if (value !== formData.value.newPassword) {
-    return Promise.reject('两次输入的密码不一致')
-  } else {
-    return Promise.resolve()
+const message = useMessage()
+const { logout } = useUserStore()
+
+const passValidator: CustomValidator = (val) => {
+  if (val !== data.value.newPassword) {
+    return {
+      result: false,
+      message: '两次输入密码不一致',
+      type: 'error',
+    }
   }
+
+  return { result: true, message: '' }
 }
 
 const rules: FormProps['rules'] = {
@@ -46,27 +27,51 @@ const rules: FormProps['rules'] = {
   ],
 }
 
+const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
 const loading = ref(false)
-const formData = ref({
+
+const data = ref({
   oldPassword: '',
   newPassword: '',
   newPasswordConfirm: '',
 })
 
 const submit = async () => {
+  loading.value = false
   try {
-    await updatePassword(formData.value)
-    message.success('保存成功，即将重新登录', 3000)
+    const result = await formRef.value?.validate()
+    if (result === true) {
+      await updatePassword({
+        oldPassword: data.value.oldPassword,
+        newPassword: data.value.newPassword,
+      })
+      message.success('修改成功，即将重新登录', 3000)
 
-    setTimeout(() => {
-      useUserStore()
-        .logout()
-        .then(() => {
+      setTimeout(() => {
+        logout().then(() => {
           window.location.href = '/login'
         })
-    }, 3000)
+      }, 3000)
+    }
   } finally {
     loading.value = false
   }
 }
 </script>
+
+<template>
+  <TForm ref="formRef" :data="data" :rules="rules" @submit="submit">
+    <TFormItem label="旧密码" name="oldPassword">
+      <TInput v-model:value="data.oldPassword" type="password" />
+    </TFormItem>
+    <TFormItem label="新密码" name="newPassword">
+      <TInput v-model:value="data.newPassword" type="password" />
+    </TFormItem>
+    <TFormItem label="确认新密码" name="newPasswordConfirm">
+      <TInput v-model:value="data.newPasswordConfirm" type="password" />
+    </TFormItem>
+    <TFormItem>
+      <TButton theme="primary" :loading="loading" type="submit">保存</TButton>
+    </TFormItem>
+  </TForm>
+</template>

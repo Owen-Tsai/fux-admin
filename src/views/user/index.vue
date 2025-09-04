@@ -1,134 +1,120 @@
 <template>
-  <div class="view">
-    <ARow :gutter="24">
-      <ACol :span="24" :lg="7">
-        <ACard>
-          <template v-if="pending">
-            <div class="flex flex-col items-center justify-center gap-4">
-              <ASkeletonAvatar active :size="80" />
-              <ASkeleton active />
-            </div>
-          </template>
-          <template v-else>
-            <div class="flex flex-col items-center justify-center gap-4">
-              <div class="relative">
-                <AAvatar :src="data?.avatar" :size="80" />
-                <ATooltip placement="right" title="更换头像">
-                  <AButton
-                    shape="circle"
-                    size="small"
-                    type="primary"
-                    class="absolute bottom-0 right-0"
-                    @click="chooseAvatar"
+  <div class="view flex flex-col">
+    <div class="flex flex-1 gap-4">
+      <div class="min-w-0 w-1/4">
+        <TCard>
+          <div class="flex-center">
+            <div class="relative">
+              <TAvatar :image="data?.avatar" size="80px" />
+              <div class="absolute -bottom-1 -right-1 z-2">
+                <TTooltip content="更换头像" placement="right">
+                  <FileUpload
+                    v-model:value="src"
+                    accept="image/*"
+                    theme="custom"
+                    auto-upload
+                    :request-fn="uploadAvatar"
+                    @success="onAvatarUploaded()"
                   >
-                    <template #icon>
-                      <CameraOutlined />
-                    </template>
-                  </AButton>
-                </ATooltip>
-              </div>
-              <div class="text-lg">{{ data?.nickname }}</div>
-            </div>
-            <div class="sub-info mt-6">
-              <div>
-                <ApartmentOutlined />
-                <span>部门：{{ data?.dept?.name || '暂无部门' }}</span>
-              </div>
-              <div>
-                <MobileOutlined />
-                <span>手机：{{ data?.mobile || '未绑定手机号' }}</span>
-              </div>
-              <div>
-                <MailOutlined />
-                <span>邮箱：{{ data?.email || '未绑定邮箱地址' }}</span>
+                    <TButton shape="circle">
+                      <template #icon>
+                        <Icon name="camera" />
+                      </template>
+                    </TButton>
+                  </FileUpload>
+                </TTooltip>
               </div>
             </div>
-
-            <ADivider />
-
+          </div>
+          <TSkeleton :loading="pending" class="!mt-2">
+            <div class="text-lg text-center">{{ data?.nickname }}</div>
+            <div class="flex items-center justify-center gap-1 mt-2 flex-wrap">
+              <TTag
+                v-for="role in data?.roles"
+                :key="role.id"
+                theme="primary"
+                variant="light-outline"
+                >{{ role.name }}</TTag
+              >
+            </div>
+            <div class="mt-4">
+              <div class="info">
+                <Icon name="institution" />
+                <div>部门：{{ data?.dept?.name || '暂无部门' }}</div>
+              </div>
+              <div class="info">
+                <Icon name="mobile" />
+                <div>手机：{{ data?.mobile || '暂未绑定手机号码' }}</div>
+              </div>
+              <div class="info">
+                <Icon name="institution" />
+                <div>邮箱：{{ data?.email || '暂未绑定邮箱地址' }}</div>
+              </div>
+            </div>
+          </TSkeleton>
+          <TDivider />
+          <div class="font-bold">其他信息</div>
+          <TSkeleton :loading="pending" class="!mt-4">
             <div>
-              <span class="font-bold">其他信息</span>
-              <div class="sub-info mt-4">
-                <div>账号：{{ data?.username }}</div>
-                <div>上次登录时间：{{ dayjs(data?.loginDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
-                <div>上次登录地点：{{ data?.loginIp }}</div>
-                <div>注册时间：{{ dayjs(data?.createTime).format('YYYY-MM-DD HH:mm:ss') }}</div>
+              <div class="info">账号：{{ data?.username }}</div>
+              <div class="info">
+                上次登录时间：{{ dayjs(data?.loginDate).format('YYYY-MM-DD HH:mm:ss') }}
+              </div>
+              <div class="info">上次登录地点：{{ data?.loginIp }}</div>
+              <div class="info">
+                注册时间：{{ dayjs(data?.createTime).format('YYYY-MM-DD HH:mm:ss') }}
               </div>
             </div>
-          </template>
-        </ACard>
-      </ACol>
-      <ACol :span="24" :lg="17">
-        <ACard>
-          <ATabs :tab-bar-style="{ marginTop: '-12px' }">
-            <ATabPane key="info" tab="个人信息">
-              <ASpin :spinning="pending">
-                <InfoForm :profile="data" />
-              </ASpin>
-            </ATabPane>
-            <ATabPane key="password" tab="修改密码">
-              <PasswordForm />
-            </ATabPane>
-          </ATabs>
-        </ACard>
-      </ACol>
-    </ARow>
-
-    <input ref="uploadEl" type="file" class="hidden" @change="onFileChange" />
+          </TSkeleton>
+        </TCard>
+      </div>
+      <div class="min-w-0 w-3/4">
+        <TCard class="min-h-full">
+          <TTabs v-model:value="tab">
+            <TTabPanel label="基本信息" :value="0">
+              <Profile :profile="data" class="!mt-6" />
+            </TTabPanel>
+            <TTabPanel label="修改密码" :value="1">
+              <Password class="!mt-6" />
+            </TTabPanel>
+          </TTabs>
+        </TCard>
+      </div>
+    </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref } from 'vue'
-import { message } from 'ant-design-vue'
-import { storeToRefs } from 'pinia'
+<script setup lang="ts">
 import dayjs from 'dayjs'
-import {
-  CameraOutlined,
-  MobileOutlined,
-  ApartmentOutlined,
-  MailOutlined,
-} from '@ant-design/icons-vue'
+import Profile from './profile.vue'
+import Password from './password.vue'
+import { getProfile, updateProfile, updateAvatar } from '@/api/system/user/profile'
 import useUserStore from '@/stores/user'
-import { getProfile, updateAvatar, updateProfile } from '@/api/system/user/profile'
-import useRequest from '@/hooks/use-request'
-import InfoForm from './info.vue'
-import PasswordForm from './password.vue'
+import type { UploadFile } from 'tdesign-vue-next'
 
-const uploadEl = ref<HTMLInputElement>()
 const { user } = storeToRefs(useUserStore())
+const src = ref('')
 
-const { data, pending, execute } = useRequest(getProfile, {
-  immediate: true,
-})
+const tab = ref(0)
 
-const chooseAvatar = () => {
-  uploadEl.value?.click()
+const { data, pending, execute } = useRequest(getProfile, { immediate: true })
+
+const onAvatarUploaded = async () => {
+  await updateProfile({
+    ...data.value,
+    avatar: src.value,
+  })
+
+  execute()
 }
 
-const onFileChange = () => {
-  const file = uploadEl.value?.files?.[0]
-  if (file) {
-    updateAvatar(file).then(async (res) => {
-      message.success('保存成功')
-      await updateProfile({
-        ...data.value,
-        avatar: res,
-      })
-      user.value!.avatar = res
-      execute()
-    })
-  }
+const uploadAvatar = (file: UploadFile) => {
+  return updateAvatar(file.raw!)
 }
-
-defineOptions({ name: 'UserConfig' })
 </script>
 
 <style lang="scss" scoped>
-.sub-info {
-  color: var(--color-text-secondary);
-  div {
-    @apply flex items-center gap-2 py-1;
-  }
+.info {
+  @apply flex items-center gap-1 mb-1 text-secondary;
 }
 </style>

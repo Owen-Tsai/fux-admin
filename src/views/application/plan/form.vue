@@ -1,146 +1,140 @@
-<template>
-  <AModal
-    v-model:open="open"
-    :title="isAdd ? '新建申报计划' : '编辑申报计划'"
-    destroy-on-close
-    :confirm-loading="loading"
-    :after-close="resetFields"
-    @ok="submit"
-  >
-    <ASpin :spinning="loading">
-      <AForm
-        ref="formRef"
-        :label-col="{ style: { width: '80px' } }"
-        :model="formData"
-        :rules="rules"
-        class="mt-4"
-      >
-        <AFormItem label="计划名称" name="item">
-          <AInput v-model:value="formData.item" placeholder="如：2024年生活补贴" />
-        </AFormItem>
-        <AFormItem label="所属应用" name="appId">
-          <ASelect
-            v-model:value="formData.appId"
-            :options="appOpts"
-            allow-clear
-            :field-names="{ label: 'name', value: 'id' }"
-            @change="setFlowId"
-          />
-        </AFormItem>
-        <AFormItem label="需求附件" name="fjfl">
-          <a-select
-            v-model:value="formData.fjfl"
-            mode="multiple"
-            style="width: 100%"
-            placeholder="请选择"
-            :options="fjflOpts"
-            :field-names="{ label: 'name', value: 'id' }"
-            :max-tag-count="5"
-            :loading="fjflPending"
-            @change="setFjflIds"
-          ></a-select>
-        </AFormItem>
-        <AFormItem label="常态化" name="daily">
-          <ASwitch v-model:checked="formData.daily" @change="(v) => onDailyChange(v as boolean)" />
-        </AFormItem>
-        <template v-if="!formData.daily">
-          <AFormItem label="开始时间" name="startTime">
-            <ADatePicker v-model:value="formData.startTime" value-format="x" />
-          </AFormItem>
-          <AFormItem label="截止时间" name="endTime">
-            <ADatePicker v-model:value="formData.endTime" value-format="x" />
-          </AFormItem>
-          <!-- <AFormItem label="起止时间" name="startTime">
-            <ARangePicker v-model:value="formData.startTime" picker="date" value-format="x" />
-           -->
-        </template>
-      </AForm>
-    </ASpin>
-  </AModal>
-</template>
+<script setup lang="ts">
+import { getPlanDetail, createPlan, updatePlan, type PlanVO } from '@/api/app/plan'
+import { getAttachmentTypeSimpleList } from '@/api/app/attachment'
+import type { AppVO } from '@/api/app/app'
+import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
 
-<script lang="ts" setup>
-import { ref, computed, type PropType } from 'vue'
-import useRequest from '@/hooks/use-request'
-import { getApplicationSimpleList } from '@/api/application'
-import { getAttachTypeSimpleList } from '@/api/application/plan'
-import { createPlan, updatePlan, getPlanDetail, type PlanVO } from '@/api/application/plan'
-import { message, type FormInstance, type FormProps, type SelectProps } from 'ant-design-vue'
+const { appList } = defineProps<{
+  appList?: AppVO[]
+}>()
 
-const rules: FormProps['rules'] = {
-  item: [{ required: true, message: '请填写申报计划名称' }],
-  appId: [{ required: true, message: '请选择应用' }],
-  // fjfl: [{ required: true, message: '请选择需求附件' }],
-  startTime: [{ required: true, message: '请选择计划开始时间' }],
-  endTime: [{ required: true, message: '请选择计划截止时间' }],
-}
-
-const props = defineProps({
-  record: {
-    type: Object as PropType<PlanVO>,
-  },
-})
-
-const emit = defineEmits(['success', 'close'])
-
-const formRef = ref<FormInstance>()
-const loading = ref(false)
-const open = ref(true)
-const formData = ref<Partial<PlanVO>>({
-  daily: false,
-})
-const { data: appOpts } = useRequest(getApplicationSimpleList, { immediate: true })
-const { data: fjflOpts, pending: fjflPending } = useRequest(getAttachTypeSimpleList, {
+const { data: attachmentTypes, pending } = useRequest(getAttachmentTypeSimpleList, {
   immediate: true,
 })
-const isAdd = computed(() => props.record === undefined)
+
+const message = useMessage()
+
+const mode = ref<'create' | 'update'>('create')
+const visible = ref(false)
+
+const emit = defineEmits(['success'])
+const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
+
+const loading = ref(false)
+const formData = ref<PlanVO>({
+  daily: false,
+})
+
+const rules: FormProps['rules'] = {
+  appId: [{ required: true, message: '请选择所属应用' }],
+  item: [{ required: true, message: '请输入计划名称' }],
+  startTime: [{ required: true, message: '非常态化申报计划需要指定起止时间' }],
+  endTime: [{ required: true, message: '非常态化申报计划需要指定起止时间' }],
+}
+
 const submit = async () => {
+  loading.value = true
   try {
-    loading.value = true
-    await formRef.value?.validate()
+    formData.value.flow = appList?.find((app) => app.id === formData.value.appId)?.processIds
 
-    if (isAdd.value) {
-      await createPlan(formData.value)
-      message.success('创建成功')
-    } else {
-      await updatePlan(formData.value)
+    const result = await formRef.value?.validate()
+    if (result === true) {
+      if (mode.value === 'create') {
+        await createPlan(formData.value)
+      } else {
+        await updatePlan(formData.value)
+      }
       message.success('保存成功')
+      emit('success')
+      visible.value = false
     }
-
-    emit('success')
-    open.value = false
   } catch (e) {
-    //
+    console.error(e)
   } finally {
     loading.value = false
   }
 }
 
-const resetFields = () => {
-  formRef.value?.resetFields()
-  emit('close')
+const loadData = async (id: string) => {
+  loading.value = true
+  const res = await getPlanDetail(id)
+  formData.value = res
+  loading.value = false
 }
 
-const onDailyChange = (checked: boolean) => {
-  // we do nothing for now
-  if (checked) {
-    formData.value.startTime = String(new Date().getTime())
-    formData.value.endTime = String(new Date('2099').getTime())
+const open = (id?: string) => {
+  formRef.value?.reset({ type: 'initial' })
+  formData.value.id = undefined
+  mode.value = 'create'
+
+  if (id) {
+    loadData(id)
+    mode.value = 'update'
+  }
+
+  visible.value = true
+}
+
+const onDailyChange = (val: boolean) => {
+  if (val) {
+    formData.value.startTime = new Date().getTime().toString()
+    formData.value.endTime = new Date('2099-01-01').getTime().toString()
+  } else {
+    formData.value.startTime = undefined
+    formData.value.endTime = undefined
   }
 }
 
-const setFlowId = () => {
-  formData.value.flow = appOpts.value?.find((v) => v.id === formData.value.appId)?.processIds
-}
-const setFjflIds: SelectProps['onChange'] = (value) => {
-  console.log(`selected ${value}`)
-}
-
-if (props.record?.id) {
-  loading.value = true
-  getPlanDetail(props.record.id).then((res) => {
-    formData.value = res
-    loading.value = false
-  })
-}
+defineExpose({ open })
 </script>
+
+<template>
+  <TDialog
+    v-model:visible="visible"
+    :header="mode === 'create' ? '新增计划' : '编辑计划'"
+    :confirm-loading="loading"
+    @confirm="submit"
+  >
+    <TForm ref="formRef" :data="formData" :rules="rules" :label-width="100">
+      <TFormItem label="计划名称" name="item">
+        <TInput v-model:value="formData.item" placeholder="如：2025年人才分类认定申报计划" />
+      </TFormItem>
+      <TFormItem label="所属应用" name="appId">
+        <TSelect
+          v-model:value="formData.appId"
+          :options="appList"
+          :keys="{ label: 'name', value: 'id' }"
+          filterable
+        />
+      </TFormItem>
+      <TFormItem label="所需附件" name="attachmentTypes" help="可在附件管理中设置附件类别">
+        <TSelect
+          v-model:value="formData.attachmentTypes"
+          multiple
+          :options="attachmentTypes"
+          :keys="{ label: 'name', value: 'id' }"
+          :loading="pending"
+        />
+      </TFormItem>
+      <TFormItem label="常态化申报" name="daily" help="常态化申报始终开启">
+        <TSwitch v-model:value="formData.daily" @change="(v) => onDailyChange(v as boolean)" />
+      </TFormItem>
+      <template v-if="!formData.daily">
+        <TFormItem label="开始时间" name="startTime">
+          <TDatePicker
+            v-model:value="formData.startTime"
+            value-type="time-stamp"
+            enable-time-picker
+          />
+        </TFormItem>
+        <TFormItem label="截止时间" name="endTime">
+          <TDatePicker
+            v-model:value="formData.endTime"
+            value-type="time-stamp"
+            enable-time-picker
+          />
+        </TFormItem>
+      </template>
+    </TForm>
+  </TDialog>
+</template>

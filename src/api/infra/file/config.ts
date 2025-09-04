@@ -30,43 +30,49 @@ export type FileConfigVO = {
   createTime?: string
 }
 
-const url = '/admin-api/infra/file-config'
+const prefix = '/infra/file-config'
 
 export const getConfigList = (params?: ListQueryParams) => {
   return request.get<PaginatedList<FileConfigVO>>({
-    url: `${url}/page`,
+    url: `${prefix}/page`,
     params,
   })
 }
 
-export const getDetail = (id: number) => {
+export const getConfigDetail = (id: number) => {
   return request.get<FileConfigVO>({
-    url: `${url}/get?id=${id}`,
+    url: `${prefix}/get?id=${id}`,
   })
 }
 
-export const addConfig = (data: FileConfigVO) => {
-  return request.post({
-    url: `${url}/create`,
+export const createConfig = (data: FileConfigVO) => {
+  return request.post<FileConfigVO>({
+    url: `${prefix}/create`,
     data,
   })
 }
 
 export const updateConfig = (data: FileConfigVO) => {
-  return request.put({
-    url: `${url}/update`,
+  return request.put<FileConfigVO>({
+    url: `${prefix}/update`,
     data,
   })
 }
 
 export const deleteConfig = (id: number) => {
-  return request.delete({
-    url: `${url}/delete?id=${id}`,
+  return request.delete<FileConfigVO>({
+    url: `${prefix}/delete?id=${id}`,
   })
 }
 
 export const testConfig = (id: number) => {
   return request.get<string>({
-    url: `${url}/test?id=${id}`,
+    url: `${prefix}/test?id=${id}`,
+  })
+}
+
+export const setMaster = (id: number) => {
+  return request.put<FileConfigVO>({
+    url: `${prefix}/update-master?id=${id}`,
   })
 }

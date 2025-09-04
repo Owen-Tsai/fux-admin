@@ -1,79 +1,93 @@
-import { ref, computed, type Ref } from 'vue'
-import dayjs from 'dayjs'
 import useRequest from '@/hooks/use-request'
-import { getApplicationList, type ListQueryParams, type ApplicationVO } from '@/api/application'
-import type { FormInstance, TableProps } from 'ant-design-vue'
-import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
+import {
+  getApplicationList,
+  deleteApplication,
+  setPublished,
+  type ListQueryParams,
+} from '@/api/app/app'
+import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { title: '应用名称', dataIndex: 'name', key: 'name', ellipsis: true },
-  { title: '应用类别', dataIndex: 'type', key: 'type' },
-  { title: '创建人', width: 120, dataIndex: 'creatornName' },
-  { title: '应用描述', width: 200, dataIndex: 'description', ellipsis: true },
-  { title: '上架状态', width: 120, dataIndex: 'published', key: 'published' },
+  { title: '应用名称', colKey: 'name', width: 160, ellipsis: true },
+  { title: '应用类别', colKey: 'type', width: 160, ellipsis: true },
+  { title: '应用描述', colKey: 'description', ellipsis: true },
+  { title: '状态', width: 120, colKey: 'published' },
   {
     title: '创建时间',
-    minWidth: 120,
-    dataIndex: 'createTime',
-    key: 'createTime',
-    sortDirections: ['ascend', 'descend'],
-    sorter: (a: ApplicationVO, b: ApplicationVO) => {
-      return dayjs(a.createTime).isSameOrBefore(b.createTime) ? 1 : -1
-    },
+    minWidth: 100,
+    colKey: 'createTime',
   },
-  { title: '操作', key: 'actions', width: 220 },
+  {
+    title: '更新时间',
+    minWidth: 100,
+    colKey: 'updateTime',
+  },
+  { title: '操作', width: 100, colKey: 'actions' },
 ]
 
-export const useTable = (formRef: Ref<FormInstance | undefined>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const query = ref<ListQueryParams>({
+    createTime: [],
+    updateTime: [],
+    pageNo: 1,
+    pageSize: 10,
+  })
 
-  const { data, execute, pending } = useRequest(
-    () =>
-      getApplicationList({
-        ...queryParams.value,
-      }),
-    {
-      immediate: true,
-    },
-  )
+  const dialog = useDialog()
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const { data, execute, pending } = useRequest(() => getApplicationList(query.value), {
+    immediate: true,
+  })
+
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
+
     execute()
   }
 
-  const onFilterReset = () => {
-    formRef.value?.resetFields()
-    queryParams.value.pageNo = 1
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
+  const onDelete = async (id: string) => {
+    const instance = dialog.confirm({
+      header: '删除应用',
+      body: '确认删除应用吗？该操作无法恢复，如需暂时停用应用可以使用【下架】功能。',
+      async onConfirm() {
+        await deleteApplication(id)
+        instance.destroy()
+        execute()
+      },
+    })
+  }
 
+  const onSetPublished = async (id: string, published: boolean) => {
+    pending.value = true
+    await setPublished(id, published)
     execute()
+    pending.value = false
   }
 
   return {
     data,
-    execute,
     pending,
-    queryParams,
-    onChange,
+    query,
     pagination,
-    onFilter,
-    onFilterReset,
+    onPageChange,
+    onQueryChange,
+    execute,
+    onDelete,
+    onSetPublished,
   }
 }

@@ -1,133 +1,110 @@
-<template>
-  <div class="view">
-    <ACard v-if="permission.has('infra:file:query')" class="mb-4">
-      <AForm
-        ref="filterForm"
-        :label-col="{ span: 6 }"
-        class="dense-form"
-        :class="{ expanded: filterExpanded }"
-        :model="queryParams"
-      >
-        <ARow :gutter="[0, 16]">
-          <ACol :lg="8" :span="24">
-            <AFormItem label="文件路径" name="path">
-              <AInput v-model:value="queryParams.path" placeholder="请输入文件路径" allow-clear />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="8" :span="24">
-            <AFormItem label="文件类型" name="type">
-              <AInput v-model:value="queryParams.type" placeholder="请输入文件类型" allow-clear />
-            </AFormItem>
-          </ACol>
-          <ACol v-show="filterExpanded" :lg="8" :span="24">
-            <AFormItem label="创建时间">
-              <ARangePicker
-                v-model:value="queryParams.createTime"
-                value-format="YYYY-MM-DD HH:mm:ss"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol :lg="{ span: 8, offset: filterExpanded ? 16 : 0 }" :span="24">
-            <AFlex justify="end" align="center" :gap="16">
-              <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-              <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-              <ATypographyLink @click="toggle()">
-                {{ filterExpanded ? '收起' : '展开' }}
-                <DownOutlined :class="{ 'rotate-180': filterExpanded }" />
-              </ATypographyLink>
-            </AFlex>
-          </ACol>
-        </ARow>
-      </AForm>
-    </ACard>
-
-    <ACard title="文件列表">
-      <template #extra>
-        <AFlex :gap="8">
-          <ATooltip v-if="permission.has('infra:file-config:export')" title="导出">
-            <AButton type="text" :loading="pending">
-              <template #icon>
-                <ExportOutlined />
-              </template>
-            </AButton>
-          </ATooltip>
-          <ATooltip title="重新载入">
-            <AButton type="text" :loading="pending" @click="execute">
-              <template #icon>
-                <ReloadOutlined />
-              </template>
-            </AButton>
-          </ATooltip>
-        </AFlex>
-      </template>
-
-      <div class="overflow-x-auto">
-        <ATable
-          :columns="columns"
-          :data-source="data?.list"
-          :loading="pending"
-          :pagination="pagination"
-          @change="onChange"
-        >
-          <template #bodyCell="scope: TableScope<FileVO>">
-            <template v-if="scope?.column.key === 'storage'">
-              <DictTag :dict-object="infraFileStorage" :value="scope.text" />
-            </template>
-            <template v-if="scope?.column.key === 'preview'">
-              <AImage
-                v-if="scope.record.type?.includes('image')"
-                :src="scope.record.url"
-                :width="120"
-              />
-              <span v-else>不支持预览</span>
-            </template>
-            <template v-if="scope?.column.key === 'createTime'">
-              {{ dayjs(scope.text).format('YYYY-MM-DD HH:mm:ss') }}
-            </template>
-            <template v-if="scope?.column.title === '操作'">
-              <AFlex :gap="16">
-                <APopconfirm
-                  v-if="permission.has('infra:file:delete')"
-                  title="该操作无法撤销，确定要删除吗？"
-                  :overlay-style="{ width: '240px' }"
-                  @confirm="onDelete(scope!.record)"
-                >
-                  <ATypographyLink type="danger">
-                    <DeleteOutlined />
-                    删除
-                  </ATypographyLink>
-                </APopconfirm>
-              </AFlex>
-            </template>
-          </template>
-        </ATable>
-      </div>
-    </ACard>
-  </div>
-</template>
-
-<script lang="ts" setup>
-import { ref } from 'vue'
+<script setup lang="ts">
 import dayjs from 'dayjs'
-import { useToggle } from '@vueuse/core'
-import { DownOutlined, ReloadOutlined, ExportOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-import useDict from '@/hooks/use-dict'
-import { permission } from '@/hooks/use-permission'
 import { columns, useTable } from './use-table'
-import useActions from './use-actions'
-import type { FormInstance } from 'ant-design-vue'
 import type { FileVO } from '@/api/infra/file'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
-const filterForm = ref<FormInstance>()
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 
-const [filterExpanded, toggle] = useToggle(false)
+const expanded = ref(false)
+const previewVisible = ref(false)
 
-const [infraFileStorage] = useDict('infra_file_storage')
+const { permission } = usePermission()
 
-const { data, pending, execute, queryParams, onFilter, onChange, onFilterReset, pagination } =
-  useTable(filterForm)
+const { data, execute, onPageChange, onQueryChange, pagination, pending, query, onDelete } =
+  useTable(queryForm)
 
-const { onDelete } = useActions(execute)
+const images = ref<string[]>([])
+
+const onPreview = (url: string) => {
+  images.value = [url]
+  previewVisible.value = true
+}
 
 defineOptions({ name: 'InfraFile' })
 </script>
+
+<template>
+  <div class="view">
+    <TCard v-if="permission.has('infra:file:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4 w-full"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
+      >
+        <TFormItem label="文件路径" name="path" class="col">
+          <TInput v-model:value="query.path" placeholder="请输入文件路径" />
+        </TFormItem>
+        <TFormItem label="文件类型" name="type" class="col">
+          <TInput v-model:value="query.type" placeholder="请输入文件类型" />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="创建时间" name="createTime" class="col">
+          <TRangePicker v-model:value="query.createTime" />
+        </TFormItem>
+        <QueryActions v-model:expanded="expanded" :class="`col ${expanded ? 'ml-2/3' : ''}`" />
+      </TForm>
+    </TCard>
+
+    <TCard title="文件列表">
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" @click="execute()">
+              <template #icon>
+                <Icon name="refresh" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </div>
+      </template>
+
+      <TTable
+        :data="data?.list"
+        row-key="id"
+        :columns="columns"
+        :pagination="pagination"
+        :loading="pending"
+        @page-change="onPageChange"
+      >
+        <template #preview="{ row }: TableScope<FileVO>">
+          <div class="relative h-30 w-30">
+            <img :src="row.url" :alt="row.name" class="w-full h-full object-contain" />
+            <div
+              class="absolute top-0 left-0 right-0 bottom-0 hover:bg-black/40 flex-center group text-[var(--td-text-color-anti)] cursor-pointer"
+              @click="onPreview(row.url!)"
+            >
+              <Icon name="browse" size="1.4em" class="!hidden !group-hover:block" />
+            </div>
+          </div>
+        </template>
+        <template #createTime="{ row }">
+          {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template #actions="{ row }">
+          <div class="flex items-center gap-2">
+            <TPopconfirm content="确认删除吗？该操作不可恢复" @confirm="onDelete(row.id!)">
+              <TTooltip content="删除">
+                <TButton
+                  shape="square"
+                  theme="danger"
+                  variant="text"
+                  :disabled="permission.hasNone('infra:file:delete')"
+                >
+                  <template #icon>
+                    <Icon name="edit-2" />
+                  </template>
+                </TButton>
+              </TTooltip>
+            </TPopconfirm>
+          </div>
+        </template>
+      </TTable>
+    </TCard>
+
+    <TImageViewer v-model:visible="previewVisible" :images="images" />
+  </div>
+</template>

@@ -1,6 +1,6 @@
 <template>
-  <ALayout>
-    <ALayoutContent>
+  <TLayout>
+    <TContent>
       <RouterView v-if="routerAlive">
         <template #default="{ Component, route }">
           <KeepAlive :include="[...keepsList]">
@@ -8,12 +8,12 @@
           </KeepAlive>
         </template>
       </RouterView>
-    </ALayoutContent>
-  </ALayout>
+    </TContent>
+  </TLayout>
 </template>
 
 <script lang="ts" setup>
-import useViewCache from '@/stores/view-cache'
+import useViewCache from '@/stores/views'
 
 const { keepsList } = storeToRefs(useViewCache())
 

@@ -1,167 +1,147 @@
-<template>
-  <AModal
-    v-model:open="open"
-    :title="isAdd ? '新建应用' : '编辑应用'"
-    destroy-on-close
-    :confirm-loading="loading"
-    :after-close="resetFields"
-    @ok="submit"
-  >
-    <ASpin :spinning="loading">
-      <AForm
-        ref="formRef"
-        :label-col="{ style: { width: '140px' } }"
-        :model="formData"
-        :rules="rules"
-        class="mt-4"
-      >
-        <AFormItem label="应用名称" name="name">
-          <AInput v-model:value="formData.name" placeholder="如：人才分类认定" />
-        </AFormItem>
-        <AFormItem label="应用编码" name="code">
-          <AInput v-model:value="formData.code" placeholder="如：talent_classification" />
-        </AFormItem>
-        <AFormItem label="业务类别" name="type">
-          <ASelect v-model:value="formData.type" :options="appTypeOpts" />
-        </AFormItem>
-        <AFormItem label="申报主体" name="userType">
-          <ASelect v-model:value="formData.userType">
-            <a-select-option value="3">个人用户</a-select-option>
-            <a-select-option value="4">单位用户</a-select-option>
-          </ASelect>
-        </AFormItem>
-        <AFormItem label="单位开通权限" name="comopen" v-if="formData.userType === '3'">
-          <ASelect v-model:value="formData.comopen">
-            <a-select-option :value="0">否</a-select-option>
-            <a-select-option :value="1">是</a-select-option>
-          </ASelect>
-        </AFormItem>
-        <AFormItem label="主管部门" name="dept">
-          <ATreeSelect
-            v-model:value="formData.dept"
-            show-search
-            :dropdown-style="{ maxHeight: '300px', overflow: 'auto' }"
-            :field-names="{ label: 'name', value: 'id' }"
-            tree-default-expand-all
-            :tree-data="deptOpts"
-          />
-        </AFormItem>
-        <AFormItem label="应用描述" name="description">
-          <ATextarea v-model:value="formData.description" />
-        </AFormItem>
-        <ARow>
-          <ACol :span="12">
-            <AFormItem label="前台图标" name="iconFe" extra="支持 png, svg, jpg 格式">
-              <Upload
-                :accept="['png', 'svg', 'jpg', 'jpeg', 'gif']"
-                v-model:value="formData.iconFe"
-                :limit="1"
-                auto-upload
-                list-type="picture-card"
-              />
-            </AFormItem>
-          </ACol>
-          <ACol :span="12">
-            <AFormItem label="后台图标" name="iconBe" extra="支持 png, svg, jpg 格式">
-              <Upload
-                :accept="['png', 'svg', 'jpg', 'jpeg', 'gif']"
-                v-model:value="formData.iconBe"
-                :limit="1"
-                auto-upload
-                list-type="picture-card"
-              />
-            </AFormItem>
-          </ACol>
-        </ARow>
-      </AForm>
-    </ASpin>
-  </AModal>
-</template>
+<script setup lang="ts">
+import { addApplication, updateApplication, getApplicationDetail, type AppVO } from '@/api/app/app'
+import { getDeptSimpleList } from '@/api/system/dept'
+import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
 
-<script lang="ts" setup>
-import { ref, computed, type PropType } from 'vue'
-import useDict from '@/hooks/use-dict'
-import { getDeptTree, type DeptTreeVO } from '@/api/system/dept'
-import {
-  addApplication,
-  updateApplication,
-  getApplicationDetail,
-  type ApplicationVO,
-} from '@/api/application'
-import { message, type FormInstance, type FormProps } from 'ant-design-vue'
-import type { Rule } from 'ant-design-vue/es/form'
-
-const validateComOpen = async (_rule: Rule, value: string) => {
-  if (formData.value.userType == '3' && (value === '' || value == undefined)) {
-    return Promise.reject('请选择是否单位开通权限！')
-  } else {
-    return Promise.resolve()
-  }
-}
+const message = useMessage()
+const [typeOpts] = useDict('system_application_type')
+const { data: deptOpts, pending } = useRequest(getDeptSimpleList, {
+  immediate: true,
+})
 
 const rules: FormProps['rules'] = {
   name: [{ required: true, message: '请填写应用名称' }],
   type: [{ required: true, message: '请选择应用类型' }],
-  userType: [{ required: true, message: '请选择用户类型' }],
-  comopen: [{ required: true, trigger: 'change', validator: validateComOpen }],
+  userType: [{ required: true, message: '请选择申报主体' }],
 }
 
-const props = defineProps({
-  record: {
-    type: Object as PropType<ApplicationVO>,
-  },
-})
+const mode = ref<'create' | 'update'>('create')
+const visible = ref(false)
 
-const emit = defineEmits(['success', 'close'])
+const emit = defineEmits(['success'])
+const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
 
-const [appTypeOpts] = useDict('system_application_type')
-
-const formRef = ref<FormInstance>()
 const loading = ref(false)
-const open = ref(true)
-const formData = ref<Partial<ApplicationVO>>({
-  published: 0,
-})
-const deptOpts = ref<DeptTreeVO>()
 
-const isAdd = computed(() => props.record === undefined)
+const formData = ref<AppVO>({
+  published: 0,
+  comopen: 0,
+})
 
 const submit = async () => {
+  loading.value = true
   try {
-    loading.value = true
-    await formRef.value?.validate()
-
-    if (isAdd.value) {
-      await addApplication(formData.value)
-      message.success('创建成功')
-    } else {
-      await updateApplication(formData.value)
+    const result = await formRef.value?.validate()
+    if (result === true) {
+      if (mode.value === 'create') {
+        await addApplication(formData.value)
+      } else {
+        await updateApplication(formData.value)
+      }
       message.success('保存成功')
+      emit('success')
+      visible.value = false
     }
-
-    emit('success')
-    open.value = false
   } catch (e) {
-    //
+    console.error(e)
   } finally {
     loading.value = false
   }
 }
 
-const resetFields = () => {
-  formRef.value?.resetFields()
-  emit('close')
-}
-
-getDeptTree().then((res) => {
-  deptOpts.value = res
-})
-
-if (props.record?.id) {
+const loadData = async (id: string) => {
   loading.value = true
-  getApplicationDetail(props.record.id).then((res) => {
-    formData.value = res
-    loading.value = false
-  })
+  const res = await getApplicationDetail(id)
+  formData.value = res
+  loading.value = false
 }
+
+const open = (id?: string) => {
+  formRef.value?.reset({ type: 'initial' })
+  formData.value.id = undefined
+  formData.value.createTime = undefined
+  mode.value = 'create'
+
+  if (id) {
+    loadData(id)
+    mode.value = 'update'
+  }
+
+  visible.value = true
+}
+
+const onUserTypeChange = (value: string) => {
+  if (value === '3') {
+    formData.value.comopen = 0
+  } else {
+    formData.value.comopen = undefined
+  }
+}
+
+defineExpose({ open })
 </script>
+
+<template>
+  <TDialog
+    v-model:visible="visible"
+    :header="mode === 'create' ? '新增应用' : '编辑应用'"
+    :confirm-loading="loading"
+    width="560px"
+    @confirm="submit"
+  >
+    <TLoading :loading="loading">
+      <TForm ref="formRef" :data="formData" :rules="rules" :label-width="100">
+        <TFormItem label="应用名称" name="name">
+          <TInput v-model:value="formData.name" placeholder="如：人才分类认定" />
+        </TFormItem>
+        <TFormItem label="应用代码" name="code">
+          <TInput v-model:value="formData.code" placeholder="如：talent_classification" />
+        </TFormItem>
+        <TFormItem label="业务类别" name="type">
+          <TSelect v-model:value="formData.type" :options="typeOpts" />
+        </TFormItem>
+        <TFormItem label="申报主体" name="userType">
+          <TSelect
+            v-model:value="formData.userType"
+            @change="(v) => onUserTypeChange(v as '3' | '4')"
+          >
+            <TOption value="3" label="个人申报" />
+            <TOption value="4" label="单位申报" />
+          </TSelect>
+        </TFormItem>
+        <TFormItem v-if="formData.userType === '3'" label="申报方式" name="comopen">
+          <TRadioGroup v-model:value="formData.comopen">
+            <TRadio :value="0" label="个人自主申报" />
+            <TRadio :value="1" label="单位开通权限" />
+          </TRadioGroup>
+        </TFormItem>
+        <TFormItem label="主管部门" name="dept">
+          <TSelect
+            v-model:value="formData.dept"
+            :options="deptOpts"
+            :loading="pending"
+            filterable
+            clearable
+            :keys="{ label: 'name', value: 'key' }"
+            :tree-props="{ expandAll: true }"
+          />
+        </TFormItem>
+        <TFormItem label="应用描述" name="description">
+          <TTextarea v-model:value="formData.description" />
+        </TFormItem>
+        <TRow>
+          <TCol :span="6">
+            <TFormItem label="前台图标" name="iconFe" help="在用户端展示的图标">
+              <FileUpload v-model:value="formData.iconFe" theme="image" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="6">
+            <TFormItem label="后台图标" name="iconBe" help="在管理端展示的图标">
+              <FileUpload v-model:value="formData.iconBe" theme="image" />
+            </TFormItem>
+          </TCol>
+        </TRow>
+      </TForm>
+    </TLoading>
+  </TDialog>
+</template>

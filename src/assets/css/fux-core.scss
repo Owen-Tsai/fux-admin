@@ -1,0 +1,219 @@
+.draggable-area.empty-slot {
+  min-height: 40px;
+  height: 100%;
+  background-color: var(--td-bg-color-container-active);
+  border-radius: var(--td-radius-medium);
+}
+
+.ghost {
+  position: relative;
+  background-color: transparent !important;
+  .text-wrapper,
+  .icon-wrapper {
+    display: none !important;
+  }
+  .drag-placeholder {
+    display: flex !important;
+  }
+}
+
+/* global style rules for flow editor */
+@mixin line {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - calc(var(--line-width) / 2));
+  width: var(--line-width);
+  background-color: var(--td-border-level-2-color);
+}
+
+@mixin bg-audit {
+  background-color: var(--td-warning-color);
+}
+
+@mixin bg-cc {
+  background-color: #029cd4;
+}
+
+@mixin bg-start {
+  background-color: var(--td-brand-color);
+}
+
+.node-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  --header-height: 32px;
+  --height: 88px;
+  --width: 240px;
+  --line-width: 3px;
+
+  .audit-node {
+    .header {
+      color: var(--td-text-color-anti);
+      @include bg-audit();
+    }
+  }
+  .cc-node {
+    .header {
+      color: var(--td-text-color-anti);
+      @include bg-cc();
+    }
+  }
+  .start-node {
+    .header {
+      color: var(--td-text-color-anti);
+      @include bg-start();
+    }
+  }
+  .condition-node {
+    .header {
+      color: var(--td-brand-color);
+    }
+  }
+
+  .btn-add {
+    height: calc(var(--height) - 8px);
+    @apply flex-center relative;
+
+    &::before {
+      @include line;
+    }
+  }
+  .node {
+    height: var(--height);
+    width: var(--width);
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--td-radius-medium);
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    transition: all 0.2s;
+    @apply shadow-md relative;
+
+    .header {
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      @apply radius-medium-t px-4;
+
+      .close-icon {
+        display: none;
+        cursor: pointer;
+
+        &:hover {
+          color: var(--td-brand-color);
+        }
+      }
+
+      .node-name-input {
+        width: calc(var(--width) / 2);
+      }
+    }
+    .body {
+      flex-grow: 1;
+      background-color: var(--td-bg-color-container);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      @apply radius-medium-b px-4;
+    }
+
+    &:hover {
+      @apply shadow-lg;
+      .input-wrapper .node-name {
+        text-decoration: dotted underline;
+      }
+      .close-icon {
+        display: block;
+      }
+    }
+
+    &.audit-node,
+    &.cc-node {
+      &::before {
+        content: '';
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        -webkit-transform: translateX(-50%);
+        transform: translate(-50%);
+        width: 0;
+        height: 4px;
+        border-style: solid;
+        border-width: 8px 6px 4px;
+        border-color: var(--td-border-level-2-color) transparent transparent;
+        background: var(--td-bg-color-secondarycontainer);
+      }
+    }
+
+    &.condition-node {
+      background-color: var(--td-bg-color-container);
+    }
+  }
+
+  .end-node {
+    padding-top: 16px;
+    position: relative;
+
+    &::before {
+      content: '';
+      height: 12px;
+      width: 12px;
+      background-color: var(--td-border-level-2-color);
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%);
+      border-radius: 50%;
+    }
+  }
+}
+
+.conditional-group {
+  .branches {
+    display: flex;
+    position: relative;
+    border-top: var(--line-width) solid var(--td-border-level-2-color);
+    border-bottom: var(--line-width) solid var(--td-border-level-2-color);
+    overflow: visible;
+    background-color: var(--td-bg-color-secondarycontainer);
+
+    .branch {
+      position: relative;
+
+      &::before {
+        @include line;
+        z-index: 0;
+      }
+    }
+
+    .edge-line {
+      position: absolute;
+      background-color: var(--td-bg-color-secondarycontainer);
+      height: var(--line-width);
+      width: 50%;
+    }
+
+    .line-tl {
+      top: calc(-1 * var(--line-width));
+      left: 0;
+    }
+    .line-tr {
+      top: calc(-1 * var(--line-width));
+      right: 0;
+    }
+    .line-bl {
+      bottom: calc(-1 * var(--line-width));
+      left: 0;
+    }
+    .line-br {
+      bottom: calc(-1 * var(--line-width));
+      right: 0;
+    }
+  }
+}

@@ -24,7 +24,7 @@ export type ListQueryParams = CommonQueryParams & {
   channelId?: number
 }
 
-const prefix = '/admin-api/system/sms-template'
+const prefix = '/system/sms-template'
 
 export const getTemplateList = (params?: ListQueryParams) => {
   return request.get<PaginatedList<TemplateVO>>({

@@ -1,28 +1,34 @@
 <template>
-  <AAlert v-if="error" :message="error" type="error" show-icon />
-  <AForm :model="formState" size="large" class="mt-6" :rules="rules" @submit="handleSubmit">
-    <AFormItem name="username">
-      <AInput v-model:value="formState.username" allow-clear placeholder="请输入用户名">
-        <template #prefix>
-          <UserOutlined />
+  <TForm ref="formRef" v-model:data="formData" :label-width="0" :rules="rules" @submit="onSubmit">
+    <TFormItem name="username">
+      <TInput v-model:value="formData.username" clearable placeholder="请输入用户名" size="large">
+        <template #prefix-icon>
+          <Icon name="user" />
         </template>
-      </AInput>
-    </AFormItem>
-    <AFormItem name="password">
-      <AInputPassword v-model:value="formState.password" allow-clear placeholder="请输入密码">
-        <template #prefix>
-          <LockOutlined />
+      </TInput>
+    </TFormItem>
+    <TFormItem name="password">
+      <TInput
+        v-model:value="formData.password"
+        type="password"
+        clearable
+        placeholder="请输入密码"
+        size="large"
+      >
+        <template #prefix-icon>
+          <Icon name="lock-on" />
         </template>
-      </AInputPassword>
-    </AFormItem>
-    <AFormItem no-style>
-      <div class="flex items-center justify-between mb-4">
-        <ACheckbox v-model:checked="formState.remember">记住密码</ACheckbox>
-        <ATypographyLink>忘记密码？</ATypographyLink>
+      </TInput>
+    </TFormItem>
+    <TFormItem name="memorize">
+      <div class="flex items-center justify-end w-full">
+        <TCheckbox v-model="formData.memorize">记住密码</TCheckbox>
       </div>
-    </AFormItem>
-    <AButton type="primary" html-type="submit" block :loading="pending">登录</AButton>
-  </AForm>
+    </TFormItem>
+    <TFormItem>
+      <TButton type="submit" block size="large" :loading="loading">登 录</TButton>
+    </TFormItem>
+  </TForm>
 
   <Captcha
     v-if="captchaEnabled"
@@ -33,92 +39,90 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-import useRequest from '@/hooks/use-request'
+import Captcha from './captcha.vue'
 import useUserStore from '@/stores/user'
-import useStorage from '@/hooks/use-storage'
-import { decrypt, encrypt } from '@/utils/encryption'
-import { useRouter, useRoute } from 'vue-router'
-import Captcha from '@/components/jigsaw-captcha/index.vue'
-import type { FormProps } from 'ant-design-vue'
+import { encrypt, decrypt } from '@/utils/encryption'
+import { localCache } from '@/utils/storage'
+import type { FormProps } from 'tdesign-vue-next'
 
-const captchaEnabled = import.meta.env.VITE_CAPTCHA_ENABLED === 'true'
+const rules: FormProps['rules'] = {
+  username: [{ required: true, message: '请输入用户名' }],
+  password: [{ required: true, message: '请输入密码' }],
+}
 
-type Rules = FormProps['rules']
-
-const storage = useStorage()
 const { login } = useUserStore()
-const router = useRouter()
-const route = useRoute()
 
+const captchaEnabled = import.meta.env.VITE_APP_CAPTCHA === 'true'
+
+const loading = ref(false)
 const captcha = ref<InstanceType<typeof Captcha>>()
 const capcthaVisible = ref(false)
 
-const rules: Rules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-}
+const { currentRoute, push } = useRouter()
 
-const formState = ref({
-  username: 'admin',
-  password: 'admin123',
+const formData = ref({
+  username: '',
+  password: '',
   captchaVerification: '',
-  remember: false,
+  memorize: false,
 })
 
-const { error, pending, execute } = useRequest(() => login(formState.value), {
-  onSuccess() {
-    setRememberedForm()
-
-    const query = route.query
-    const redirect: string | null = query.redirect as string | null
-    delete query.redirect
-    router.push({ path: redirect || '/', query })
-  },
-  onError() {
-    if (captchaEnabled) {
-      captcha.value?.refetch()
-    }
-  },
-})
-
-const getRememberedForm = () => {
-  const memorize: boolean = storage.get('remember')
-  const password = storage.get('password')
-  if (memorize === true) {
-    formState.value.username = storage.get('username')
-    formState.value.password = password ? (decrypt(password) as string) : ''
-    formState.value.remember = true
-  }
-}
-
-const setRememberedForm = () => {
-  const memorize = formState.value.remember
-  const expireSeconds = 3600 * 24 * 7
-  if (memorize) {
-    storage.set('username', formState.value.username, { exp: expireSeconds })
-    storage.set('password', encrypt(formState.value.username), { exp: expireSeconds })
-  } else {
-    storage.delete('username')
-    storage.delete('password')
-  }
-}
-
-const doLogin = (verificationCode: string) => {
-  formState.value.captchaVerification = verificationCode
-  execute()
-  capcthaVisible.value = false
-}
-
-const handleSubmit = () => {
+const onSubmit = () => {
   if (captchaEnabled) {
     capcthaVisible.value = true
   } else {
-    execute()
+    doLogin()
   }
 }
 
-getRememberedForm()
+const doLogin = async (verificationCode?: string) => {
+  capcthaVisible.value = false
+  loading.value = true
+  try {
+    await login({
+      ...formData.value,
+      captchaVerification: verificationCode,
+    })
+
+    setMemorized()
+
+    const query = currentRoute.value.query
+    const redirect: string | null = query.redirect as string | null
+    delete query.redirect
+    push({ path: redirect || '/', query })
+  } catch (error) {
+    console.error(error)
+    if (captchaEnabled) {
+      captcha.value?.reload()
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+// 获取记忆的用户名和密码
+const getMemorized = () => {
+  const pwd = localCache.get('password')
+  if (pwd) {
+    formData.value.username = localCache.get('username')
+    formData.value.password = decrypt(pwd as string) || ''
+  }
+}
+
+// 当勾选记住密码时，设置记忆 7d
+const setMemorized = () => {
+  console.log('called', formData.value.memorize)
+  const exp = 3600 * 24 * 7
+  const memorize = formData.value.memorize
+  if (memorize) {
+    localCache.set('username', formData.value.username, { exp })
+    localCache.set('password', encrypt(formData.value.password), { exp })
+    console.log('set memorized')
+  } else {
+    localCache.delete('username')
+    localCache.delete('password')
+  }
+}
+
+getMemorized()
 </script>

@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 export type JobVO = {
-  createTime?: number
+  createTime?: string
   cronExpression?: string
   handlerName?: string
   handlerParam?: string
@@ -19,44 +19,44 @@ export type ListQueryParams = CommonQueryParams & {
   status?: number
 }
 
-const url = '/admin-api/infra/job'
+const prefix = '/infra/job'
 
-export const getJobList = (params?: ListQueryParams) => {
+export const getJobList = (params: ListQueryParams) => {
   return request.get<PaginatedList<JobVO>>({
-    url: `${url}/page`,
+    url: `${prefix}/page`,
     params,
   })
 }
 
 export const getJobDetail = (id: number) => {
   return request.get<JobVO>({
-    url: `${url}/get?id=${id}`,
+    url: `${prefix}/get?id=${id}`,
   })
 }
 
 export const createJob = (data: JobVO) => {
   return request.post({
-    url: `${url}/create`,
+    url: `${prefix}/create`,
     data,
   })
 }
 
 export const updateJob = (data: JobVO) => {
   return request.put({
-    url: `${url}/update`,
+    url: `${prefix}/update`,
     data,
   })
 }
 
 export const deleteJob = (id: number) => {
   return request.delete({
-    url: `${url}/delete?id=${id}`,
+    url: `${prefix}/delete?id=${id}`,
   })
 }
 
-export const exportJobList = (params: ListQueryParams) => {
+export const exportExcel = (params: ListQueryParams) => {
   return request.download({
-    url: `${url}/export-excel`,
+    url: `${prefix}/export-excel`,
     params,
     filename: '定时任务.xlsx',
   })
@@ -64,7 +64,7 @@ export const exportJobList = (params: ListQueryParams) => {
 
 export const updateJobStatus = (id: number, status: number) => {
   return request.put({
-    url: `${url}/update-status`,
+    url: `${prefix}/update-status`,
     params: {
       id,
       status,
@@ -74,12 +74,12 @@ export const updateJobStatus = (id: number, status: number) => {
 
 export const runJob = (id: number) => {
   return request.put({
-    url: `${url}/trigger?id=${id}`,
+    url: `${prefix}/trigger?id=${id}`,
   })
 }
 
 export const getJobScheduledTimes = (id: number) => {
   return request.get<number[]>({
-    url: `${url}/get_next_times?id=${id}`,
+    url: `${prefix}/get-next-times?id=${id}`,
   })
 }

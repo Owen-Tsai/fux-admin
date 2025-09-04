@@ -1,45 +1,53 @@
-import useRequest from '@/hooks/use-request'
-import type { TableProps, FormInstance } from 'ant-design-vue'
-import { getDeptTree, type TreeQueryParams } from '@/api/system/dept'
-import { getSimpleUserList, type SimpleUserListVO } from '@/api/system/user'
+import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
+import { getDeptTree, deleteDept, type TreeQueryParams } from '@/api/system/dept'
+import { getSimpleUserList } from '@/api/system/user'
 
 export const columns: TableProps['columns'] = [
-  { key: 'name', title: '部门名称', dataIndex: 'name' },
-  { key: 'leaderUserId', title: '负责人', dataIndex: 'leaderUserId' },
-  { key: 'sort', title: '排序', dataIndex: 'sort' },
-  { key: 'status', title: '状态', dataIndex: 'status' },
-  { key: 'createTime', title: '创建时间', dataIndex: 'createTime' },
-  { key: 'actions', title: '操作' },
+  { colKey: 'name', title: '部门名称' },
+  { colKey: 'leaderUserId', title: '负责人' },
+  { colKey: 'sort', title: '排序' },
+  { colKey: 'status', title: '状态' },
+  { colKey: 'createTime', title: '创建时间' },
+  { colKey: 'actions', title: '操作' },
 ]
 
-export const useTable = (formRef: Ref<FormInstance>) => {
-  const queryParams = ref<TreeQueryParams>({})
-  const userList = ref<SimpleUserListVO>()
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const query = ref<TreeQueryParams>({
+    name: undefined,
+    status: undefined,
+  })
+  const message = useMessage()
 
-  const { data, pending, execute } = useRequest(() => getDeptTree(queryParams.value), {
+  const { data, pending, execute } = useRequest(() => getDeptTree(query.value), {
     immediate: true,
   })
 
-  getSimpleUserList().then((users) => {
-    userList.value = users
+  const { data: userList, execute: getUserList } = useRequest(getSimpleUserList, {
+    immediate: true,
   })
 
-  const onFilter = () => {
+  const onQueryChange = (reset?: boolean) => {
+    if (reset) {
+      formRef.value?.reset({ type: 'initial' })
+    }
+
     execute()
   }
 
-  const onFilterReset = () => {
-    formRef.value?.resetFields()
+  const onDelete = async (id: number) => {
+    await deleteDept(id)
+    message.success('删除成功')
     execute()
   }
 
   return {
     data,
-    userList,
     pending,
     execute,
-    queryParams,
-    onFilter,
-    onFilterReset,
+    query,
+    onQueryChange,
+    onDelete,
+    userList,
+    getUserList,
   }
 }

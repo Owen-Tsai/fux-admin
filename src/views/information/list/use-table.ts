@@ -1,60 +1,74 @@
-import useRequest from '@/hooks/use-request'
-import { getList, type ListQueryParams } from '@/api/information'
-import type { FormInstance, TableProps } from 'ant-design-vue'
-import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
+import { getInfoList, deleteInfo, type ListQueryParams } from '@/api/information/list'
+import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { key: 'id', title: '编号', dataIndex: 'id', width: 80 },
-  { key: 'title', title: '资讯标题', dataIndex: 'title', width: 260 },
-  { key: 'creator', title: '创建人', dataIndex: 'creator', width: 80 },
-  { key: 'createTime', title: '创建时间', dataIndex: 'createTime', width: 120 },
-  { key: 'auditadminid', title: '审核人', dataIndex: 'auditadminid', width: 80 },
-  { key: 'audittime', title: '审核时间', dataIndex: 'audittime', width: 120 },
-  { key: 'actions', title: '操作', dataIndex: 'actions', width: 200 },
+  { title: '资讯标题', colKey: 'title' },
+  { title: '资讯类别', colKey: 'type', width: 120 },
+  { title: '创建人', colKey: 'creator', width: 120, ellipsis: true },
+  { title: '状态', width: 120, colKey: 'auditState' },
+  {
+    title: '创建时间',
+    width: 180,
+    colKey: 'createTime',
+  },
+  {
+    title: '更新时间',
+    width: 180,
+    colKey: 'updateTime',
+  },
+  { title: '操作', width: 100, colKey: 'actions' },
 ]
 
-export const useTable = (filterFormRef: Ref<FormInstance | null>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const query = ref<ListQueryParams>({
+    createTime: [],
+    publishTime: [],
+    pageNo: 1,
+    pageSize: 10,
+  })
 
-  const { data, pending, execute } = useRequest(() => getList(), { immediate: true })
+  const message = useMessage()
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const { data, execute, pending } = useRequest(() => getInfoList(query.value), {
+    immediate: true,
+  })
+
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
 
     execute()
   }
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
-  const onFilterReset = () => {
-    filterFormRef.value?.resetFields()
-    queryParams.value.pageNo = 1
+  const onDelete = async (id: string) => {
+    pending.value = true
+    await deleteInfo(id)
+    message.success('删除成功')
     execute()
   }
 
   return {
     data,
     pending,
-    execute,
+    query,
     pagination,
-    queryParams,
-    onFilter,
-    onFilterReset,
-    onChange,
+    onPageChange,
+    onQueryChange,
+    execute,
+    onDelete,
   }
 }
