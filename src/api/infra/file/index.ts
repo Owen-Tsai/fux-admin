@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { FILE_UPLOAD_STORAGE } from '@/utils/constant'
 
 export type ListQueryParams = CommonQueryParams & {
   path?: string
@@ -24,6 +25,7 @@ export type FilePresignedRespVO = {
 
 export type FileUploadVO = {
   file: File
+  clientId?: FILE_UPLOAD_STORAGE
 }
 
 const prefix = '/infra/file'

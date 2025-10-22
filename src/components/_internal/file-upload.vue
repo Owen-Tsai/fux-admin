@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { uploadFile } from '@/api/infra/file'
+import { FILE_UPLOAD_STORAGE } from '@/utils/constant'
 import type { UploadFile, UploadProps, UploadInstanceFunctions } from 'tdesign-vue-next'
 
 const {
@@ -15,6 +16,7 @@ const {
   placeholder,
   sizeLimit = 5 * 1024,
   theme,
+  storage = FILE_UPLOAD_STORAGE.PUBLIC,
 } = defineProps<{
   requestFn?: (
     files: UploadFile | UploadFile[],
@@ -30,6 +32,7 @@ const {
   loading?: boolean
   name?: string
   placeholder?: string
+  storage?: FILE_UPLOAD_STORAGE
 }>()
 
 const message = useMessage()
@@ -71,7 +74,7 @@ const uploadFn: UploadProps['requestMethod'] = async (files) => {
 
     const res = requestFn
       ? await requestFn(files)
-      : await uploadFile({ file: (files as UploadFile).raw! })
+      : await uploadFile({ file: (files as UploadFile).raw!, clientId: storage })
 
     if (res.code === 0) {
       if (Array.isArray(value.value)) {
