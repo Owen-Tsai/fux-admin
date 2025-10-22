@@ -11,6 +11,7 @@ const [commonStatus] = useDict('common_status')
 
 const rules = ref<FormProps['rules']>({
   name: [{ required: true, message: '请输入部门名称' }],
+  // 可根据需要添加地区验证规则
 })
 
 const { treeData, userData } = defineProps<{
@@ -56,9 +57,27 @@ const submit = async () => {
 
 const loadData = async (id: number) => {
   loading.value = true
-  const data = await getDeptDetail(id)
-  formData.value = data
-  loading.value = false
+  try {
+    const data = await getDeptDetail(id)
+
+    console.log('res:')
+    console.log(data)
+
+    // 确保数据中包含地区信息
+    if (!data.region) {
+      data.region = []
+    }
+
+    formData.value = data
+
+    // 加载并设置地区路径
+    await loadRegionPathData(id)
+  } catch (e) {
+    console.error('加载部门详情失败', e)
+    message.error('加载部门详情失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 const open = (id?: number) => {
@@ -67,8 +86,16 @@ const open = (id?: number) => {
   formData.value.id = undefined
 
   if (id) {
-    loadData(id)
+    await loadData(id)
     mode.value = 'update'
+  } else {
+    formData.value = {
+      parentId: undefined,
+      name: '',
+      sort: 0,
+      status: 0,
+      region: [],
+    }
   }
 
   visible.value = true

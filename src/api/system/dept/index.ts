@@ -18,6 +18,14 @@ export type DeptVO = {
   phone?: string
   sort?: number
   status?: number
+  // 新增地区字段
+  region?: string[] // 省市区编码数组
+  provinceId?: string
+  cityId?: string
+  countyId?: string
+  provinceName?: string
+  cityName?: string
+  countyName?: string
 }
 
 export type TreeQueryParams = {
@@ -28,6 +36,7 @@ export type TreeQueryParams = {
 
 const prefix = '/system/dept'
 
+// 部门接口
 export const getDeptTree = (params?: TreeQueryParams) => {
   return request.get<DeptTreeVO>({
     url: `${prefix}/tree-list`,
@@ -64,5 +73,38 @@ export const deleteDept = (id: number) => {
 export const getDeptSimpleList = () => {
   return request.get<Array<{ id: number; name: string }>>({
     url: `${prefix}/simple-list`,
+  })
+}
+
+// 地区接口
+export const getTopRegions = () => {
+  return request.get<RegionTreeNode[]>({
+    url: `${regionPrefix}/top`,
+  })
+}
+
+export const getChildrenRegions = (parentId: string) => {
+  return request.get<RegionTreeNode[]>({
+    url: `${regionPrefix}/children/${parentId}`,
+  })
+}
+
+//获取地区路径
+export const getRegionPath = (id: string) => {
+  return request.get<RegionTreeNode[]>({
+    url: `${regionPrefix}/path/${id}`,
+  })
+}
+
+export const getRegionName = (code: string) => {
+  return request.get<string>({
+    url: `${regionPrefix}/name/${code}`,
+  })
+}
+
+export const getRegionNames = (codes: string[]) => {
+  return request.post<Record<string, string>>({
+    url: `${regionPrefix}/names`,
+    data: { codes },
   })
 }
