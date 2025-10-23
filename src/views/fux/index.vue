@@ -75,7 +75,7 @@ const current = ref(0)
 
 const drawerVisible = ref(false)
 const { copied, copy } = useClipboard({
-  source: JSON.stringify(appSchema.value, null, 2),
+  source: () => JSON.stringify(appSchema.value, null, 2),
 })
 
 const code = computedAsync(
