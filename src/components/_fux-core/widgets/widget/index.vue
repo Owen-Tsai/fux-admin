@@ -4,6 +4,7 @@
   </template>
   <template v-if="widget.class === 'form' && shouldShow">
     <TFormItem
+      v-if="visible"
       :help="widget.props.field.extra"
       :label="widget.props.field.label"
       :name="widget.props.field.name || widget.uid"
@@ -21,6 +22,7 @@
 import { widgetToRender } from '@fusionx/core/utils/widget'
 import { validation } from '@fusionx/core/utils'
 import { useRendererCtxInject } from '@fusionx/core/hooks/use-context'
+import useSignals from './use-signals'
 import type { Widget, FormWidget, FieldInteractivity } from '@fusionx/core/types'
 
 const ctx = useRendererCtxInject()
@@ -51,6 +53,8 @@ const shouldShow = computed(() => {
 const setInteractivity = (prop: 'readonly' | 'disabled', val: boolean) => {
   ;(widget.value as FormWidget).props[prop] = val
 }
+
+const { visible } = useSignals(widget)
 
 watchDebounced(
   () => interactivity.value,
