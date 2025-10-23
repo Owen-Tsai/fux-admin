@@ -200,6 +200,7 @@ export const useAppSave = (
       body: confirmText,
       onConfirm: async () => {
         loading.value = true
+        instance.setConfirmLoading(true)
         try {
           loading.value = true
           await generateWorkflowXML()
