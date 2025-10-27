@@ -49,7 +49,7 @@ const interactivity = computed<FieldInteractivity['config'] | undefined>(() => {
 const shouldShow = computed(() => {
   if (ctx?.mode === 'archive' || ctx?.mode === 'dev') return true
 
-  return interactivity.value !== 'hidden'
+  return interactivity.value !== 'hidden' && widget.value.props.hide !== true
 })
 
 const setInteractivity = (prop: 'readonly' | 'disabled', val: boolean) => {

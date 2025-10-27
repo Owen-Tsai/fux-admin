@@ -17,17 +17,17 @@
       class="!mt-4"
       @page-change="onPageChange"
     >
-      <template v-for="(column, i) in widget.props.columns" :key="i" #[column.key]="{ row }">
+      <template v-for="(column, i) in widget.props.columns" :key="i" #[column.colKey]="{ row }">
         <template v-if="column.formatter?.type === 'dict'">
-          <DictTag :dict-data="getDictData(column.formatter.value)" :value="row[column.key]" />
+          <DictTag :dict-data="getDictData(column.formatter.value)" :value="row[column.colKey]" />
         </template>
         <template v-else-if="column.formatter?.type === 'image'">
-          <TImageViewer v-model:visible="imageViewerVisible" :src="row[column.key]" />
+          <TImageViewer v-model:visible="imageViewerVisible" :src="row[column.colKey]" />
         </template>
         <template v-else-if="column.formatter?.type === 'custom'">
           {{ renderColumn(column.formatter.value, row) }}
         </template>
-        <template v-else-if="column.key === 'actions'">
+        <template v-else-if="column.colKey === 'actions'">
           <div class="flex gap-2">
             <TTooltip content="编辑">
               <TButton
@@ -56,6 +56,7 @@
             </TTooltip>
           </div>
         </template>
+        <template v-else>{{ row[column.colKey] }}</template>
       </template>
     </TTable>
 
