@@ -18,7 +18,7 @@
             </div>
           </div>
           <div>
-            <TStatistic title="待审核" :value="data?.total || 0" />
+            <TStatistic :title="isArchive ? '总数' : '待审核'" :value="data?.total || 0" />
           </div>
         </div>
 
@@ -36,7 +36,20 @@
             <TFormItem label="申请人" name="startUser" class="col">
               <TInput v-model:value="query.startUser" placeholder="请输入申请人" clearable />
             </TFormItem>
-            <TFormItem label="审核状态" name="auditProcess" class="col">
+            <TFormItem label="申请时间" name="submitTime" class="col">
+              <TDateRangePicker
+                v-model:value="query.submitTime"
+                placeholder="请选择申请时间"
+                clearable
+              />
+            </TFormItem>
+            <TFormItem
+              v-if="isArchive"
+              v-show="expanded"
+              label="审核状态"
+              name="auditProcess"
+              class="col"
+            >
               <TSelect
                 v-model:value="query.auditProcess"
                 :options="auditProcessOpts"
@@ -44,17 +57,12 @@
                 clearable
               />
             </TFormItem>
-            <TFormItem v-show="expanded" label="申请时间" name="submitTime" class="col">
-              <TDateRangePicker
-                v-model:value="query.submitTime"
-                placeholder="请选择申请时间"
-                clearable
-              />
-            </TFormItem>
             <QueryActions
+              v-if="isArchive"
               v-model:expanded="expanded"
               :class="['col', expanded ? 'ml-2/3' : null]"
             />
+            <QueryActions v-else :expanded="null" class="col" />
           </TForm>
         </TCard>
 
