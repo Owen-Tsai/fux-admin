@@ -85,10 +85,9 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
             await onReturn()
             break
         }
+        message.success('提交成功')
+        removeTab(route.fullPath)
       }
-
-      message.success('提交成功')
-      removeTab(route.fullPath)
     } catch (error) {
       console.log(error)
       message.error('提交失败')
