@@ -68,7 +68,7 @@
                     </TFormItem>
                   </TCol>
                   <TCol :span="12" class="text-right">
-                    <TButton type="submit">提交</TButton>
+                    <TButton type="submit" :loading="auditLoading">提交</TButton>
                   </TCol>
                 </TRow>
               </TForm>
@@ -103,7 +103,7 @@ const rules: FormProps['rules'] = {
 }
 
 const { loading, appSchema, plan, app, starter, submitTime } = useData(fuxRenderer)
-const { taskRtnOpts, onSubmit, state } = useAudit(formRef)
+const { taskRtnOpts, onSubmit, state, loading: auditLoading } = useAudit(formRef)
 
 const [auditOptions] = useDict('app_audit_options')
 </script>
