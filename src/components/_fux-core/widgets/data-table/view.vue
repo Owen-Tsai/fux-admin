@@ -32,7 +32,7 @@ const loadData = async () => {
     url,
     params: {
       pageNo: 1,
-      pageSize: 999,
+      pageSize: 100,
       // TODO: delareId: appParamsCtx.applyId
     },
   })

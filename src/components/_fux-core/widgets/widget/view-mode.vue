@@ -26,7 +26,9 @@ import type { Widget, FormWidget, FieldInteractivity } from '@fusionx/core/types
 const ctx = useRendererCtxInject()
 
 const widget = defineModel<Widget>('widget', { required: true })
-const fieldValue = ctx?.formData.value[widget.value.props.field.name || widget.value.uid]
+const fieldValue = computed(
+  () => ctx?.formData.value[widget.value.props.field.name || widget.value.uid],
+)
 
 const rules = computed(() => validation.generateRules(widget.value as FormWidget))
 
