@@ -26,7 +26,9 @@ import type { Widget, FormWidget, FieldInteractivity } from '@fusionx/core/types
 const ctx = useRendererCtxInject()
 
 const widget = defineModel<Widget>('widget', { required: true })
-const fieldValue = ctx?.formData.value[widget.value.props.field.name || widget.value.uid]
+const fieldValue = computed(
+  () => ctx?.formData.value[widget.value.props.field.name || widget.value.uid],
+)
 
 const rules = computed(() => validation.generateRules(widget.value as FormWidget))
 
@@ -47,7 +49,7 @@ const interactivity = computed<FieldInteractivity['config'] | undefined>(() => {
 const shouldShow = computed(() => {
   if (ctx?.mode === 'archive' || ctx?.mode === 'dev') return true
 
-  return interactivity.value !== 'hidden'
+  return interactivity.value !== 'hidden' && widget.value.props.hide !== true
 })
 
 const setInteractivity = (prop: 'readonly' | 'disabled', val: boolean) => {

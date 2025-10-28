@@ -79,6 +79,21 @@ const useRendererInstance = () => {
     merge($state.value, data)
   }
 
+  const findPaginatedWidget = () => {
+    if (!appSchema.value?.info.paginated) return null
+    return appSchema.value.form.widgets.find(
+      (widget) =>
+        (widget.type === 'tabs' && widget.props.stepsMode === true) || widget.type === 'steps',
+    )
+  }
+
+  const setPaginatedWidgetDisabled = (disabled: boolean) => {
+    const paginatedWidget = findPaginatedWidget()
+    if (paginatedWidget) {
+      setWidgetProps(paginatedWidget.uid, { disabled })
+    }
+  }
+
   return {
     clearFormData,
     getAppSchema,
@@ -89,6 +104,7 @@ const useRendererInstance = () => {
     setState,
     setWidgetOptions,
     setWidgetProps,
+    setPaginatedWidgetDisabled,
   }
 }
 

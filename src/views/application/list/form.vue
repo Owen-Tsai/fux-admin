@@ -122,7 +122,7 @@ defineExpose({ open })
             :loading="pending"
             filterable
             clearable
-            :keys="{ label: 'name', value: 'key' }"
+            :keys="{ label: 'name', value: 'id' }"
             :tree-props="{ expandAll: true }"
           />
         </TFormItem>

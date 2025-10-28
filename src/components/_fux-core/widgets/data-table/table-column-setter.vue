@@ -34,7 +34,7 @@ const saveColumnsConfig = () => {
 const addColumn = () => {
   columns.value.push({
     title: '',
-    key: '',
+    colKey: '',
     width: '',
     formatter: {
       type: '',
@@ -65,8 +65,8 @@ defineExpose({ open })
           <TFormItem label="列标题" :name="`columns[${idx}].title`">
             <TInput v-model:value="column.title" />
           </TFormItem>
-          <TFormItem label="键名" :name="`columns[${idx}].key`">
-            <TInput v-model:value="column.key" />
+          <TFormItem label="键名" :name="`columns[${idx}].colKey`">
+            <TInput v-model:value="column.colKey" />
           </TFormItem>
           <TFormItem label="列宽度" :name="`columns[${idx}].width`">
             <TInput v-model:value="column.width" placeholder="请输入含单位的值" />

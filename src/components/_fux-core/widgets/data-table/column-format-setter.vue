@@ -32,7 +32,7 @@ const formatterOpts = [
 const { data: dictOpts } = useRequest(getSimpleDictTypeList, { immediate: true })
 
 const saveFormatterConfig = () => {
-  const activedColumn = props.value.columns?.find((c) => c.key === activeColumn.value?.key)
+  const activedColumn = props.value.columns?.find((c) => c.colKey === activeColumn.value?.colKey)
   if (activedColumn) {
     activedColumn.formatter = formatter.value
   }
@@ -51,7 +51,12 @@ defineExpose({ open })
       </TFormItem>
     </TForm>
     <TFormItem v-if="formatter.type === 'dict'">
-      <TSelect v-model:value="formatter.value" :options="dictOpts" filterable />
+      <TSelect
+        v-model:value="formatter.value"
+        :options="dictOpts"
+        :keys="{ label: 'name', value: 'type' }"
+        filterable
+      />
     </TFormItem>
     <TFormItem v-if="formatter.type === 'custom'">
       <CodeEditor v-model="formatter.value" :height="200" />

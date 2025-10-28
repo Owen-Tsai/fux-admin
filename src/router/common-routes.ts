@@ -47,6 +47,23 @@ const commonRoutes: RouteRecordRaw[] = [
         },
       },
       {
+        path: '/business/:appId/audit',
+        name: 'BusinessAuditList',
+        component: () => import('@/views/business/list/index.vue'),
+        meta: {
+          title: '待审核列表',
+          keepAlive: false,
+        },
+      },
+      {
+        path: '/business/:appId/audit/detail',
+        name: 'BusinessAuditDetail',
+        component: () => import('@/views/business/audit/index.vue'),
+        meta: {
+          title: '业务审核',
+        },
+      },
+      {
         path: '/__demo/editor',
         name: 'EditorDemo',
         component: () => import('@/views/__demo/editor.vue'),

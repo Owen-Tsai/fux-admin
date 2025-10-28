@@ -1,6 +1,10 @@
 <template>
-  <TDescriptions v-for="(entry, i) in data" :key="i" bordered>
-    <TDescriptionsItem v-for="(field, j) in widget.props.widgets" :key="j">
+  <TDescriptions v-for="(entry, i) in data" :key="i" bordered class="!mb-4">
+    <TDescriptionsItem
+      v-for="(field, j) in tableNestedWidgets"
+      :key="j"
+      :label="field.props.field.label"
+    >
       <component
         :is="viewModeWidgetToRender(field.type)"
         :widget="field"
@@ -12,17 +16,25 @@
 
 <script setup lang="ts">
 import request from '@/utils/request'
-import { viewModeWidgetToRender } from '@fusionx/core/utils'
+import { viewModeWidgetToRender, findWidgetsByCompareFn } from '@fusionx/core/utils'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const { widget } = defineProps<{
   widget: WidgetMap['dataTable']
 }>()
 
+const route = useRoute()
 const URL_PREFIX = widget.props.url || ''
 
 const data = ref<any[]>([])
 const loading = ref(false)
+
+const tableNestedWidgets = computed(() => {
+  return findWidgetsByCompareFn(
+    widget.props.widgets,
+    (w) => w.class === 'form' && w.props.hide !== true,
+  )
+})
 
 const loadData = async () => {
   loading.value = true
@@ -32,8 +44,8 @@ const loadData = async () => {
     url,
     params: {
       pageNo: 1,
-      pageSize: 999,
-      // TODO: delareId: appParamsCtx.applyId
+      pageSize: 100,
+      declareId: route.query.applyId,
     },
   })
 

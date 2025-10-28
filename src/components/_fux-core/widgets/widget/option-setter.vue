@@ -48,7 +48,7 @@
         v-model:value="options.value"
         :options="dictTypes"
         filterable
-        :keys="{ label: 'name', value: 'id' }"
+        :keys="{ label: 'name', value: 'type' }"
         placeholder="请选择字典类型"
       />
     </template>

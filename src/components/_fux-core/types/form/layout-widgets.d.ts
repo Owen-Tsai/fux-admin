@@ -85,6 +85,7 @@ export type WPropsTableColumn = {
    * @deprecated use `colKey` instead
    */
   dataIndex?: string
+  colKey?: string
 }
 
 export type WPropsTablePagination = {
