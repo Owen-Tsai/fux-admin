@@ -54,6 +54,59 @@ export const findWidgetByUid = (widgets: Widget[], uid: string): Widget | null =
   return null
 }
 
+export const findWidgetsByClass = (widgets: Widget[], className: string): Widget[] => {
+  const ret: Widget[] = []
+
+  widgets.forEach((w) => {
+    if (w.class === className) {
+      ret.push(w)
+    } else if (w.class === 'layout') {
+      if (w.type === 'grid' || w.type === 'steps' || w.type === 'tabs') {
+        if (w.props.children) {
+          for (let j = 0; j < w.props.children.length; j++) {
+            ret.push(...findWidgetsByClass(w.props.children[j].widgets, className))
+          }
+        }
+      } else if (w.type === 'subForm') {
+        ret.push(...findWidgetsByClass(w.props.children, className))
+      } else {
+        // dataTable
+        ret.push(...findWidgetsByClass(w.props.widgets, className))
+      }
+    }
+  })
+
+  return ret
+}
+
+export const findWidgetsByCompareFn = (
+  widgets: Widget[],
+  compareFn: (w: Widget) => boolean,
+): Widget[] => {
+  const ret: Widget[] = []
+
+  widgets.forEach((w) => {
+    if (compareFn(w)) {
+      ret.push(w)
+    } else if (w.class === 'layout') {
+      if (w.type === 'grid' || w.type === 'steps' || w.type === 'tabs') {
+        if (w.props.children) {
+          for (let j = 0; j < w.props.children.length; j++) {
+            ret.push(...findWidgetsByCompareFn(w.props.children[j].widgets, compareFn))
+          }
+        }
+      } else if (w.type === 'subForm') {
+        ret.push(...findWidgetsByCompareFn(w.props.children, compareFn))
+      } else {
+        // dataTable
+        ret.push(...findWidgetsByCompareFn(w.props.widgets, compareFn))
+      }
+    }
+  })
+
+  return ret
+}
+
 /**
  * 复制组件，插入到 siblings
  * @param widgetToCopy 需要复制的组件
