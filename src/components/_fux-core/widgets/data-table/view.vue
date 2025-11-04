@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import request from '@/utils/request'
 import { viewModeWidgetToRender, findWidgetsByCompareFn } from '@fusionx/core/utils'
-import type { WidgetMap } from '@fusionx/core/types'
+import type { WidgetMap, FormWidget } from '@fusionx/core/types'
 
 const { widget } = defineProps<{
   widget: WidgetMap['dataTable']
@@ -29,11 +29,11 @@ const URL_PREFIX = widget.props.url || ''
 const data = ref<any[]>([])
 const loading = ref(false)
 
-const tableNestedWidgets = computed(() => {
+const tableNestedWidgets = computed<FormWidget[]>(() => {
   return findWidgetsByCompareFn(
     widget.props.widgets,
     (w) => w.class === 'form' && w.props.hide !== true,
-  )
+  ) as FormWidget[]
 })
 
 const loadData = async () => {

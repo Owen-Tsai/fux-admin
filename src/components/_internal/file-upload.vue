@@ -6,6 +6,7 @@ import type { UploadFile, UploadProps, UploadInstanceFunctions } from 'tdesign-v
 const {
   accept,
   requestFn,
+  data,
   autoUpload = true,
   disabled,
   draggable,
@@ -14,14 +15,18 @@ const {
   multiple,
   name,
   placeholder,
-  sizeLimit = 5 * 1024,
+  sizeLimit,
   theme,
   storage = FILE_UPLOAD_STORAGE.PUBLIC,
+  beforeUpload,
 } = defineProps<{
-  requestFn?: (
-    files: UploadFile | UploadFile[],
-  ) => Promise<{ code: number; msg?: string; data: string }>
+  requestFn?: (reqData: {
+    file: UploadFile | UploadFile[]
+    [x: string]: any
+  }) => Promise<{ code: number; msg?: string; data: string }>
   accept?: string
+  action?: string
+  data?: Record<string, any>
   theme?: 'file-input' | 'file' | 'image' | 'file-flow' | 'image-flow' | 'custom'
   multiple?: boolean
   max?: number
@@ -33,6 +38,7 @@ const {
   name?: string
   placeholder?: string
   storage?: FILE_UPLOAD_STORAGE
+  beforeUpload?: UploadProps['beforeUpload']
 }>()
 
 const message = useMessage()
@@ -41,10 +47,6 @@ const message = useMessage()
 const value = defineModel<string[] | string>('value')
 // list used to display
 const fileList = ref<UploadFile[]>([])
-// list to upload
-const filesToUpload = ref<UploadFile[]>([])
-
-const uploadUrl = import.meta.env.VITE_UPLOAD_URL
 
 // const emit = defineEmits(['update:value', 'start', 'success', 'error', 'finish'])
 const emit = defineEmits<{
@@ -73,8 +75,8 @@ const uploadFn: UploadProps['requestMethod'] = async (files) => {
     }
 
     const res = requestFn
-      ? await requestFn(files)
-      : await uploadFile({ file: (files as UploadFile).raw!, clientId: storage })
+      ? await requestFn({ file: files as UploadFile | UploadFile[], ...data })
+      : await uploadFile({ file: (files as UploadFile).raw!, clientId: storage, ...data })
 
     if (res.code === 0) {
       if (Array.isArray(value.value)) {
@@ -152,7 +154,7 @@ defineExpose({
     ref="uploadRef"
     v-model:files="fileList"
     :accept="accept"
-    :action="uploadUrl"
+    :data="data"
     :auto-upload="autoUpload"
     :request-method="uploadFn"
     :max="max"
@@ -164,7 +166,9 @@ defineExpose({
     :placeholder="placeholder"
     :size-limit="sizeLimit"
     :theme="theme"
+    :before-upload="beforeUpload"
     @success="onSuccess"
+    @fail="(error) => $emit('error', error)"
     @remove="onRemove"
   >
     <slot></slot>

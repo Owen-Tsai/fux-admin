@@ -16,6 +16,9 @@
       <component :is="widgetToRender(widget.type)" :widget="widget" />
     </TFormItem>
   </template>
+  <template v-if="widget.class === 'special'">
+    <component :is="widgetToRender(widget.type)" :widget="widget" />
+  </template>
 </template>
 
 <script setup lang="ts">
