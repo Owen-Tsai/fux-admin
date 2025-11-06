@@ -80,7 +80,7 @@ const loadData = async (id: number) => {
   }
 }
 
-const open = (id?: number) => {
+const open = async (id?: number) => {
   formRef.value?.reset({ type: 'initial' })
   mode.value = 'create'
   formData.value.id = undefined
