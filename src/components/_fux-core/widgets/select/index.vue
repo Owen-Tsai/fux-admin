@@ -12,12 +12,16 @@
     :multiple="widget.props.multiple"
     :max="widget.props.max"
     :min-collapsed-num="widget.props.minCollapsedNum"
+    @change="handler('change')"
+    @focus="handler('focus')"
+    @blur="handler('blur')"
   />
 </template>
 
 <script setup lang="ts">
 import { useModel, useRecordOptions } from '@fusionx/core/hooks'
 import { tryParse } from '@fusionx/core/utils'
+import { useEventHandlers } from '@fusionx/core/hooks'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const { widget } = defineProps<{
@@ -25,6 +29,8 @@ const { widget } = defineProps<{
 }>()
 
 const model = useModel(widget)
+
+const handler = useEventHandlers(widget.props.event)
 
 const keys = computed(() => tryParse(widget.props.fieldNames))
 
