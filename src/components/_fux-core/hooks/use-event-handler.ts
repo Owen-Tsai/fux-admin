@@ -5,7 +5,7 @@ import useInstanceMethods from '../form-renderer/use-instance'
 export const useEventHandlers = (eventMap?: Record<string, string>) => {
   const ctx = useRendererCtxInject()
   if (!ctx) {
-    throw new Error('No renderer context found')
+    return
   }
 
   const { $state, appSchema, formData, mode } = ctx
