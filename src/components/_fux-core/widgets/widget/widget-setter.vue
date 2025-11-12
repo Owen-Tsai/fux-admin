@@ -2,6 +2,19 @@
   <TEmpty v-if="appSchema.form.widgets.length <= 0" title="请添加组件进行配置" />
   <TEmpty v-else-if="selectedWidget === undefined" title="请选中组件进行配置" />
   <TForm v-else :data="appSchema" label-align="top" layout="inline" class="!w-full">
+    <TFormItem label="UID">
+      <TInput v-model:value="selectedWidget.uid" readonly>
+        <template #suffix>
+          <TTooltip content="复制">
+            <TButton theme="primary" size="small" shape="square" @click="copy()">
+              <template #icon>
+                <Icon :name="copied ? 'check' : 'copy'" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </template>
+      </TInput>
+    </TFormItem>
     <TFormItem v-if="selectedWidget.class === 'form'" label="字段标签" name="label">
       <TInput v-model:value="selectedWidget.props.field.label" />
     </TFormItem>
@@ -56,6 +69,7 @@ const compToRender = computed(() => {
 })
 
 const { appSchema, selectedWidget } = useDesignerCtxInject()!
+const { copy, copied } = useClipboard({ source: selectedWidget.value?.uid })
 
 const widgetTypeOpts = Object.keys(initialWidgetConfig).map((type) => ({
   label: initialWidgetConfig[type as keyof typeof initialWidgetConfig]?.name,
