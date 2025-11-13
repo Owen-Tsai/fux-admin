@@ -53,7 +53,7 @@ const [operateType] = useDict('system_operate_type')
       </TForm>
     </TCard>
 
-    <TCard title="登录日志">
+    <TCard title="操作日志">
       <TTable
         :data="data?.list"
         row-key="id"
