@@ -7,11 +7,13 @@
     :readonly="widget.props.readonly"
     :theme="theme"
     :variant="variant"
+    @change="handler('change')"
   />
 </template>
 
 <script setup lang="ts">
 import { useModel, useRecordOptions } from '@fusionx/core/hooks'
+import { useEventHandlers } from '@fusionx/core/hooks'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const { widget } = defineProps<{
@@ -21,6 +23,8 @@ const { widget } = defineProps<{
 const model = useModel(widget)
 
 const options = useRecordOptions(widget)
+
+const handler = useEventHandlers(widget.props.event)
 
 const variant = computed(() => {
   if (widget.props.variant === 'radio') return undefined

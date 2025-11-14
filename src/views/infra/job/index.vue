@@ -2,14 +2,20 @@
 import dayjs from 'dayjs'
 import Form from './form.vue'
 import { columns, useTable } from './use-table'
-import type { FileConfigVO } from '@/api/infra/file/config'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
+import type { JobVO } from '@/api/infra/job'
+
+enum JOB_STATUS {
+  INIT,
+  NORMAL,
+  STOP,
+}
 
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
 
 const { permission } = usePermission()
-const [infraFileStorage] = useDict('infra_file_storage')
+const [jobStatusOpts] = useDict('infra_job_status')
 
 const {
   data,
@@ -24,12 +30,12 @@ const {
   onUpdateStatus,
 } = useTable(queryForm)
 
-defineOptions({ name: 'InfraFileConfig' })
+defineOptions({ name: 'InfraJob' })
 </script>
 
 <template>
   <div class="view">
-    <TCard v-if="permission.has('infra:file-config:query')" class="query-form !mb-4">
+    <TCard v-if="permission.has('infra:job:query')" class="query-form !mb-4">
       <TForm
         ref="queryForm"
         :data="query"
@@ -42,18 +48,18 @@ defineOptions({ name: 'InfraFileConfig' })
         <TFormItem label="配置名称" name="name" class="col">
           <TInput v-model:value="query.name" placeholder="请输入配置名称" />
         </TFormItem>
-        <TFormItem label="存储器" name="storage" class="col">
+        <TFormItem label="任务状态" name="status" class="col">
           <TSelect
-            v-model:value="query.storage"
-            :options="infraFileStorage"
-            placeholder="请选择存储器"
+            v-model:value="query.status"
+            :options="jobStatusOpts"
+            placeholder="请选择任务状态"
           />
         </TFormItem>
         <QueryActions :expanded="null" class="col" />
       </TForm>
     </TCard>
 
-    <TCard title="文件配置列表">
+    <TCard title="定时任务列表">
       <template #actions>
         <div class="flex items-center gap-2">
           <TButton
@@ -84,17 +90,16 @@ defineOptions({ name: 'InfraFileConfig' })
         :loading="pending"
         @page-change="onPageChange"
       >
-        <template #name="{ row }: TableScope<FileConfigVO>">
+        <template #name="{ row }: TableScope<JobVO>">
           {{ row.name }}
-          <TTag v-if="row.master" theme="primary" variant="light-outline">主配置</TTag>
         </template>
-        <template #storage="{ row }">
-          <DictTag :dict-data="infraFileStorage" :value="row.storage" />
+        <template #status="{ row }">
+          <DictTag :dict-data="jobStatusOpts" :value="row.status" />
         </template>
         <template #createTime="{ row }">
           {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
-        <template #actions="{ row }: TableScope<FileConfigVO>">
+        <template #actions="{ row }: TableScope<JobVO>">
           <div class="flex items-center gap-2">
             <TTooltip content="编辑">
               <TButton
@@ -116,19 +121,13 @@ defineOptions({ name: 'InfraFileConfig' })
                 </template>
               </TButton>
               <TDropdownMenu>
-                <TDropdownItem @click="onTest(row.id!)">测试配置</TDropdownItem>
-                <TDropdownItem
-                  :disabled="permission.hasNone('infra:file-config:update') || !!row.master"
-                  @click="onSetMaster(row.id!)"
-                  divider
-                  >设为主配置</TDropdownItem
-                >
-                <TDropdownItem
-                  theme="error"
-                  :disabled="permission.hasNone('infra:file-config:delete')"
-                  @click="onDelete(row.id!)"
-                  >删除配置</TDropdownItem
-                >
+                <TDropdownItem divider>
+                  {{ row.status === JOB_STATUS.STOP ? '开启' : '暂停' }}
+                </TDropdownItem>
+                <TDropdownItem divider>手动执行</TDropdownItem>
+                <TDropdownItem>任务详情</TDropdownItem>
+                <TDropdownItem divider>调度日志</TDropdownItem>
+                <TDropdownItem theme="error">删除任务</TDropdownItem>
               </TDropdownMenu>
             </TDropdown>
           </div>

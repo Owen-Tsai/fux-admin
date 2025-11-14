@@ -49,7 +49,6 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
 
     nextTick(() => {
       fuxRenderer.value?.setFormData(dataToFill)
-      emitter.emit('form:ready')
     })
   }
 

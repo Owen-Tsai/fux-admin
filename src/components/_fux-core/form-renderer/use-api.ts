@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 import { set } from 'lodash-es'
-import { emitter } from '@fusionx/core/utils'
+import { emitter, eventKeys } from '@fusionx/core/utils'
 import { useRendererCtxInject } from '@fusionx/core/hooks'
 
 /**
@@ -26,12 +26,12 @@ const useAPI = () => {
         })
         .then((res) => {
           set($state.value, dataIndex, res)
-          emitter.emit('update:state')
+          emitter.emit(eventKeys.FORM_$STATE_CHANGE)
         })
     })
 
     Promise.all(promises).then(() => {
-      emitter.emit('ready:state')
+      emitter.emit(eventKeys.FORM_READY)
     })
   }
 }

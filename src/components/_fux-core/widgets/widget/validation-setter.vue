@@ -22,7 +22,6 @@
         />
       </div>
     </TFormItem>
-    <pre>{{ validation.generateRules(selectedWidget) }}</pre>
   </template>
 </template>
 
@@ -43,4 +42,18 @@ const onValidationTypeChange: SelectProps['onChange'] = (v) => {
     validation.removeRulesAndAdd(selectedWidget.value as FormWidget)
   }
 }
+
+watch(
+  () => selectedWidget.value,
+  () => {
+    const validation = (selectedWidget.value as FormWidget)?.props.field?.validation
+    if (!validation) {
+      validateType.value = ''
+      return
+    }
+    const keys = Object.keys(validation).filter((key) => key !== 'required')
+
+    validateType.value = keys[0]
+  },
+)
 </script>

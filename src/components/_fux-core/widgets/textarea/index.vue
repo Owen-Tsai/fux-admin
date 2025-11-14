@@ -6,11 +6,15 @@
     :maxlength="widget.props.maxlength"
     :placeholder="widget.props.placeholder"
     :readonly="widget.props.readonly"
+    @change="handler('change')"
+    @focus="handler('focus')"
+    @blur="handler('blur')"
   />
 </template>
 
 <script setup lang="ts">
 import { useModel } from '@fusionx/core/hooks'
+import { useEventHandlers } from '@fusionx/core/hooks'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const { widget } = defineProps<{
@@ -18,6 +22,8 @@ const { widget } = defineProps<{
 }>()
 
 const model = useModel(widget)
+
+const handler = useEventHandlers(widget.props.event)
 
 const size = computed(() => {
   if (widget.props.autoResize) return true

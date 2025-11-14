@@ -31,3 +31,12 @@ export enum AUDIT_PROCESS {
   /** 已提交 / 审核中 */
   SUBMITTED = '0',
 }
+
+export enum ERROR_LOG_PROCESS_STATUS {
+  /** 未处理 */
+  UNPROCESSED = 0,
+  /** 已处理 */
+  PROCESSED = 1,
+  /** 已忽略 */
+  IGNORED = 2,
+}

@@ -17,12 +17,16 @@
     :readonly="widget.props.readonly"
     :keys="keys"
     :options="options"
+    @change="handler('change')"
+    @focus="handler('focus')"
+    @blur="handler('blur')"
   />
 </template>
 
 <script setup lang="ts">
 import { useModel, useTreeStructureOptions } from '@fusionx/core/hooks'
 import { tryParse } from '@fusionx/core/utils'
+import { useEventHandlers } from '@fusionx/core/hooks'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const { widget } = defineProps<{
@@ -30,6 +34,8 @@ const { widget } = defineProps<{
 }>()
 
 const model = useModel(widget)
+
+const handler = useEventHandlers(widget.props.event)
 
 const options = useTreeStructureOptions(widget)
 
