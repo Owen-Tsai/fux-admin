@@ -106,6 +106,7 @@ const getMemorized = () => {
   if (pwd) {
     formData.value.username = localCache.get('username')
     formData.value.password = decrypt(pwd as string) || ''
+    formData.value.memorize = true
   }
 }
 
