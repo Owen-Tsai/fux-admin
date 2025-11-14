@@ -22,7 +22,6 @@
         />
       </div>
     </TFormItem>
-    <pre>{{ validation.generateRules(selectedWidget) }}</pre>
   </template>
 </template>
 
