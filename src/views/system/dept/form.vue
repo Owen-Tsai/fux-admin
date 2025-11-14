@@ -71,7 +71,7 @@ const loadData = async (id: number) => {
     formData.value = data
 
     // 加载并设置地区路径
-    await loadRegionPathData(id)
+    // await loadRegionPathData(id)
   } catch (e) {
     console.error('加载部门详情失败', e)
     message.error('加载部门详情失败')
