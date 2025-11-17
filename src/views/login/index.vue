@@ -30,9 +30,8 @@ const footerText = import.meta.env.VITE_APP_FOOTER
 
 <style lang="scss" scoped>
 .page {
-  background: url('@/assets/img/login-bg.png') no-repeat top center;
-  background-size: 100%;
-  background-attachment: fixed;
+  background: url('@/assets/img/login-bg.png') no-repeat fixed top center;
+  background-size: cover;
   @apply min-h-screen flex flex-col items-center h-full;
 }
 
