@@ -1,16 +1,30 @@
 class Logger {
-  private DEV: boolean = true
   private static instance: Logger | null = null
+  private readonly DEV: boolean
 
+  // 私有构造函数，防止外部直接实例化
   private constructor(dev: boolean) {
     this.DEV = dev
   }
 
-  static getInstance(dev: boolean) {
+  /**
+   * 初始化Logger实例
+   * 应在应用启动时调用一次
+   */
+  static initialize(dev: boolean): void {
     if (!Logger.instance) {
       Logger.instance = new Logger(dev)
     }
+  }
 
+  /**
+   * 获取Logger单例实例
+   * 注意：使用前必须先调用initialize方法
+   */
+  static getInstance(): Logger {
+    if (!Logger.instance) {
+      throw new Error('Logger not initialized. Call Logger.initialize() first.')
+    }
     return Logger.instance
   }
 
@@ -23,17 +37,31 @@ class Logger {
     ]
   }
 
-  error(module: string, message?: string, ...args: any): void {
+  error(module: string, message?: string, ...args: any[]): void {
     if (this.DEV) {
       const prefix = Logger.formatPrefix(module)
       console.error(...prefix, message, ...args)
     }
   }
 
-  warn(module: string, message?: string, ...args: any): void {
+  warn(module: string, message?: string, ...args: any[]): void {
     if (this.DEV) {
       const prefix = Logger.formatPrefix(module)
       console.warn(...prefix, message, ...args)
+    }
+  }
+
+  info(module: string, message?: string, ...args: any[]): void {
+    if (this.DEV) {
+      const prefix = Logger.formatPrefix(module)
+      console.info(...prefix, message, ...args)
+    }
+  }
+
+  debug(module: string, message?: string, ...args: any[]): void {
+    if (this.DEV) {
+      const prefix = Logger.formatPrefix(module)
+      console.debug(...prefix, message, ...args)
     }
   }
 }
