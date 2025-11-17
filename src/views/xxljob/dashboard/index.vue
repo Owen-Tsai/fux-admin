@@ -33,9 +33,9 @@ import PieChart from './components/PieChart.vue'
 import {getDashboardChartInfo, getDashBoardPanelInfo} from "@/api/xxljob/joblog";
 
 const panelGroupData = ref<{
-  jobInfoCount: number | null
-  jobLogCount: number | null
-  executorCount: number | null
+  jobInfoCount: number
+  jobLogCount: number
+  executorCount: number
 }>({
   jobInfoCount: 0,
   jobLogCount: 0,
@@ -63,7 +63,6 @@ const pieCharData = ref<{
   jobFail: 0,
   jobRunning: 0,
 })
-
 
 const timeRange = ref([dayjs().subtract(6, 'day').startOf('day').toDate(), dayjs().endOf('day').toDate()]);
 

@@ -44,12 +44,7 @@
 
 <script setup lang="ts">
 import { defineProps, withDefaults } from 'vue'
-
 import CountUp from 'vue-countup-v3'
-
-// -------------------------------
-// 定义 Props 类型
-// -------------------------------
 
 interface GroupData {
   jobInfoCount: number
@@ -61,7 +56,6 @@ interface Props {
   groupData: GroupData
 }
 
-// 设置默认值（可选）
 const props = withDefaults(defineProps<Props>(), {
   groupData: () => ({
     jobInfoCount: 0,
@@ -69,20 +63,6 @@ const props = withDefaults(defineProps<Props>(), {
     executorCount: 0,
   }),
 })
-
-// -------------------------------
-// 事件定义与方法
-// -------------------------------
-
-// 定义 emit 类型
-const emit = defineEmits<{
-  (e: 'handleSetLineChartData', type: string): void
-}>()
-
-// 点击卡片触发事件
-const handleSetLineChartData = (type: string) => {
-  emit('handleSetLineChartData', type)
-}
 </script>
 
 <style lang="scss" scope>

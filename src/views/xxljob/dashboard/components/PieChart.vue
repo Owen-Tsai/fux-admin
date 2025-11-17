@@ -5,11 +5,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
-import 'echarts/theme/macarons' // 主题
-
-// -------------------------------
-// 定义 Props 接口
-// -------------------------------
+import 'echarts/theme/macarons'
 
 interface PieChartData {
   jobSuccess: number
@@ -31,16 +27,8 @@ const props = withDefaults(
   }
 )
 
-// -------------------------------
-// 图表 DOM 引用
-// -------------------------------
-
 const chartRef = ref<HTMLDivElement | null>(null)
 let chart: echarts.ECharts | null = null
-
-// -------------------------------
-// 初始化图表
-// -------------------------------
 
 const initChart = () => {
   if (!chartRef.value) return
@@ -49,10 +37,6 @@ const initChart = () => {
   setOptions(props.chartData)
 
 }
-
-// -------------------------------
-// 设置图表选项
-// -------------------------------
 
 const setOptions = (data: PieChartData) => {
   if (!chart) return
@@ -90,10 +74,6 @@ const setOptions = (data: PieChartData) => {
   })
 }
 
-// -------------------------------
-// 监听数据变化
-// -------------------------------
-
 watch(
   () => props.chartData,
   (newData) => {
@@ -103,10 +83,6 @@ watch(
   },
   { deep: true }
 )
-
-// -------------------------------
-// 生命周期
-// -------------------------------
 
 onMounted(() => {
   nextTick(() => {
@@ -121,8 +97,3 @@ onBeforeUnmount(() => {
   }
 })
 </script>
-
-<style scoped>
-/* 如果需要覆盖 el-col 样式，请在父级处理 */
-/* .el-col-lg-8 { width: 50%; } 不建议放在这里 */
-</style>

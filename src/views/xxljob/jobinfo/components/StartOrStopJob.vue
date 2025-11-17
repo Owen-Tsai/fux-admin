@@ -11,8 +11,8 @@
 </template>
 
 <script lang="ts" setup>
-import {DialogPlugin, type FormInstanceFunctions, MessagePlugin} from 'tdesign-vue-next'
-import {nextTriggerTime, startJob, stopJob} from "@/api/xxljob/jobinfo";
+import { MessagePlugin} from 'tdesign-vue-next'
+import { startJob, stopJob} from "@/api/xxljob/jobinfo";
 
 const emit = defineEmits(['success'])
 
@@ -33,7 +33,6 @@ const open = (targetMode: 'start' | 'stop', id: number) => {
 }
 
 const onConfirm = () => {
-  console.log('确认', mode.value)
   if (mode.value === 'start')
     onStartJob()
   else
@@ -43,7 +42,6 @@ const onConfirm = () => {
 
 // 启动任务
 const onStartJob = () => {
-  console.log('启动确认', mode.value)
     startJob(jobId.value).then(() => {
       MessagePlugin.success({ content: `任务启动成功`})
       emit('success')
@@ -55,7 +53,6 @@ const onStartJob = () => {
 
 // 停止任务
 const onStopJob = () => {
-  console.log('停止', mode.value)
     stopJob(jobId.value).then(() => {
       MessagePlugin.success({ content: `任务停止成功`})
       emit('success')
@@ -64,7 +61,6 @@ const onStopJob = () => {
       MessagePlugin.error({ content: `任务停止失败:${err.message}`});
     })
 }
-
 
 defineExpose({ open })
 </script>

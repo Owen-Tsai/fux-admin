@@ -31,7 +31,6 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
     query.value.pageNo = current
     query.value.pageSize = pageSize
-
     execute()
   }
 

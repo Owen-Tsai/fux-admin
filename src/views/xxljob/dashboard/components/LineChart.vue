@@ -7,10 +7,6 @@ import { onMounted, onBeforeUnmount, watch, ref, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import 'echarts/theme/macarons' // 引入主题
 
-// -------------------------------
-// 定义 Props
-// -------------------------------
-
 interface ChartData {
   successData: number[]
   failData: number[]
@@ -34,16 +30,8 @@ const props = withDefaults(
   }
 )
 
-// -------------------------------
-// 模板引用
-// -------------------------------
-
 const chartRef = ref<HTMLDivElement | null>(null)
 let chart: echarts.ECharts | null = null
-
-// -------------------------------
-// 初始化图表
-// -------------------------------
 
 const initChart = () => {
   if (!chartRef.value) return
@@ -52,10 +40,6 @@ const initChart = () => {
   setOptions(props.chartData)
 
 }
-
-// -------------------------------
-// 设置图表选项
-// -------------------------------
 
 const setOptions = (data: ChartData) => {
   if (!chart) return
@@ -142,10 +126,6 @@ const setOptions = (data: ChartData) => {
   })
 }
 
-// -------------------------------
-// 监听数据变化
-// -------------------------------
-
 watch(
   () => props.chartData,
   (val) => {
@@ -156,10 +136,6 @@ watch(
   { deep: true }
 )
 
-// -------------------------------
-// 生命周期
-// -------------------------------
-
 onMounted(() => {
   nextTick(() => {
     initChart()
@@ -169,14 +145,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (!chart) return
 
-  // 销毁图表
   chart?.dispose()
   chart = null
 })
 </script>
-
-<style scoped>
-.chart {
-  /* 可选基础样式 */
-}
-</style>
