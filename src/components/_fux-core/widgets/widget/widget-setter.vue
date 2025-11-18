@@ -6,7 +6,7 @@
       <TInput v-model:value="selectedWidget.uid" readonly>
         <template #suffix>
           <TTooltip content="复制">
-            <TButton theme="primary" size="small" shape="square" @click="copy()">
+            <TButton theme="primary" size="small" shape="square" @click="copy(selectedWidget.uid)">
               <template #icon>
                 <Icon :name="copied ? 'check' : 'copy'" />
               </template>
