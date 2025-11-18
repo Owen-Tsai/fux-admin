@@ -4,7 +4,7 @@ import type { Widget } from '@fusionx/core/types'
 import type { ModelRef } from 'vue'
 
 const useSignals = (widget: ModelRef<Widget>) => {
-  const visible = ref(true)
+  const visible = ref(widget.value.props.hide !== true)
 
   emitter.on(eventKeys.WIDGET_HIDE, (nameOrUid) => {
     if (nameOrUid === widget.value.props.field.name || nameOrUid === widget.value.uid) {
