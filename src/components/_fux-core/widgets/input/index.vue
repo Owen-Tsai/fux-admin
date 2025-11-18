@@ -5,6 +5,7 @@
     :default-value="widget.props.defaultValue"
     :clearable="widget.props.allowClear"
     :disabled="widget.props.disabled"
+    :readonly="widget.props.readonly"
     :placeholder="widget.props.placeholder"
     :maxlength="widget.props.maxlength"
     :show-limit-number="widget.props.showCount"
