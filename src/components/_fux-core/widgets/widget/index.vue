@@ -4,7 +4,7 @@
   </template>
   <template v-if="widget.class === 'form' && shouldShow">
     <TFormItem
-      v-if="visible"
+      v-if="visible || ctx === null"
       :help="widget.props.field.extra"
       :label="widget.props.field.label"
       :name="widget.props.field.name || widget.uid"
@@ -48,7 +48,7 @@ const interactivity = computed<FieldInteractivity['config'] | undefined>(() => {
 })
 
 const shouldShow = computed(() => {
-  if (ctx?.mode === 'archive' || ctx?.mode === 'dev') return true
+  if (ctx?.mode === 'archive' || ctx?.mode === 'dev' || ctx === null) return true
 
   return interactivity.value !== 'hidden' && widget.value.props.hide !== true
 })
