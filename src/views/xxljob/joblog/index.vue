@@ -135,6 +135,7 @@ defineOptions({ name: 'XxlJobLog' })
 
 
 const onGetJobInfoListAll = () => {
+  query.value.jobId = undefined
   getJobInfoListAll({
     "jobGroup": query.value.jobGroup,
   }).then((res: JobInfoVO[]) => {
