@@ -64,6 +64,7 @@
 <script setup lang="ts">
 import useFuxDesignerStore from '@/stores/fux-designer'
 import { initialWidgetConfig } from '@fusionx/core/utils'
+import { useDesignerCtxInject } from '@fusionx/core/hooks'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const { type = 'default' } = defineProps<{
@@ -85,6 +86,8 @@ const optionOpts = [
   { label: '表达式', value: 'expression' },
 ]
 
+const ctx = useDesignerCtxInject()
+
 const options = defineModel<ModelType<typeof type>>('options', { required: true })
 
 const { dictTypes } = storeToRefs(useFuxDesignerStore())
@@ -103,10 +106,13 @@ const removeOption = (idx: number) => {
 const optionCacheMap = ref<Map<string, any>>(new Map())
 
 watch(
-  () => options.value.type,
-  (newType, oldType) => {
-    if (oldType) {
-      optionCacheMap.value.set(oldType, options.value.value)
+  [() => options.value.type, () => ctx?.selectedWidget.value?.uid],
+  ([newType, newWidget], [prevType, prevWidget]) => {
+    if (newWidget !== prevWidget) {
+      return
+    }
+    if (prevType) {
+      optionCacheMap.value.set(prevType, options.value.value)
     }
     if (newType && optionCacheMap.value.has(newType)) {
       options.value.value = optionCacheMap.value.get(newType)
@@ -115,5 +121,6 @@ watch(
         newType === 'static' ? [...initialWidgetConfig.select!.props.options.value] : undefined
     }
   },
+  { deep: true, immediate: true },
 )
 </script>
