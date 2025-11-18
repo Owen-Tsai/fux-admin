@@ -45,7 +45,7 @@ const loadData = async () => {
     params: {
       pageNo: 1,
       pageSize: 100,
-      declareId: route.query.applyId,
+      applyId: route.query.applyId,
     },
   })
 
