@@ -41,8 +41,8 @@
       <TSwitch v-model:value="node.joint" />
     </TFormItem>
   </TForm>
-  <TForm v-show="active === 1" :data="node.fieldsOverride" label-width="0" class="!mt-4">
-    <div v-for="(field, index) in node.fieldsOverride" :key="index" class="flex gap-2">
+  <TForm v-show="active === 1" :data="node.fieldsInteractivity" label-width="0" class="!mt-4">
+    <div v-for="(field, index) in node.fieldsInteractivity" :key="index" class="flex gap-2">
       <div class="flex-1 flex items-center gap-2">
         <TFormItem class="min-w-0">
           <TInput label="字段名" v-model:value="field.name" />
@@ -56,14 +56,14 @@
         variant="text"
         theme="danger"
         class="flex-none"
-        @click="node.fieldsOverride.splice(index, 1)"
+        @click="node.fieldsInteractivity.splice(index, 1)"
       >
         <template #icon>
           <Icon name="delete" />
         </template>
       </TButton>
     </div>
-    <TButton block @click="node.fieldsOverride.push({})">添加字段配置</TButton>
+    <TButton block @click="node.fieldsInteractivity.push({})">添加字段配置</TButton>
   </TForm>
 </template>
 

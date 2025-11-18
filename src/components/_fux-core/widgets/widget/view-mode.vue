@@ -12,13 +12,19 @@
       :rules="rules"
       class="w-full"
     >
-      <component :is="viewModeWidgetToRender(widget.type)" :widget="widget" :model="fieldValue" />
+      <component
+        v-if="interactivity !== 'writable'"
+        :is="viewModeWidgetToRender(widget.type)"
+        :widget="widget"
+        :model="fieldValue"
+      />
+      <component v-else :is="widgetToRender(widget.type)" :widget="widget" :model="fieldValue" />
     </TFormItem>
   </template>
 </template>
 
 <script setup lang="ts">
-import { viewModeWidgetToRender } from '@fusionx/core/utils/widget'
+import { viewModeWidgetToRender, widgetToRender } from '@fusionx/core/utils/widget'
 import { validation } from '@fusionx/core/utils'
 import { useRendererCtxInject } from '@fusionx/core/hooks/use-context'
 import type { Widget, FormWidget, FieldInteractivity } from '@fusionx/core/types'
@@ -48,8 +54,11 @@ const interactivity = computed<FieldInteractivity['config'] | undefined>(() => {
 
 const shouldShow = computed(() => {
   if (ctx?.mode === 'archive' || ctx?.mode === 'dev') return true
+  if (widget.value.props.hide) {
+    return interactivity.value && interactivity.value !== 'hidden'
+  }
 
-  return interactivity.value !== 'hidden' && widget.value.props.hide !== true
+  return true
 })
 
 const setInteractivity = (prop: 'readonly' | 'disabled', val: boolean) => {
