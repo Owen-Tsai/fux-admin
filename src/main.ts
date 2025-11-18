@@ -10,6 +10,8 @@ import router from './router'
 import './router/guard'
 
 import registerComponents from './plugins/register.ts'
+import Logger from './utils/logger'
+Logger.initialize(import.meta.env.DEV)
 
 const app = createApp(App)
 
