@@ -40,7 +40,9 @@
         </TButton>
       </template>
 
-      <template v-else> </template>
+      <template v-else>
+        <CodeEditor v-model="options.value" :height="200" />
+      </template>
     </template>
 
     <template v-if="options.type === 'dict'">
