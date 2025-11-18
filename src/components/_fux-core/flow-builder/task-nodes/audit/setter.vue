@@ -43,7 +43,7 @@
   </TForm>
   <TForm v-show="active === 1" :data="node.fieldsInteractivity" label-width="0" class="!mt-4">
     <div v-for="(field, index) in node.fieldsInteractivity" :key="index" class="flex gap-2">
-      <div class="flex-1 flex items-center gap-2">
+      <div class="flex-1 flex items-center gap-2 w-full min-w-0">
         <TFormItem class="min-w-0">
           <TInput label="字段名" v-model:value="field.name" />
         </TFormItem>
@@ -63,7 +63,7 @@
         </template>
       </TButton>
     </div>
-    <TButton block @click="node.fieldsInteractivity.push({})">添加字段配置</TButton>
+    <TButton block @click="addFieldConfig">添加字段配置</TButton>
   </TForm>
 </template>
 
@@ -103,6 +103,16 @@ const onStrategyChange = () => {
 const onRoleChange = () => {
   const first = node.value.actor.value?.[0]
   node.value.actor.text = roleOptions.value?.find((u) => u.id === first)?.name
+}
+
+const addFieldConfig = () => {
+  if (!node.value.fieldsInteractivity) {
+    node.value.fieldsInteractivity = []
+  }
+  node.value.fieldsInteractivity.push({
+    name: '',
+    config: 'shown',
+  })
 }
 </script>
 
