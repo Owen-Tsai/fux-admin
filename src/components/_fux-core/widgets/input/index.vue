@@ -8,9 +8,9 @@
     :placeholder="widget.props.placeholder"
     :maxlength="widget.props.maxlength"
     :show-limit-number="widget.props.showCount"
-    @change="handler('change')"
-    @focus="handler('focus')"
-    @blur="handler('blur')"
+    @change="handler?.('change')"
+    @focus="handler?.('focus')"
+    @blur="handler?.('blur')"
   >
     <template #prefix-icon v-if="widget.props.prefixIcon">
       <Icon :name="widget.props.prefixIcon" />

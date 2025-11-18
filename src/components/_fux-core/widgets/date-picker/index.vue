@@ -12,9 +12,9 @@
     :readonly="widget.props.readonly"
     :disable-date="widget.props.disableDate"
     :value-type="widget.props.valueType"
-    @change="handler('change')"
-    @focus="handler('focus')"
-    @blur="handler('blur')"
+    @change="handler?.('change')"
+    @focus="handler?.('focus')"
+    @blur="handler?.('blur')"
   />
 </template>
 

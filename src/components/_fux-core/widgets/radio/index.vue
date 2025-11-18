@@ -7,7 +7,7 @@
     :readonly="widget.props.readonly"
     :theme="theme"
     :variant="variant"
-    @change="handler('change')"
+    @change="handler?.('change')"
   />
 </template>
 

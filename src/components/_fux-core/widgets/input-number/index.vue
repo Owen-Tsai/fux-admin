@@ -11,9 +11,9 @@
     :readonly="widget.props.readonly"
     :step="widget.props.step"
     :theme="widget.props.controlsLayout"
-    @change="handler('change')"
-    @focus="handler('focus')"
-    @blur="handler('blur')"
+    @change="handler?.('change')"
+    @focus="handler?.('focus')"
+    @blur="handler?.('blur')"
   />
 </template>
 

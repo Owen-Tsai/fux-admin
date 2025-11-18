@@ -17,9 +17,9 @@
     :readonly="widget.props.readonly"
     :keys="keys"
     :options="options"
-    @change="handler('change')"
-    @focus="handler('focus')"
-    @blur="handler('blur')"
+    @change="handler?.('change')"
+    @focus="handler?.('focus')"
+    @blur="handler?.('blur')"
   />
 </template>
 

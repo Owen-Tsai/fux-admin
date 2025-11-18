@@ -6,9 +6,9 @@
     :maxlength="widget.props.maxlength"
     :placeholder="widget.props.placeholder"
     :readonly="widget.props.readonly"
-    @change="handler('change')"
-    @focus="handler('focus')"
-    @blur="handler('blur')"
+    @change="handler?.('change')"
+    @focus="handler?.('focus')"
+    @blur="handler?.('blur')"
   />
 </template>
 

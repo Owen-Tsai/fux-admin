@@ -5,7 +5,7 @@
     :readonly="widget.props.readonly"
     :max="widget.props.max"
     :options="options"
-    @change="handler('change')"
+    @change="handler?.('change')"
   />
 </template>
 

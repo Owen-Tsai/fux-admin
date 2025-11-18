@@ -12,9 +12,9 @@
     :multiple="widget.props.multiple"
     :max="widget.props.max"
     :min-collapsed-num="widget.props.minCollapsedNum"
-    @change="handler('change')"
-    @focus="handler('focus')"
-    @blur="handler('blur')"
+    @change="handler?.('change')"
+    @focus="handler?.('focus')"
+    @blur="handler?.('blur')"
   />
 </template>
 
