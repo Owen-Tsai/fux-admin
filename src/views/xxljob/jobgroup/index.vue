@@ -68,6 +68,21 @@
             <span v-if="row.addressType === 0">自动注册</span>
             <span v-if="row.addressType === 1">手动注册</span>
           </template>
+          <template #addressList="{ row }">
+            <span v-if="!row.addressList">-</span>
+            <span v-else>
+              <t-popup placement="right" :show-arrow="true">
+                <t-button variant="text" theme="primary">{{ row.addressList.split(',').length }}个 (查看)</t-button>
+                <template #content>
+                  <t-list :split="false" size="small">
+                    <t-list-item v-for="(item, index) in row.addressList.split(',')" :key="index">
+                      <t-tag theme="primary" variant="outline">{{ item }}</t-tag>
+                    </t-list-item>
+                  </t-list>
+                </template>
+              </t-popup>
+            </span>
+          </template>
           <template #actions="{ row }">
             <div class="flex gap-2">
               <TTooltip content="编辑" v-if="permission.has('xxljob:job-group:update')">
