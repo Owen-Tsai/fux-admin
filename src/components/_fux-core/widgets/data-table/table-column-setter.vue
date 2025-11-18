@@ -2,12 +2,14 @@
 import ColumnFormatSetter from './column-format-setter.vue'
 import type { WidgetMap } from '@fusionx/core/types'
 import type { WPropsTableColumn } from '../../types/form/layout-widgets'
+import { useSortable } from '@vueuse/integrations/useSortable.mjs'
 
 const props = defineModel<WidgetMap['dataTable']['props']>('props', { required: true })
 
 const formatSetterRef = useTemplateRef<InstanceType<typeof ColumnFormatSetter>>('formatSetterRef')
 
 const visible = ref(false)
+const dragWrapper = useTemplateRef('dragWrapper')
 
 const open = () => {
   visible.value = true
@@ -19,6 +21,11 @@ const open = () => {
 }
 
 const columns = ref<Array<WPropsTableColumn & { idx?: number }>>([])
+
+useSortable(dragWrapper, columns, {
+  animation: 200,
+  handle: '.drag-handle',
+})
 
 const alignOpts = [
   { label: '左对齐', value: 'left' },
