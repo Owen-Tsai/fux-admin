@@ -53,6 +53,15 @@
             </template>
             新增
           </TButton>
+          <TButton
+                  theme="default"
+                  @click="onExport"
+          >
+            <template #icon>
+              <Icon name="download" />
+            </template>
+            导出
+          </TButton>
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" @click="execute()">
               <template #icon>
@@ -130,6 +139,7 @@
   import DetailDrawer from './detail-drawer.vue'
   import type { MedicalInsuranceVO } from '@/api/application/insurance'
   import type { FormInstanceFunctions } from 'tdesign-vue-next'
+  import { exportMedicalInsurance } from '@/api/application/insurance'
 
   const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
   const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
@@ -159,6 +169,18 @@
   const openDetail = (id: string) => {
     selectedId.value = id
     detailVisible.value = true
+  }
+
+  /**
+   * 导出Excel文件
+   * 使用当前查询条件导出医疗保险数据
+   */
+  const onExport = async () => {
+    try {
+      await exportMedicalInsurance(query.value)
+    } catch (error) {
+      console.error('导出失败:', error)
+    }
   }
 
   defineOptions({ name: 'MedicalInsurance' })

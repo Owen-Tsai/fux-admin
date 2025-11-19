@@ -55,7 +55,7 @@ export const exportTalentSettle = (params?: ListQueryParams) => {
     return request.download({
         url: `${prefix}/export-excel`,
         params: params,
-        filename: '人才落户信息表'
+        filename: '人才落户信息表.xlsx'
     })
 }
 

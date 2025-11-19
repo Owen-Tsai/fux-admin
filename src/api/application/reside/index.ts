@@ -52,7 +52,7 @@ export const exportResideCard = (params?: ListQueryParams) => {
     return request.download({
         url: `${prefix}/export-excel`,
         params: params,
-        filename: '居住证核发信息表'
+        filename: '居住证核发信息表.xlsx'
     })
 }
 

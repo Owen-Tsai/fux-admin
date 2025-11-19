@@ -56,7 +56,7 @@ export const exportReserveFundLoan = (params?: ListQueryParams) => {
     return request.download({
         url: `${prefix}/export-excel`,
         params: params,
-        filename: '公积金贷款信息表'
+        filename: '公积金贷款信息表.xlsx'
     })
 }
 

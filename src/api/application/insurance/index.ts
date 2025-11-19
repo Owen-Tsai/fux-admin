@@ -56,7 +56,7 @@ export const exportMedicalInsurance = (params?: ListQueryParams) => {
     return request.download({
         url: `${prefix}/export-excel`,
         params: params,
-        filename: '医疗保险业务对接'
+        filename: '医疗保险业务对接.xlsx'
     })
 }
 

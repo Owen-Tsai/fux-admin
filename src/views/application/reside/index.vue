@@ -58,6 +58,15 @@
             新增
           </TButton>
           <TButton
+                  theme="default"
+                  @click="onExport"
+          >
+            <template #icon>
+              <Icon name="download" />
+            </template>
+            导出
+          </TButton>
+          <TButton
             theme="primary"
             variant="outline"
             @click="importDrawerVisible = true"
@@ -232,6 +241,7 @@
     import request from '@/utils/request'
     import useMessage from '@/hooks/use-message'
     import { TUploadProps } from 'tdesign-vue-next'
+    import { exportResideCard } from '@/api/application/reside'
 
   const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
   const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
@@ -258,6 +268,18 @@
   const openDetail = (id: string) => {
     selectedId.value = id
     detailVisible.value = true
+  }
+
+  /**
+   * 导出Excel文件
+   * 使用当前查询条件导出居住证核发信息数据
+   */
+  const onExport = async () => {
+    try {
+      await exportResideCard(query.value)
+    } catch (error) {
+      console.error('导出失败:', error)
+    }
   }
 
   // 导入相关状态
