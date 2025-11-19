@@ -15,7 +15,7 @@
             <TFormItem  label="飘窗标题" name="windowTitle" class="col">
               <TInput v-model:value="query.windowTitle" placeholder="请输入飘窗标题" allow-clear />
             </TFormItem>
-            <TFormItem  v-show='expanded' label="点击跳转地址" name="clickUrl" class="col">
+            <TFormItem  label="点击跳转地址" name="clickUrl" class="col">
               <TInput v-model:value="query.clickUrl" placeholder="请输入点击跳转地址" allow-clear />
             </TFormItem>
               <TFormItem  v-show='expanded' label="创建时间" name="createTime" class="col">
@@ -26,7 +26,7 @@
               />
             </TFormItem>
 
-        <!-- <QueryActions v-model:expanded="expanded" :class="`col ${expanded ? 'ml-1/3' : ''}`" /> -->
+        <QueryActions v-model:expanded="expanded" class="col ml-auto" />
       </TForm>
     </TCard>
 
