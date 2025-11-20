@@ -6,8 +6,18 @@ export type UploadList = Array<{
   required: boolean
   maxFileSize: number
   allowedFileTypes: string
-  attachDO: Record<string, unknown>
+  attachDO: AttachDO | null
 }>
+
+export type AttachDO = {
+  id: string
+  uploadname: string
+  uploaddate: number
+  generatename: string
+  modeName: string
+  uploadPath: string
+  uploadType: string
+}
 
 export const getUploadList = (appId: string, planId: string, applyId: string) => {
   return request.get<UploadList>({
