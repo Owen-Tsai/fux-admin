@@ -4,12 +4,13 @@
 
 <script setup lang="ts">
 import { getUploadList, type UploadList } from '@/api/business/attachment'
-import { useRendererCtxInject } from '@fusionx/core/hooks'
+import { useRendererCtxInject, usePlanIdCtxInject } from '@fusionx/core/hooks'
 import type { TableProps } from 'tdesign-vue-next'
 
 const route = useRoute()
+const ctx = usePlanIdCtxInject()
 const appId = route.params.appId as string
-const planId = (route.params.planId || route.query.planId) as string
+const planId = (route.params.planId || route.query.planId || ctx?.planId.value) as string
 const applyId = (route.params.applyId || route.query.applyId) as string
 
 const rendererCtx = useRendererCtxInject()
