@@ -21,6 +21,9 @@
       <component v-else :is="widgetToRender(widget.type)" :widget="widget" :model="fieldValue" />
     </TFormItem>
   </template>
+  <template v-if="widget.class === 'special'">
+    <component :is="viewModeWidgetToRender(widget.type)" :widget="widget" :model="fieldValue" />
+  </template>
 </template>
 
 <script setup lang="ts">
