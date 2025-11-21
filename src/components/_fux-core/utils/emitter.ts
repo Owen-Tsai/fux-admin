@@ -13,4 +13,16 @@ export const eventKeys = {
    * 一般是表单的初始化数据已经获取完毕。
    */
   FORM_READY: 'form:ready',
+  /**
+   * 隐藏控件
+   */
+  WIDGET_HIDE: 'widget:hide',
+  /**
+   * 显示控件
+   */
+  WIDGET_SHOW: 'widget:show',
+  /**
+   * 控件属性变化
+   */
+  WIDGET_PROP_CHANGE: 'widget:prop:change',
 }

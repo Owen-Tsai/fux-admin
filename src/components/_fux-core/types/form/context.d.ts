@@ -22,6 +22,10 @@ export interface FuxRendererCtx extends FuxCoreContext {
   fieldsInteractivity: ComputedRef<FieldInteractivity[]>
 }
 
+export interface PlanIdCtx {
+  planId: Ref<string>
+}
+
 /**
  * 渲染器工作模式。
  * dev - 编辑模式

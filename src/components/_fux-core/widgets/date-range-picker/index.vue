@@ -11,11 +11,15 @@
     :readonly="widget.props.readonly"
     :disable-date="widget.props.disableDate"
     :value-type="widget.props.valueType"
+    @change="handler?.('change')"
+    @focus="handler?.('focus')"
+    @blur="handler?.('blur')"
   />
 </template>
 
 <script setup lang="ts">
 import { useModel } from '@fusionx/core/hooks'
+import { useEventHandlers } from '@fusionx/core/hooks'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const { widget } = defineProps<{
@@ -23,4 +27,6 @@ const { widget } = defineProps<{
 }>()
 
 const model = useModel(widget)
+
+const handler = useEventHandlers(widget.props.event)
 </script>

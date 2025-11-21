@@ -13,4 +13,30 @@ export enum FILE_UPLOAD_STORAGE {
   LOGO = 3,
   /** 资讯类附件 */
   INFO = 28,
+  /** 个人申报附件 */
+  BUSINESS_PERSONAL = 5,
+  /** 单位申报附件 */
+  BUSINESS_COMPANY = 6,
+}
+
+export enum AUDIT_PROCESS {
+  /** 已通过 */
+  APPROVED = '1',
+  /** 未通过 */
+  REJECTED = '2',
+  /** 已退回到发起人 */
+  RETURNED = '3',
+  /** 未提交 */
+  UNCOMMITTED = '-2',
+  /** 已提交 / 审核中 */
+  SUBMITTED = '0',
+}
+
+export enum ERROR_LOG_PROCESS_STATUS {
+  /** 未处理 */
+  UNPROCESSED = 0,
+  /** 已处理 */
+  PROCESSED = 1,
+  /** 已忽略 */
+  IGNORED = 2,
 }

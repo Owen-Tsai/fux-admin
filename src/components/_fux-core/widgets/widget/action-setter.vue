@@ -25,7 +25,8 @@
 
           <div class="mt-1">
             <TSelect
-              :value="selectedWidget.props.event?.[evtName]"
+              v-if="selectedWidget.props.event?.[evtName]"
+              v-model:value="selectedWidget.props.event[evtName]"
               size="small"
               :options="functionsList"
             />

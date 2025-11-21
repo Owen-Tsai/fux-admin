@@ -1,7 +1,7 @@
 import { set } from 'lodash-es'
 import dayjs from 'dayjs'
-import { emitter } from '@fusionx/core/utils'
-import { getApplyDetail, getTaskInfo, type ApplyDetailVO } from '@/api/business'
+import { usePlanIdCtxProvide } from '@fusionx/core/hooks'
+import { getApplyDetail, getTaskInfo } from '@/api/business'
 import FormRenderer from '@fusionx/core/form-renderer/index.vue'
 import type { PlanVO } from '@/api/app/plan'
 import type { AppVO } from '@/api/app/app'
@@ -18,9 +18,12 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
   const appSchema = ref<AppSchema>()
   const formData = ref<Record<string, any>>({})
   const plan = ref<PlanVO>()
+  const planId = ref<string>('')
   const app = ref<AppVO>()
   const starter = ref<string>()
   const submitTime = ref<string>()
+
+  usePlanIdCtxProvide(planId)
 
   const loadApplyDetail = async () => {
     const res = await getApplyDetail(appId, applyId)
@@ -28,6 +31,7 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
     appSchema.value = JSON.parse(res.schema)
     formData.value = res.data
     plan.value = res.plan
+    planId.value = plan.value?.id || ''
     app.value = res.applicationDO
     starter.value = taskInfo.starter
     submitTime.value = dayjs(taskInfo.submitTime).format('YYYY-MM-DD HH:mm:ss')
@@ -49,7 +53,6 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
 
     nextTick(() => {
       fuxRenderer.value?.setFormData(dataToFill)
-      emitter.emit('form:ready')
     })
   }
 

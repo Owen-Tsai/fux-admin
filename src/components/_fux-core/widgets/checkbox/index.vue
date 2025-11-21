@@ -5,11 +5,13 @@
     :readonly="widget.props.readonly"
     :max="widget.props.max"
     :options="options"
+    @change="handler?.('change')"
   />
 </template>
 
 <script setup lang="ts">
 import { useModel, useRecordOptions } from '@fusionx/core/hooks'
+import { useEventHandlers } from '@fusionx/core/hooks'
 import type { WidgetMap } from '@fusionx/core/types'
 
 const { widget } = defineProps<{
@@ -19,4 +21,6 @@ const { widget } = defineProps<{
 const model = useModel(widget)
 
 const options = useRecordOptions(widget)
+
+const handler = useEventHandlers(widget.props.event)
 </script>

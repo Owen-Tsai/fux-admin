@@ -75,7 +75,7 @@ const fieldsInteractivity = computed<FieldInteractivity[]>(() => {
 
     // 某一审核环节的任务节点配置的表单字段控制性覆写
     const currTask = appSchema.value.flow.nodes.find((node) => node.uid == taskKey)
-    return (currTask?.props as any)?.fieldsOverride || []
+    return (currTask?.props as any)?.fieldsInteractivity || []
   }
 
   return []

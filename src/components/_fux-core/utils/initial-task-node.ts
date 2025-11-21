@@ -14,7 +14,7 @@ export const initialTaskNodeConfig: TaskNodeConfigMap = {
     type: 'audit',
     props: {
       actor: {},
-      fieldsOverride: [],
+      fieldsInteractivity: [],
       joint: false,
     },
   },

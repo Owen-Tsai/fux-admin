@@ -226,4 +226,14 @@ export const initialWidgetConfig: Partial<WidgetMap> = {
     },
     icon: 'table',
   },
+  attachmentTable: {
+    class: 'special',
+    name: '计划附件表',
+    type: 'attachmentTable',
+    props: {
+      field: {},
+    },
+    uid: 'attachmentTable',
+    icon: 'file-attachment',
+  },
 }

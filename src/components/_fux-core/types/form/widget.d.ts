@@ -1,8 +1,10 @@
 import type { FormWidgetPropsMap } from './form-widgets'
 import type { LayoutWidgetPropsMap } from './layout-widgets'
+import type { SpecialWidgetPropsMap } from './special-widgets'
+
 import type { FormProps, APIConfig, FunctionConfig } from './misc'
 
-export type WidgetPropsMap = FormWidgetPropsMap & LayoutWidgetPropsMap
+export type WidgetPropsMap = FormWidgetPropsMap & LayoutWidgetPropsMap & SpecialWidgetPropsMap
 
 export type ConfigOf<T extends keyof WidgetPropsMap> = {
   name: string
@@ -26,6 +28,7 @@ export type WidgetMap = {
 export type Widget = WidgetMap[keyof WidgetMap]
 export type FormWidget = WidgetMap[keyof FormWidgetPropsMap]
 export type LayoutWidget = WidgetMap[keyof LayoutWidgetPropsMap]
+export type SpecialWidget = WidgetMap[keyof SpecialWidgetPropsMap]
 
 export interface FormSchema extends FormProps {
   function?: Record<string, FunctionConfig>

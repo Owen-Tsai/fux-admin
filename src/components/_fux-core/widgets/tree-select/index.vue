@@ -13,12 +13,16 @@
     :readonly="widget.props.readonly"
     :keys="keys"
     :data="options"
+    @change="handler?.('change')"
+    @focus="handler?.('focus')"
+    @blur="handler?.('blur')"
   />
 </template>
 
 <script setup lang="ts">
 import { useModel, useTreeStructureOptions } from '@fusionx/core/hooks'
 import { tryParse } from '@fusionx/core/utils'
+import { useEventHandlers } from '@fusionx/core/hooks'
 import type { WidgetMap } from '@fusionx/core/types'
 import type { TreeSelectProps } from 'tdesign-vue-next'
 
@@ -30,6 +34,7 @@ const model = useModel(widget)
 
 const options = useTreeStructureOptions(widget)
 
+const handler = useEventHandlers(widget.props.event)
 const keys = computed(() => tryParse(widget.props.fieldNames))
 
 const treeProps = computed<TreeSelectProps['treeProps']>(() => ({

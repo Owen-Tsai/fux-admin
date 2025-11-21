@@ -1,6 +1,6 @@
 import { useRendererCtxInject } from '@fusionx/core/hooks'
 import { merge } from 'lodash-es'
-import { emitter } from '@fusionx/core/utils'
+import { emitter, eventKeys } from '@fusionx/core/utils'
 
 /**
  * 返回表单渲染器 formRenderer 实例的方法供外部调用
@@ -43,7 +43,7 @@ const useRendererInstance = () => {
    * @param nameOrUid 组件的 name 或 uid
    */
   const hide = (nameOrUid: string) => {
-    emitter.emit('widget:hide', nameOrUid)
+    emitter.emit(eventKeys.WIDGET_HIDE, nameOrUid)
   }
 
   /**
@@ -51,7 +51,7 @@ const useRendererInstance = () => {
    * @param nameOrUid 组件的 name 或 uid
    */
   const show = (nameOrUid: string) => {
-    emitter.emit('widget:show', nameOrUid)
+    emitter.emit(eventKeys.WIDGET_SHOW, nameOrUid)
   }
 
   /**
@@ -60,7 +60,7 @@ const useRendererInstance = () => {
    * @param newProps 新的 Props
    */
   const setWidgetProps = (nameOrUid: string, newProps: Record<string, any>) => {
-    emitter.emit('widget:props', { nameOrUid, newProps })
+    emitter.emit(eventKeys.WIDGET_PROP_CHANGE, { nameOrUid, newProps })
   }
 
   /**

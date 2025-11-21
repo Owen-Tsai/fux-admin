@@ -2,14 +2,14 @@ import { getOperateLogPage, type ListQueryParams } from '@/api/system/log/op-log
 import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { colKey: 'id', title: '日志编号', width: 90 },
+  { colKey: 'id', title: '日志编号', width: 90, ellipsis: true },
   { colKey: 'module', title: '操作模块', ellipsis: true },
   { colKey: 'name', title: '操作名', minWidth: 140 },
   { colKey: 'type', title: '操作类型', width: 90 },
   { colKey: 'userNickname', title: '操作人', ellipsis: true, width: 90 },
   { colKey: 'resultCode', title: '操作结果', width: 90 },
-  { colKey: 'startTime', title: '操作时间', width: 120 },
-  { colKey: 'duration', title: '执行时长', width: 90 },
+  { colKey: 'startTime', title: '操作时间', width: 180 },
+  { colKey: 'duration', title: '执行时长', width: 120 },
   { colKey: 'actions', title: '操作', width: 90 },
 ]
 
