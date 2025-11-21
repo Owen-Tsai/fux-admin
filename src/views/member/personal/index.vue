@@ -98,7 +98,7 @@ defineOptions({ name: 'MemberPersonal' })
       </TForm>
     </TCard>
 
-    <TCard title="字典类型列表">
+    <TCard title="人才信息库">
       <template #actions>
         <div class="flex items-center gap-2">
           <TTooltip content="导出">
