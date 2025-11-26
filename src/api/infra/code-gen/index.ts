@@ -157,3 +157,14 @@ export const downloadCode = (id: number) => {
     filename: 'generated-code.zip',
   })
 }
+
+// download generated code batch 批量生成代码
+export const downloadCodeBatch = (ids: (number | string)[]) => {
+  return request.download({
+    url: `${url}/download-batch`,
+    params: {
+      tableIds: ids.join(','),
+    },
+    filename: 'generated-code.zip',
+  })
+}
