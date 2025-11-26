@@ -123,7 +123,7 @@ export const getDetail = (id: string) => {
 
 export const setEnabled = (id: string, isEnabled: boolean) => {
   return request.put({
-    url: `${prefix}/update`,
+    url: `${prefix}/update-talent-status`,
     data: {
       id,
       isenable: isEnabled,

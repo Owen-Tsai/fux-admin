@@ -1,7 +1,6 @@
 import request from '@/utils/request'
 
-// 单位会员 VO
-export type UnitInfoVO = {
+export type ProfileVO = {
   id?: string // 主键
   username?: string // 用户名
   email?: string // email
@@ -62,69 +61,47 @@ export type UnitInfoVO = {
   fgyzqydjzclx?: string // 非公有制企业登记注册类型
 }
 
-const prefix = '/admin-api/system/unit-info'
+export type ListQueryParams = CommonQueryParams & {
+  name?: string // 单位名称
+  creditrate?: string // 统一社会信用代码
+  institutionType?: number // 机构类型
+  unitType?: number // 单位类型
+  technicalField?: string // 技术领域
+  unitnature?: number // 单位性质
+  introduce?: string // 单位介绍
+  scalesize?: number // 规模
+  regfund?: number // 注册资金
+  tradeinfoid?: number // 行业类别
+}
 
-export type ListQueryParams = CommonQueryParams & Partial<UnitInfoVO>
+const prefix = '/system/unit-info'
 
-// 查询单位会员分页
-export const getList = (params: ListQueryParams) => {
-  return request.get<PaginatedList<UnitInfoVO>>({
+export const getList = (params?: ListQueryParams) => {
+  return request.get<PaginatedList<ProfileVO>>({
     url: `${prefix}/page`,
     params,
   })
 }
 
-export const getDetail = (id: number) => {
-  return request.get<UnitInfoVO>({
+export const getDetail = (id: string) => {
+  return request.get<ProfileVO>({
     url: `${prefix}/get?id=${id}`,
   })
 }
 
-export const createUnitInfo = (data: UnitInfoVO) => {
-  return request.post({
-    url: `${prefix}/create`,
-    data,
-  })
-}
-
-export const updateUnitInfo = (data: UnitInfoVO) => {
-  return request.put({
-    url: `${prefix}/update`,
-    data,
-  })
-}
-
-export const deleteUnitInfo = (id: number) => {
-  return request.delete({
-    url: `${prefix}/delete?id=${id}`,
-  })
-}
-
-export const exportUnitInfo = (params?: ListQueryParams) => {
-  return request.download({
-    url: `${prefix}/export-excel`,
-    params: params,
-    filename: '单位会员',
-  })
-}
-
-// 更新单位状态
-export const updateUnitStatus = (id: number, status: number) => {
+export const setEnabled = (id: string, isEnabled: boolean) => {
   return request.put({
     url: `${prefix}/update-unit-status`,
-    params: {
+    data: {
       id,
-      status,
+      status: isEnabled,
     },
   })
 }
 
-// 重置单位密码
-export const resetPassword = (id: number) => {
-  return request.put({
-    url: `${prefix}/reset-password`,
-    params: {
-      id,
-    },
+export const exportExcel = (params?: ListQueryParams) => {
+  return request.download({
+    url: `${prefix}/export-excel`,
+    params,
   })
 }
