@@ -3,6 +3,7 @@ import {
   getCodeGenConfigList,
   deleteCodeGenConfig,
   downloadCode,
+  downloadCodeBatch,
   type ListQueryParams,
 } from '@/api/infra/code-gen'
 
@@ -81,6 +82,16 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     downloadCode(id)
   }
 
+  const selectedRowKeys = ref<(number | string)[]>([])
+
+  const onBatchDownload = async () => {
+    downloadCodeBatch(selectedRowKeys.value)
+  }
+  const rehandleSelectChange: TableProps['onSelectChange'] = (value) => {
+    selectedRowKeys.value = value;
+  };
+
+
   return {
     query,
     execute,
@@ -92,5 +103,8 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     onDelete,
     onEdit,
     onDownload,
+    onBatchDownload,
+    selectedRowKeys,
+    rehandleSelectChange
   }
 }

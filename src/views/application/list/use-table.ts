@@ -8,17 +8,19 @@ import {
 import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { title: '应用名称', colKey: 'name', width: 160, ellipsis: true },
-  { title: '应用类别', colKey: 'type', width: 160, ellipsis: true },
+  { title: '应用名称', colKey: 'name', ellipsis: true },
   { title: '应用描述', colKey: 'description', ellipsis: true },
+  { title: '应用类别', colKey: 'type', width: 160, ellipsis: true },
   { title: '状态', width: 120, colKey: 'published' },
   {
     title: '创建时间',
+    width: 200,
     minWidth: 100,
     colKey: 'createTime',
   },
   {
     title: '更新时间',
+    width: 200,
     minWidth: 100,
     colKey: 'updateTime',
   },

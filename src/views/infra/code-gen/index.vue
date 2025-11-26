@@ -25,6 +25,9 @@ const {
   onDelete,
   onEdit,
   onDownload,
+  onBatchDownload,
+  selectedRowKeys,
+  rehandleSelectChange
 } = useTable(queryForm)
 const { data: dataSourceList } = useRequest(getDataSourceList, { immediate: true })
 
@@ -66,6 +69,18 @@ defineOptions({ name: 'InfraCodeGen' })
       <template #actions>
         <div class="flex items-center gap-2">
           <TButton
+            v-if="permission.has('infra:code-gen:download')"
+            :loading="pending"
+            :disabled="selectedRowKeys.length === 0"
+            theme="primary"
+            @click="onBatchDownload"
+          >
+            <template #icon>
+              <Icon name="cloud-download" />
+            </template>
+            批量生成代码
+          </TButton>
+          <TButton
             v-if="permission.has('infra:code-gen:create')"
             theme="primary"
             :loading="pending"
@@ -93,6 +108,8 @@ defineOptions({ name: 'InfraCodeGen' })
         :columns="columns"
         :pagination="pagination"
         :loading="pending"
+        :selected-row-keys="selectedRowKeys"
+        @select-change="rehandleSelectChange"
         @page-change="onPageChange"
       >
         <template #dataSourceConfigId="{ row }: TableScope<ConfigVO>">
