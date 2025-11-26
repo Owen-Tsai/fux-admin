@@ -236,4 +236,16 @@ export const initialWidgetConfig: Partial<WidgetMap> = {
     uid: 'attachmentTable',
     icon: 'file-attachment',
   },
+  upload: {
+    class: 'form',
+    name: '上传组件',
+    type: 'upload',
+    uid: 'upload',
+    props: {
+      field: {
+        label: '上传组件',
+      },
+    },
+    icon: 'upload',
+  },
 }
