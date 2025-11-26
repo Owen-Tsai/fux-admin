@@ -63,6 +63,7 @@ const emit = defineEmits<{
   ): void
   (e: 'error', err: any): void
   (e: 'finish'): void
+  (e: 'change', files: UploadFile[]): void
 }>()
 
 const uploadFn: UploadProps['requestMethod'] = async (files) => {
@@ -169,8 +170,9 @@ defineExpose({
     :before-upload="beforeUpload"
     @success="onSuccess"
     @fail="(error) => $emit('error', error)"
+    @change="(files) => $emit('change', files)"
     @remove="onRemove"
   >
-    <slot></slot>
+    <slot v-if="$slots.default"></slot>
   </TUpload>
 </template>

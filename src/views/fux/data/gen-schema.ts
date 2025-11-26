@@ -56,15 +56,14 @@ const genDataTableSchema = (info: ConfigDetailVO, widgets: Widget[]): WidgetMap[
       ...cloneDeep(initialWidgetConfig.dataTable!.props),
       widgets: widgets,
       columns: columns.map((column) => ({
-        key: column.javaField,
         title: column.columnComment || column.columnName,
-        dataIndex: column.javaField,
+        colKey: column.javaField,
         formatter: {
           type: column.dictTypeStr ? 'dict' : '',
           value: column.dictTypeStr || '',
         },
       })),
-      url: '/applications/' + kebabCase(info.table.tableName),
+      url: '/' + kebabCase(info.table.tableName),
     },
   }
 

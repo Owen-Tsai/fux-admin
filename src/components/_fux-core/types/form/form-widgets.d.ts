@@ -262,9 +262,14 @@ export interface WPropsDateRangePicker extends WPropsDatePickerCommon {
 
 export interface WPropsUpload extends WPropsCommon {
   action?: string
-  accept?: string[]
+  accept?: string
+  /**
+   * @deprecated use `theme` instead
+   */
   type?: 'image' | 'image-flow' | 'file' | 'file-flow' | 'id-card'
+  theme?: 'file-input' | 'file' | 'image' | 'file-flow' | 'image-flow'
   multiple?: boolean
+  storage?: number
   max?: number
   /**
    * @deprecated use `max` instead
