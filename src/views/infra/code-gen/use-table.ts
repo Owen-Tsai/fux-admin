@@ -8,6 +8,11 @@ import {
 } from '@/api/infra/code-gen'
 
 export const columns: TableProps['columns'] = [
+  {
+    colKey: 'row-select',
+    type: 'multiple',
+    width: 50,
+  },
   { colKey: 'dataSourceConfigId', title: '数据源', width: 90 },
   { colKey: 'tableName', title: '表名称' },
   { colKey: 'tableComment', title: '表描述' },
@@ -82,6 +87,7 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     downloadCode(id)
   }
 
+
   const selectedRowKeys = ref<(number | string)[]>([])
 
   const onBatchDownload = async () => {
@@ -90,7 +96,6 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   const rehandleSelectChange: TableProps['onSelectChange'] = (value) => {
     selectedRowKeys.value = value;
   };
-
 
   return {
     query,
