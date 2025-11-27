@@ -1,5 +1,5 @@
 <template>
-  <TDialog v-model:visible="visible" header="函数" width="600px">
+  <TDialog v-model:visible="visible" header="函数" width="800px">
     <div class="flex gap-6 items-start pr-1">
       <div class="w-1/4 min-w-0 max-h-400px">
         <Scrollbar>

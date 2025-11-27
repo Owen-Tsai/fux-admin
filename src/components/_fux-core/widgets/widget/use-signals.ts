@@ -27,6 +27,9 @@ const useSignals = (widget: ModelRef<Widget>) => {
         }
       })
     }
+
+    // 触发表单状态改变事件，以使部分表达式赋值的控件进行更新
+    emitter.emit(eventKeys.FORM_$STATE_CHANGE)
   })
 
   return {
