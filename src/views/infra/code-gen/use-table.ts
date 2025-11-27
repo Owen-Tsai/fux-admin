@@ -2,6 +2,7 @@ import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
 import {
   getCodeGenConfigList,
   deleteCodeGenConfig,
+  syncTable,
   downloadCode,
   downloadCodeBatch,
   type ListQueryParams,
@@ -83,6 +84,20 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     push(`/infra/code-gen/edit?id=${id}`)
   }
 
+  const onSyncFromDb = (id: number) => {
+    const instance = dialog.confirm({
+      header: '同步确认',
+      body: '确定要同步数据库结构吗？',
+      onConfirm: async () => {
+        await syncTable(id)
+        message.success('同步成功')
+        execute()
+        instance.destroy()
+      },
+    })
+  }
+
+
   const onDownload = (id: number) => {
     downloadCode(id)
   }
@@ -107,6 +122,7 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     onQueryChange,
     onDelete,
     onEdit,
+    onSyncFromDb,
     onDownload,
     onBatchDownload,
     selectedRowKeys,

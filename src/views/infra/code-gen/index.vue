@@ -24,6 +24,7 @@ const {
   onQueryChange,
   onDelete,
   onEdit,
+  onSyncFromDb,
   onDownload,
   onBatchDownload,
   selectedRowKeys,
@@ -154,7 +155,7 @@ defineOptions({ name: 'InfraCodeGen' })
                   @click="onDownload(row.id!)"
                   >生成并下载代码</TDropdownItem
                 >
-                <TDropdownItem divider>同步表结构</TDropdownItem>
+                <TDropdownItem divider @click="onSyncFromDb(row.id!)">同步表结构</TDropdownItem>
                 <TDropdownItem theme="error" @click="onDelete(row.id!)">删除配置</TDropdownItem>
               </TDropdownMenu>
             </TDropdown>
