@@ -18,6 +18,12 @@ const open = () => {
   } else {
     columns.value = []
   }
+  // 遍历 columns  如果colKey为空,就把key的值赋给colKey
+  columns.value.forEach((column, idx) => {
+    if (!column.colKey) {
+      column.colKey = column.key
+    }
+  })
 }
 
 const columns = ref<Array<WPropsTableColumn & { idx?: number }>>([])
