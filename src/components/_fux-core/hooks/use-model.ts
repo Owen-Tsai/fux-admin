@@ -1,5 +1,6 @@
 import { useRendererCtxInject, useFuxNestedModelCtxInject } from './use-context'
 import { get, set } from 'lodash-es'
+import { emitter, eventKeys } from '@fusionx/core/utils'
 import type { FormWidget } from '../types'
 
 export const useModel = (widget: FormWidget) => {
@@ -22,9 +23,30 @@ export const useModel = (widget: FormWidget) => {
     },
   })
 
-  if ((widget.props as any).defaultValue) {
-    model.value = (widget.props as any).defaultValue
+  const setDefaultValue = () => {
+    const defaultVal: string = (widget.props as any).defaultValue
+    // 0. if the user or the system has already modified the value,
+    // do nothing and retuen
+    if (!!formData && !!get(formData, key)) {
+      return
+    }
+    if (defaultVal) {
+      // 1. if the given `defaultValue` is an expression
+      const isExpression = /\{\{(.*?)\}\}/.test(defaultVal)
+      if (isExpression) {
+        const expression = defaultVal.replace(/\{\{(.*?)\}\}/, (_, expr) => expr.trim())
+        const key = expression.split('.')[1]
+        model.value = get(ctx?.$state, key)
+      } else {
+        // 2. if the `defualtValue` is a static value
+        model.value = defaultVal
+      }
+    }
   }
+
+  emitter.on(eventKeys.FORM_$STATE_CHANGE, setDefaultValue)
+
+  setDefaultValue()
 
   return model
 }
