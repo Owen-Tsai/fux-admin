@@ -60,7 +60,7 @@ export const exportYouthCreate = (params?: ListQueryParams) => {
     return request.download({
         url: `${prefix}/export-excel`,
         params: params,
-        filename: '河洛青年创新创业人才表'
+        filename: '河洛青年创新创业人才表.xlsx'
     })
 }
 

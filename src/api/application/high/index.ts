@@ -55,7 +55,7 @@ export const exportHighCreateGroup = (params?: ListQueryParams) => {
     return request.download({
         url: `${prefix}/export-excel`,
         params: params,
-        filename: '河洛高层次创新创业人才(团队)'
+        filename: '河洛高层次创新创业人才(团队).xlsx'
     })
 }
 

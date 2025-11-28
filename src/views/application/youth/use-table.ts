@@ -9,13 +9,13 @@ export const columns: TableProps['columns'] = [
     { colKey: 'professionalTitle', title: '职称' },
     { colKey: 'workUnit', title: '工作单位' },
     { colKey: 'techField', title: '技术领域' },
-    { colKey: 'talentTitle', title: '人才称号' },
-    { colKey: 'supportFund', title: '支持资金' },
-    { colKey: 'selectionYear', title: '入选年度' },
+    // { colKey: 'talentTitle', title: '人才称号' },
+    // { colKey: 'supportFund', title: '支持资金' },
+    // { colKey: 'selectionYear', title: '入选年度' },
     { colKey: 'county', title: '所在县区' },
-    { colKey: 'contact', title: '本人联系方式' },
-    { colKey: 'projectResult', title: '项目验收结果' },
-    { colKey: 'createTime', title: '创建时间' },
+    // { colKey: 'contact', title: '本人联系方式' },
+    // { colKey: 'projectResult', title: '项目验收结果' },
+    // { colKey: 'createTime', title: '创建时间' },
     { colKey: 'actions', title: '操作', width: 240 }
 ]
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {

@@ -2,15 +2,15 @@ import { getHighCreateGroupList,deleteHighCreateGroup, type ListQueryParams } fr
 import type { TableProps,FormInstanceFunctions } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-    { colKey: 'idcard', title: '身份证号' },
+    // { colKey: 'idcard', title: '身份证号' },
     { colKey: 'companyName', title: '企业名称' },
     { colKey: 'projectName', title: '项目名称' },
     { colKey: 'teamLeader', title: '团队带头人' },
-    { colKey: 'industryType', title: '产业类别' },
-    { colKey: 'investmentAmount', title: '投资金额' },
+    // { colKey: 'industryType', title: '产业类别' },
+    // { colKey: 'investmentAmount', title: '投资金额' },
     { colKey: 'landingCounty', title: '落地县区' },
     { colKey: 'contactPerson', title: '联系人' },
-    { colKey: 'createTime', title: '创建时间' },
+    // { colKey: 'createTime', title: '创建时间' },
     { colKey: 'actions', title: '操作', width: 240 }
 ]
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {

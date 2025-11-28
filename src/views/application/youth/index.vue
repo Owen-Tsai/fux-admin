@@ -93,7 +93,6 @@
       <template #actions>
         <div class="flex items-center gap-2">
           <TButton
-
                   theme="primary"
                   @click="formRef?.open()"
           >
@@ -101,6 +100,15 @@
               <Icon name="add" />
             </template>
             新增
+          </TButton>
+          <TButton
+                  theme="default"
+                  @click="onExport"
+          >
+            <template #icon>
+              <Icon name="download" />
+            </template>
+            导出
           </TButton>
           <TTooltip content="重新载入">
             <TButton shape="square" variant="text" @click="execute()">
@@ -125,31 +133,29 @@
               {{ dayjs(row.birthday).format('YYYY-MM-DD') }}
             </template>
              <template #diploma="{ row }">
-              <DictTag :dict-data="USER_EDUCATION" :value="scope?.text" />
+              <DictTag :dict-data="USER_EDUCATION" :value="row.diploma" />
             </template>
              <template #professionalTitle="{ row }">
-              <DictTag :dict-data="PERSONAL_TITLE_LEVEL" :value="scope?.text" />
+              <DictTag :dict-data="PERSONAL_TITLE_LEVEL" :value="row.professionalTitle" />
             </template>
              <template #techField="{ row }">
-              <DictTag :dict-data="TEC_FIELD" :value="scope?.text" />
+              <DictTag :dict-data="TEC_FIELD" :value="row.techField" />
             </template>
              <template #talentTitle="{ row }">
-              <DictTag :dict-data="YOUTH_CREATE_TITLE" :value="scope?.text" />
+              <DictTag :dict-data="YOUTH_CREATE_TITLE" :value="row.talentTitle" />
             </template>
              <template #county="{ row }">
-              <DictTag :dict-data="APPLY_INAREA" :value="scope?.text" />
+              <DictTag :dict-data="APPLY_INAREA" :value="row.county" />
             </template>
              <template #createTime="{ row }">
               {{ dayjs(row.createTime).format('YYYY-MM-DD') }}
             </template>
             <template #actions="{ row }">
               <div class="flex gap-2">
-                <TTooltip  content="编辑"
-
-                >
-                  <TButton shape="square" theme="primary" variant="text" @click="formRef?.open(row.id)">
+                <TTooltip content="查看详情">
+                  <TButton shape="square" theme="default" variant="text" @click="openDetail(row.id!)">
                     <template #icon>
-                      <Icon name="edit-2" />
+                      <Icon name="zoom-in" />
                     </template>
                   </TButton>
                 </TTooltip>
@@ -173,6 +179,11 @@
     </TCard>
 
     <Form ref="formRef" @success="execute" />
+    <DetailDrawer
+      ref="detailDrawerRef"
+      v-model:visible="detailVisible"
+      :id="selectedId"
+    />
   </div>
 </template>
 
@@ -183,13 +194,18 @@
   import useDict from '@/hooks/use-dict'
   import { useTable, columns } from './use-table'
   import Form from './form.vue'
+  import DetailDrawer from './detail-drawer.vue'
   import type { YouthCreateVO } from '@/api/application/youth'
   import type { FormInstanceFunctions } from 'tdesign-vue-next'
+  import { exportYouthCreate } from '@/api/application/youth'
+  import useMessage from '@/hooks/use-message'
 
   const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
   const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+  const detailDrawerRef = useTemplateRef<InstanceType<typeof DetailDrawer>>('detailDrawerRef')
 
   const { permission } = usePermission()
+  const message = useMessage()
 
   const [
     USER_EDUCATION ,
@@ -207,17 +223,29 @@
     "yes_no"
   )
 
-  const {
-    data,
-    pending,
-    execute,
-    query,
-    onQueryChange,
-    pagination,
-    onPageChange,
-    onDelete
-  } = useTable(queryForm)
+  const { data, pending, execute, query, onQueryChange, pagination, onPageChange, onDelete } = useTable(queryForm)
   const expanded = ref(false)
+  const detailVisible = ref(false)
+  const selectedId = ref<string>('')
+
+  // 打开详情抽屉
+  const openDetail = (id: string) => {
+    selectedId.value = id
+    detailVisible.value = true
+  }
+
+  /**
+   * 导出Excel文件
+   * 使用当前查询条件导出河洛青年创新创业人才数据
+   */
+  const onExport = async () => {
+    try {
+      await exportYouthCreate(query.value)
+    } catch (error) {
+      message.error('导出失败')
+      console.error('导出失败:', error)
+    }
+  }
 
   defineOptions({ name: 'YouthCreate' })
 </script>
