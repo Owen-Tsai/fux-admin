@@ -1,28 +1,20 @@
 import { get } from 'lodash-es'
 
-/**
- * evaluate expression with given context
- */
-function evalExpression(expression: string, context: Record<string, any>): any {
-  // 移除模板表达式中的双花括号
-  const cleanedExpression = expression.replace(/\{\{(.*?)\}\}/, (_, expr) => expr.trim())
-
-  try {
-    // 替换嵌套路径的表达式，以支持路径解析
-    const pathExpression = cleanedExpression.replace(
-      /([a-zA-Z_$][\w$]*(?:\.[\w$]+)*)/g,
-      (match) => {
-        const value = get(context, match)
-        return value !== undefined ? JSON.stringify(value) : match
-      },
-    )
-
-    // 使用 Function 执行表达式并返回值
-    const result = new Function(`return ${pathExpression};`)()
-    return result
-  } catch (error) {
-    console.error(`Error evaluating expression: ${expression}`, error)
-    return undefined
+const parseExpression = (expression: string, context: Record<string, any>) => {
+  const isExpression = /\{\{(.*?)\}\}/.test(expression)
+  if (isExpression) {
+    // 1. 如果包含双花括号，说明是表达式
+    const str = expression.replace(/\{\{(.*?)\}\}/, (_, expr) => expr.trim())
+    // 1.1 如果包含 $state，从 context 中取值
+    if (str.includes('$state')) {
+      const key = str.split('$state.')[1]
+      return get(context, key)
+    }
+    // 1.2 如果表达式不包含 $state，如 {{0}}、{{['an', 'array']}} 等，解析为 js 表达式
+    return safeEval(`return ${str}`, context)
+  } else {
+    // 2. 如果不是表达式，直接返回原始值
+    return expression
   }
 }
 
@@ -46,4 +38,4 @@ const safeEval = (code: string, context: Record<string, any> = {}) => {
   return runInSandbox(code, context)
 }
 
-export { evalExpression, safeEval }
+export { parseExpression, safeEval }
