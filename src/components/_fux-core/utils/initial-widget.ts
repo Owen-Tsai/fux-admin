@@ -248,4 +248,27 @@ export const initialWidgetConfig: Partial<WidgetMap> = {
     },
     icon: 'upload',
   },
+  divider: {
+    class: 'special',
+    name: '分割线',
+    type: 'divider',
+    uid: 'divider',
+    props: {
+      field: {},
+      title: '分组标题',
+    },
+    icon: 'remove',
+  },
+  card: {
+    class: 'layout',
+    name: '卡片',
+    type: 'card',
+    uid: 'card',
+    props: {
+      field: {},
+      title: '卡片标题',
+      widgets: [],
+    },
+    icon: 'creditcard',
+  },
 }

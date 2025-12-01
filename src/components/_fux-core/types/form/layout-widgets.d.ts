@@ -113,10 +113,18 @@ export interface WPropsDataTable extends WPropsCommon {
   max?: number
 }
 
+export interface WPropsCard extends WPropsCommon {
+  title?: string
+  subtitle?: string
+  headerBordered?: boolean
+  widgets: Widget[]
+}
+
 export interface LayoutWidgetPropsMap {
   grid: WPropsGrid
   tabs: WPropsTabs
   steps: WPropsSteps
   subForm: WPropsSubForm
   dataTable: WPropsDataTable
+  card: WPropsCard
 }
