@@ -1,17 +1,20 @@
 <template>
-  <TDescriptions v-for="(entry, i) in data" :key="i" bordered class="!mb-4">
-    <TDescriptionsItem
-      v-for="(field, j) in tableNestedWidgets"
-      :key="j"
-      :label="field.props.field.label"
-    >
-      <component
-        :is="viewModeWidgetToRender(field.type)"
-        :widget="field"
-        :model="entry[field.props.field.name || field.uid]"
-      />
-    </TDescriptionsItem>
-  </TDescriptions>
+  <template v-if="data && data.length > 0">
+    <TDescriptions v-for="(entry, i) in data" :key="i" bordered class="!mb-4">
+      <TDescriptionsItem
+        v-for="(field, j) in tableNestedWidgets"
+        :key="j"
+        :label="field.props.field.label"
+      >
+        <component
+          :is="viewModeWidgetToRender(field.type)"
+          :widget="field"
+          :model="entry[field.props.field.name || field.uid]"
+        />
+      </TDescriptionsItem>
+    </TDescriptions>
+  </template>
+  <TEmpty v-else />
 </template>
 
 <script setup lang="ts">
