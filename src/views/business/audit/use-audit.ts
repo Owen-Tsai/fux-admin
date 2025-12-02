@@ -41,7 +41,8 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
 
   const onApprove = async () => {
     await approveTask({
-      id: applyId,
+      id: taskId,
+      applyId,
       reason: state.value.reason || '',
       fields: state.value.fields || {},
     })
@@ -49,7 +50,8 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
 
   const onReject = async () => {
     await rejectTask({
-      id: applyId,
+      id: taskId,
+      applyId,
       reason: state.value.reason || '',
       fields: state.value.fields || {},
     })
@@ -58,13 +60,15 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
   const onReturn = async () => {
     if (state.value.rtnToTaskKey === KEY_RETURN_TO_STARTER) {
       await returnTaskToStart({
-        id: applyId,
+        id: taskId,
+        applyId,
         reason: state.value.reason || '',
         fields: state.value.fields || {},
       })
     } else {
       await returnTask({
-        id: applyId,
+        id: taskId,
+        applyId,
         reason: state.value.reason || '',
         fields: state.value.fields || {},
         targetTaskDefinitionKey: state.value.rtnToTaskKey,

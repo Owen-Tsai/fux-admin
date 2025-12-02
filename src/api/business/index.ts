@@ -108,7 +108,9 @@ export const getTaskReturnOptions = (taskId: string) => {
 }
 
 export type TaskVO = {
+  /** 任务ID / taskId */
   id: string
+  applyId?: string
   reason: string
   fields?: object
   targetTaskDefinitionKey?: string
