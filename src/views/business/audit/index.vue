@@ -6,14 +6,14 @@
           <div class="flex items-center">
             <div class="flex items-center gap-4">
               <TTooltip content="返回列表">
-                <TButton variant="outline" theme="default" shape="square">
+                <TButton variant="outline" theme="default" shape="square" @click="$router.go(-1)">
                   <template #icon>
                     <Icon name="arrow-left" />
                   </template>
                 </TButton>
               </TTooltip>
               <div>
-                <h2 class="my-0">{{ plan?.item }} 审核</h2>
+                <h2 class="my-0">{{ plan?.item }} {{ isArchive ? '申报详情' : '审核' }}</h2>
                 <div class="flex items-center text-muted gap-10">
                   <div>所属应用：{{ app?.name }}</div>
                   <div>提交人：{{ starter }}</div>
@@ -36,7 +36,7 @@
               />
             </TCard>
 
-            <TCard class="!mt-4" title="审核意见">
+            <TCard v-if="!isArchive" class="!mt-4" title="审核意见">
               <TForm ref="formRef" colon :rules="rules" :data="state" @submit="onSubmit">
                 <TRow>
                   <TCol :span="6">
@@ -94,6 +94,7 @@ import Timeline from './timeline.vue'
 import FormRenderer from '@fusionx/core/form-renderer/index.vue'
 import type { FormProps, FormInstanceFunctions } from 'tdesign-vue-next'
 
+const route = useRoute()
 const fuxRenderer = useTemplateRef('fuxRenderer')
 const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
 
@@ -107,4 +108,8 @@ const { loading, appSchema, plan, app, starter, submitTime } = useData(fuxRender
 const { taskRtnOpts, onSubmit, state, loading: auditLoading } = useAudit(formRef)
 
 const [auditOptions] = useDict('app_audit_options')
+
+const isArchive = computed(() => route.query.taskKey === 'All')
+
+defineOptions({ name: 'BusinessAuditDetail' })
 </script>

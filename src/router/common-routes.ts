@@ -60,7 +60,8 @@ const commonRoutes: RouteRecordRaw[] = [
         name: 'BusinessAuditDetail',
         component: () => import('@/views/business/audit/index.vue'),
         meta: {
-          title: '业务审核',
+          title: '申报信息详情',
+          keepAlive: false,
         },
       },
       {

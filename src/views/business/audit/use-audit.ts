@@ -19,8 +19,7 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
 
   const { removeTab } = useTabsStore()
 
-  const { data: taskRtnOpts } = useRequest(() => getTaskReturnOptions(taskId), {
-    immediate: true,
+  const { data: taskRtnOpts, execute } = useRequest(() => getTaskReturnOptions(taskId), {
     onSuccess: () => {
       taskRtnOpts.value?.push({
         name: '发起人',
@@ -28,6 +27,10 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
       })
     },
   })
+
+  if (route.query.taskKey !== 'All') {
+    execute()
+  }
 
   const state = ref<{
     conclusion?: string

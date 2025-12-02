@@ -106,7 +106,7 @@
                 </TButton>
               </TTooltip>
               <TTooltip v-else content="查看详情">
-                <TButton theme="primary" variant="text" shape="square">
+                <TButton theme="primary" variant="text" shape="square" @click="toAuditPage(row)">
                   <template #icon>
                     <Icon name="browse" />
                   </template>
