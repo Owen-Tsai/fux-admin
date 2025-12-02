@@ -1,5 +1,5 @@
 <template>
-  <div>{{ displayValue.join(' - ') }}</div>
+  <div>{{ displayValue ? displayValue.join(' - ') : '' }}</div>
 </template>
 
 <script setup lang="ts">
@@ -12,10 +12,15 @@ const { widget, model } = defineProps<{
 }>()
 
 const displayValue = computed(() => {
-  if (widget.props.valueType === 'time-stamp' || widget.props.valueType === 'Date') {
-    return model.map((m) => dayjs(m).format('YYYY-MM-DD HH:mm:ss'))
+  if (!model || model.length === 0) {
+    return null
   }
-
-  return model.map((m) => dayjs(m).format(widget.props.valueType))
+  if (widget.props.displayFormat === 'time-stamp') {
+    return model.map((m) => dayjs(m).unix())
+  } else if (widget.props.displayFormat === 'Date') {
+    return model.map((m) => new Date(m))
+  } else {
+    return model.map((m) => dayjs(m).format(widget.props.displayFormat || 'YYYY-MM-DD HH:mm:ss'))
+  }
 })
 </script>

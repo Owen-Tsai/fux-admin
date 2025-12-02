@@ -15,6 +15,9 @@
   <TFormItem label="值格式" name="valueType">
     <TSelect v-model:value="props.valueType" :options="dateValueTypeOpts" />
   </TFormItem>
+  <TFormItem label="显示模式" name="displayFormat" help="审核和阅读模式下生效">
+    <TSelect v-model:value="props.displayFormat" :options="dateValueTypeOpts" />
+  </TFormItem>
 
   <TFormItem label="允许多选" name="multiple" class="boolean-setter">
     <TSwitch v-model:value="props.multiple" />

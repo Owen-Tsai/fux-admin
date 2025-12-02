@@ -12,10 +12,15 @@ const { widget, model } = defineProps<{
 }>()
 
 const displayValue = computed(() => {
-  if (widget.props.valueType === 'time-stamp' || widget.props.valueType === 'Date') {
-    return dayjs(model).format('YYYY-MM-DD HH:mm:ss')
+  if (!model) {
+    return ''
   }
-
-  return dayjs(model).format(widget.props.valueType)
+  if (widget.props.displayFormat === 'time-stamp') {
+    return dayjs(model).unix()
+  } else if (widget.props.displayFormat === 'Date') {
+    return new Date(model)
+  } else {
+    return dayjs(model).format(widget.props.displayFormat || 'YYYY-MM-DD HH:mm:ss')
+  }
 })
 </script>

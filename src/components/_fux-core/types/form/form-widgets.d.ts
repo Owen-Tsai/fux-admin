@@ -247,6 +247,16 @@ interface WPropsDatePickerCommon extends WPropsCommon {
     | 'YYYY-MM-DD HH:mm'
     | 'YYYY-MM-DD HH:mm:ss'
     | 'YYYY-MM-DD HH:mm:ss:SSS'
+  displayFormat?:
+    | 'time-stamp'
+    | 'Date'
+    | 'YYYY'
+    | 'YYYY-MM'
+    | 'YYYY-MM-DD'
+    | 'YYYY-MM-DD HH'
+    | 'YYYY-MM-DD HH:mm'
+    | 'YYYY-MM-DD HH:mm:ss'
+    | 'YYYY-MM-DD HH:mm:ss:SSS'
 }
 
 export interface WPropsDatePicker extends WPropsDatePickerCommon {
