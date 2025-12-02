@@ -24,7 +24,7 @@
                 :loading="pending"
                 :keys="{ label: 'name', value: 'id' }"
                 :min-collapsed-num="8"
-                :tree-props="{ valueMode: 'all' }"
+                :tree-props="{ valueMode: 'all', checkStrictly: true }"
               />
             </TFormItem>
           </TCol>
