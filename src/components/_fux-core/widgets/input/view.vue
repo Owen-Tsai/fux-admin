@@ -1,5 +1,5 @@
 <template>
-  <div>{{ model }}</div>
+  <div>{{ widget.props.prefixText }}{{ model }}{{ widget.props.suffixText }}</div>
 </template>
 
 <script setup lang="ts">

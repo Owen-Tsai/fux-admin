@@ -14,6 +14,12 @@
   <TFormItem label="前缀图标" name="prefixIcon">
     <IconSelect v-model:value="props.prefixIcon" :panel-match-input-width="false" />
   </TFormItem>
+  <TFormItem label="前缀文字" name="prefixText">
+    <TInput v-model:value="props.prefixText" clearable />
+  </TFormItem>
+  <TFormItem label="后缀文字" name="suffixText">
+    <TInput v-model:value="props.suffixText" clearable />
+  </TFormItem>
   <TFormItem label="显示字数" name="showCount" class="boolean-setter">
     <TSwitch v-model:value="props.showCount" />
   </TFormItem>
