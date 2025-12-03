@@ -8,8 +8,11 @@ interface WPropsCommon {
   field: FieldProps
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface WPropsAttachmentTable extends WPropsCommon {}
+export interface WPropsAttachmentTable extends WPropsCommon {
+  hasButton?: boolean
+  action?: string
+  buttonLabel?: string
+}
 
 export interface WPropsDivider extends WPropsCommon {
   title?: string
