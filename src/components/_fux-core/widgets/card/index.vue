@@ -3,6 +3,7 @@
     :title="widget.props.title"
     :subtitle="widget.props.subtitle"
     :header-bordered="widget.props.headerBordered"
+    class="!my-4"
   >
     <template v-if="ctx && ctx.mode !== 'dev'">
       <WidgetRenderer v-for="w in widget.props.widgets" :key="w.uid" :widget="w" />
