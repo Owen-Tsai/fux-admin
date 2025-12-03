@@ -1,5 +1,6 @@
 import { set } from 'lodash-es'
 import dayjs from 'dayjs'
+import { emitter, LifecyclePhases } from '@fusionx/core/utils/emitter'
 import { usePlanIdCtxProvide } from '@fusionx/core/hooks'
 import { getApplyDetail, getTaskInfo } from '@/api/business'
 import FormRenderer from '@fusionx/core/form-renderer/index.vue'
@@ -53,6 +54,9 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
 
     nextTick(() => {
       fuxRenderer.value?.setFormData(dataToFill)
+      nextTick(() => {
+        emitter.emit(LifecyclePhases.LOADED)
+      })
     })
   }
 

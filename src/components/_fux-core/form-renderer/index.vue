@@ -37,6 +37,7 @@ import ViewModeWidgetRenderer from '../widgets/widget/view-mode.vue'
 import highlightCode from '@/utils/highlighter'
 import useAPI from './use-api'
 import useInstance from './use-instance'
+import useLifecycles from './use-lifecycles'
 import { useRendererCtxProvide } from '@fusionx/core/hooks'
 import type { FormInstanceFunctions, FormValidateParams } from 'tdesign-vue-next'
 import type { AppSchema, FuxRendererMode, FieldInteractivity } from '@fusionx/core/types'
@@ -98,13 +99,15 @@ const highlighted = computedAsync(async () => {
 const instanceMethods = useInstance()
 useAPI()
 
-const validateForm = (params: FormValidateParams) => {
+const validateForm = (params?: FormValidateParams) => {
   return formRef.value?.validate(params)
 }
 
 const resetForm = () => {
   formRef.value?.reset()
 }
+
+useLifecycles()
 
 defineExpose({
   ...instanceMethods,

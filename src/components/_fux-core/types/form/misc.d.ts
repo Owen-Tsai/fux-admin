@@ -35,3 +35,5 @@ export interface FunctionConfig {
   name: string
   body?: string
 }
+
+export type LifecyclePhase = 'loaded' | 'beforeSubmit'
