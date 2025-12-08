@@ -1,11 +1,21 @@
 <template>
-  <TTable :columns="columns" :data="uploadList" :loading="loading"></TTable>
+  <div>
+    <div v-if="widget.props.hasButton" class="text-right !mb-4">
+      <TButton @click="exportTemplate">{{ widget.props.buttonLabel || '导出模板' }}</TButton>
+    </div>
+    <TTable :columns="columns" :data="uploadList" :loading="loading"></TTable>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { getUploadList, type UploadList } from '@/api/business/attachment'
 import { useRendererCtxInject, usePlanIdCtxInject } from '@fusionx/core/hooks'
+import type { WidgetMap } from '@fusionx/core/types'
 import type { TableProps } from 'tdesign-vue-next'
+
+const { widget } = defineProps<{
+  widget: WidgetMap['attachmentTable']
+}>()
 
 const route = useRoute()
 const ctx = usePlanIdCtxInject()
@@ -38,6 +48,10 @@ const load = async () => {
   loading.value = true
   uploadList.value = await getUploadList(appId, planId, applyId)
   loading.value = false
+}
+
+const exportTemplate = () => {
+  window.open(widget.props.action, '_blank')
 }
 
 load()

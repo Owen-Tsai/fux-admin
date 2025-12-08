@@ -18,12 +18,14 @@
     <TFormItem label="表单禁用" class="boolean-setter">
       <TSwitch v-model:value="appSchema.form.disabled" />
     </TFormItem>
+    <AppLifecycleSetter />
   </TForm>
 </template>
 
 <script setup lang="ts">
 import { useDesignerCtxInject } from '@fusionx/core/hooks'
 import { labelAlignOpts, requiredMarkOpts } from '../../utils/form-setter-opts'
+import AppLifecycleSetter from './app-lifecycle-setter.vue'
 
 const { appSchema } = useDesignerCtxInject()!
 </script>

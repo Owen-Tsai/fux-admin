@@ -110,6 +110,6 @@ const onDeleteAction = (evtName: string) => {
 }
 
 const onEditAction = () => {
-  ctx.showModal?.('func')
+  ctx.showModal.value?.('func')
 }
 </script>

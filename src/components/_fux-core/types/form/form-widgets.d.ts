@@ -65,13 +65,10 @@ export interface WPropsInput extends WPropsCommon {
   maxlength?: number
   placeholder?: string
   showCount?: boolean
-  /**
-   * @deprecated use `prefixIcon` instead. TDesign doesn't support text prefix.
-   */
-  prefix?: AddonProps
-  suffix?: AddonProps
   tips?: string
   prefixIcon?: string
+  prefixText?: string
+  suffixText?: string
 }
 
 /**
@@ -90,8 +87,8 @@ export interface WPropsInputNumber extends WPropsCommon {
   max?: number
   min?: number
   placeholder?: string
-  suffix?: AddonProps
-  prefix?: string
+  prefixText?: string
+  suffixText?: string
   precision?: number
   step?: number
   tips?: string

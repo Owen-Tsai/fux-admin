@@ -9,6 +9,8 @@
     :placeholder="widget.props.placeholder"
     :maxlength="widget.props.maxlength"
     :show-limit-number="widget.props.showCount"
+    :suffix="widget.props.suffixText"
+    :label="widget.props.prefixText"
     @change="handler?.('change')"
     @focus="handler?.('focus')"
     @blur="handler?.('blur')"

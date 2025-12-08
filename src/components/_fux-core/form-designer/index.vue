@@ -39,9 +39,11 @@ useDesignerCtxProvide(cAppSchema)
 const CTX_KEY = Symbol('sidePanelCtx')
 const sidePanel = ref<InstanceType<typeof SidePanel>>()
 
+const showModal = computed(() => sidePanel.value?.showFuncModal)
+
 export const injectSidePanelCtx = () => {
-  return inject(CTX_KEY, {
-    showModal: sidePanel.value?.showFuncModal,
+  return injectLocal(CTX_KEY, {
+    showModal,
   })
 }
 </script>

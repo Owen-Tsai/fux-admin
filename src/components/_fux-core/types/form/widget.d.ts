@@ -2,7 +2,7 @@ import type { FormWidgetPropsMap } from './form-widgets'
 import type { LayoutWidgetPropsMap } from './layout-widgets'
 import type { SpecialWidgetPropsMap } from './special-widgets'
 
-import type { FormProps, APIConfig, FunctionConfig } from './misc'
+import type { FormProps, APIConfig, FunctionConfig, LifecyclePhase } from './misc'
 
 export type WidgetPropsMap = FormWidgetPropsMap & LayoutWidgetPropsMap & SpecialWidgetPropsMap
 
@@ -34,4 +34,5 @@ export interface FormSchema extends FormProps {
   function?: Record<string, FunctionConfig>
   api?: Record<string, APIConfig>
   widgets: Widget[]
+  lifecycle?: Partial<Record<LifecyclePhase, string>>
 }

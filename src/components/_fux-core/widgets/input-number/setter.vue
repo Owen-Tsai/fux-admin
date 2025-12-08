@@ -29,6 +29,12 @@
   <TFormItem label="步进值">
     <TInputNumber v-model:value="props.step" class="w-full" />
   </TFormItem>
+  <TFormItem label="前缀文字" name="prefixText">
+    <TInput v-model:value="props.prefixText" clearable />
+  </TFormItem>
+  <TFormItem label="后缀文字" name="suffixText">
+    <TInput v-model:value="props.suffixText" clearable />
+  </TFormItem>
   <TFormItem label="允许清空" name="allowClear" class="boolean-setter">
     <TSwitch v-model:value="props.allowClear" />
   </TFormItem>

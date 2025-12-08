@@ -37,7 +37,13 @@
             </TCard>
 
             <TCard v-if="!isArchive" class="!mt-4" title="审核意见">
-              <TForm ref="formRef" colon :rules="rules" :data="state" @submit="onSubmit">
+              <TForm
+                ref="formRef"
+                colon
+                :rules="rules"
+                :data="state"
+                @submit="onSubmit(getFields())"
+              >
                 <TRow>
                   <TCol :span="6">
                     <TFormItem label="申请人">{{ starter }}</TFormItem>
@@ -90,6 +96,7 @@
 <script setup lang="ts">
 import useData from './use-data'
 import useAudit from './use-audit'
+import useFields from './use-fields'
 import Timeline from './timeline.vue'
 import FormRenderer from '@fusionx/core/form-renderer/index.vue'
 import type { FormProps, FormInstanceFunctions } from 'tdesign-vue-next'
@@ -106,6 +113,7 @@ const rules: FormProps['rules'] = {
 
 const { loading, appSchema, plan, app, starter, submitTime } = useData(fuxRenderer)
 const { taskRtnOpts, onSubmit, state, loading: auditLoading } = useAudit(formRef)
+const { getFields } = useFields(appSchema, fuxRenderer)
 
 const [auditOptions] = useDict('app_audit_options')
 

@@ -26,3 +26,8 @@ export const eventKeys = {
    */
   WIDGET_PROP_CHANGE: 'widget:prop:change',
 }
+
+export enum LifecyclePhases {
+  LOADED = 'lifecycle:loaded',
+  BEFORE_SUBMIT = 'lifecycle:beforeSubmit',
+}

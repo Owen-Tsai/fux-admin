@@ -11,6 +11,8 @@
     :readonly="widget.props.readonly"
     :step="widget.props.step"
     :theme="widget.props.controlsLayout"
+    :label="widget.props.prefixText"
+    :suffix="widget.props.suffixText"
     @change="handler?.('change')"
     @focus="handler?.('focus')"
     @blur="handler?.('blur')"
