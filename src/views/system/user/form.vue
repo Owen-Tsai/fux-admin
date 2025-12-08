@@ -21,9 +21,10 @@ const visible = ref(false)
 const loading = ref(false)
 const formData = ref<UserVO>({
   status: 0,
+  countyId: -1,
 })
 
-const [sexOpts, statusOpts] = useDict('system_user_sex', 'common_status')
+const [sexOpts, statusOpts, countyOpts] = useDict('system_user_sex', 'common_status', 'APPLY_INAREA')
 
 const { data, pending } = useRequest(getDeptTree, { immediate: true })
 
@@ -58,6 +59,7 @@ const open = (id?: number) => {
   formRef.value?.reset({ type: 'initial' })
   formData.value.id = undefined
   formData.value.createTime = undefined
+  formData.value.countyId = -1
   mode.value = 'create'
 
   if (id) {
@@ -120,6 +122,11 @@ defineExpose({ open, setDept })
           <TCol :span="12" :lg="6">
             <TFormItem label="邮箱" name="email">
               <TInput v-model:value="formData.email" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="12" :lg="6">
+            <TFormItem label="区县" name="countyId">
+              <TSelect v-model:value="formData.countyId" :options="countyOpts" placeholder="请选择区县" :allow-clear="false" />
             </TFormItem>
           </TCol>
           <TCol :span="12" :lg="6">

@@ -16,6 +16,8 @@ export type UserVO = {
   remark?: string
   avatar?: string
   createTime?: Date
+  countyId?: number
+  countyName?: string
 }
 
 export type ListQueryParams = CommonQueryParams & {
@@ -24,6 +26,7 @@ export type ListQueryParams = CommonQueryParams & {
   mobile?: string
   status?: number
   deptId?: string | number
+  countyId?: number
 }
 
 export type SimpleUserListVO = Array<{
