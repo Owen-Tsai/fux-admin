@@ -170,7 +170,7 @@ const syncData = async () => {
       url: widget.props.syncUrl,
       data: {
         appId,
-        planId,
+        planId: planId?.value,
         applyId,
       },
     })

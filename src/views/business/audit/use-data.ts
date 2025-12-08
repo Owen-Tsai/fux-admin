@@ -24,7 +24,7 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
   const starter = ref<string>()
   const submitTime = ref<string>()
 
-  useBusinessCtxProvide({ appId, planId: planId.value, applyId })
+  useBusinessCtxProvide({ appId, planId, applyId })
 
   const loadApplyDetail = async () => {
     const res = await getApplyDetail(appId, applyId)

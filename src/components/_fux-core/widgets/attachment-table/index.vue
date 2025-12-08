@@ -42,11 +42,11 @@ const loading = ref(false)
 
 const load = async () => {
   if (!isProd.value) return
-  if (!appId || !planId || !applyId) {
+  if (!appId || !planId?.value || !applyId) {
     return
   }
   loading.value = true
-  uploadList.value = await getUploadList(appId, planId, applyId)
+  uploadList.value = await getUploadList(appId, planId.value, applyId)
   loading.value = false
 }
 

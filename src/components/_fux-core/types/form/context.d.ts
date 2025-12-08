@@ -23,7 +23,7 @@ export interface FuxRendererCtx extends FuxCoreContext {
 }
 
 export interface BusinessCtx {
-  planId: string
+  planId: Ref<string>
   appId: string
   applyId: string
   taskKey?: string
