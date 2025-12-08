@@ -7,8 +7,11 @@
           增加
         </template>
       </TButton>
-      <TTooltip content="同步您曾经填写过的个人信息。此操作将覆盖当前表格中已填数据">
-        <TButton v-if="widget.props.syncButton" theme="default" @click="syncData">
+      <TTooltip
+        v-if="widget.props.syncButton"
+        content="同步您曾经填写过的个人信息。此操作将覆盖当前表格中已填数据"
+      >
+        <TButton theme="default" @click="syncData">
           <template #icon>
             <Icon name="refresh" />
           </template>
