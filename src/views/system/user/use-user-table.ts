@@ -6,6 +6,7 @@ export const columns: TableProps['columns'] = [
   { colKey: 'username', title: '用户账号', width: 160 },
   { colKey: 'nickname', title: '用户名称', width: 160 },
   { colKey: 'deptName', title: '所属部门', width: 120 },
+  { colKey: 'countyId', title: '区县', width: 120 },
   { colKey: 'mobile', title: '绑定手机', ellipsis: true },
   { colKey: 'status', title: '状态' },
   { colKey: 'createTime', title: '注册时间', width: 140 },
