@@ -1,7 +1,7 @@
 import { set } from 'lodash-es'
 import dayjs from 'dayjs'
 import { emitter, LifecyclePhases } from '@fusionx/core/utils/emitter'
-import { usePlanIdCtxProvide } from '@fusionx/core/hooks'
+import { useBusinessCtxProvide } from '@fusionx/core/hooks'
 import { getApplyDetail, getTaskInfo } from '@/api/business'
 import FormRenderer from '@fusionx/core/form-renderer/index.vue'
 import type { PlanVO } from '@/api/app/plan'
@@ -24,7 +24,7 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
   const starter = ref<string>()
   const submitTime = ref<string>()
 
-  usePlanIdCtxProvide(planId)
+  useBusinessCtxProvide({ appId, planId, applyId })
 
   const loadApplyDetail = async () => {
     const res = await getApplyDetail(appId, applyId)

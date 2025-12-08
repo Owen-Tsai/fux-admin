@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { getUploadList, type UploadList } from '@/api/business/attachment'
-import { useRendererCtxInject, usePlanIdCtxInject } from '@fusionx/core/hooks'
+import { useRendererCtxInject, useBusinessCtxInject } from '@fusionx/core/hooks'
 import type { WidgetMap } from '@fusionx/core/types'
 import type { TableProps } from 'tdesign-vue-next'
 
@@ -17,11 +17,8 @@ const { widget } = defineProps<{
   widget: WidgetMap['attachmentTable']
 }>()
 
-const route = useRoute()
-const ctx = usePlanIdCtxInject()
-const appId = route.params.appId as string
-const planId = (route.params.planId || route.query.planId || ctx?.planId.value) as string
-const applyId = (route.params.applyId || route.query.applyId) as string
+const bizCtx = useBusinessCtxInject()
+const { planId, appId, applyId } = bizCtx || {}
 
 const rendererCtx = useRendererCtxInject()
 
@@ -45,8 +42,11 @@ const loading = ref(false)
 
 const load = async () => {
   if (!isProd.value) return
+  if (!appId || !planId?.value || !applyId) {
+    return
+  }
   loading.value = true
-  uploadList.value = await getUploadList(appId, planId, applyId)
+  uploadList.value = await getUploadList(appId, planId.value, applyId)
   loading.value = false
 }
 

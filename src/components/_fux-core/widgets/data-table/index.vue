@@ -1,12 +1,23 @@
 <template>
   <div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center justify-end gap-2">
       <TButton @click="tableDialogRef?.onAdd()">
         <template #icon>
           <Icon name="plus" />
           增加
         </template>
       </TButton>
+      <TTooltip
+        v-if="widget.props.syncButton"
+        content="同步您曾经填写过的个人信息。此操作将覆盖当前表格中已填数据"
+      >
+        <TButton theme="default" @click="syncData">
+          <template #icon>
+            <Icon name="refresh" />
+          </template>
+          {{ widget.props.syncButtonLabel || '同步信息' }}
+        </TButton>
+      </TTooltip>
     </div>
     <TTable
       v-show="isProd || widget.props.state.mode === 'table'"
@@ -76,7 +87,8 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { safeEval } from '@fusionx/core/utils'
-import { useRendererCtxInject } from '@fusionx/core/hooks'
+import Logger from '@/utils/logger'
+import { useRendererCtxInject, useBusinessCtxInject } from '@fusionx/core/hooks'
 import request from '@/utils/request'
 import TableDialog from './table-dialog.vue'
 import NestedWidgets from '@fusionx/core/form-designer/canvas/nested.vue'
@@ -88,6 +100,9 @@ const { widget } = defineProps<{
 }>()
 
 const URL_PREFIX = widget.props.url || ''
+const logger = Logger.getInstance()
+const bizCtx = useBusinessCtxInject()
+const { planId, appId, applyId } = bizCtx || {}
 
 const states = ref<{
   total: number
@@ -99,6 +114,7 @@ const states = ref<{
   current: 1,
 })
 
+const message = useMessage()
 const rendererCtx = useRendererCtxInject()
 
 const isProd = computed(() => rendererCtx && rendererCtx.mode !== 'dev')
@@ -143,6 +159,28 @@ const loadData = async () => {
 
     states.value.data = res.list
     states.value.total = res.total
+    loading.value = false
+  }
+}
+
+const syncData = async () => {
+  if (!widget.props.syncUrl) {
+    return
+  }
+  loading.value = true
+  try {
+    await request.post({
+      url: widget.props.syncUrl,
+      data: {
+        appId,
+        planId: planId?.value,
+        applyId,
+      },
+    })
+    message.success('同步成功')
+  } catch (e) {
+    logger.error(import.meta.url, '[fux-core/dataTable] 同步数据失败', e)
+  } finally {
     loading.value = false
   }
 }
