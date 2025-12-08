@@ -111,6 +111,7 @@ const states = ref<{
   current: 1,
 })
 
+const message = useMessage()
 const rendererCtx = useRendererCtxInject()
 
 const isProd = computed(() => rendererCtx && rendererCtx.mode !== 'dev')
@@ -173,6 +174,7 @@ const syncData = async () => {
         applyId,
       },
     })
+    message.success('同步成功')
   } catch (e) {
     logger.error(import.meta.url, '[fux-core/dataTable] 同步数据失败', e)
   } finally {
