@@ -111,6 +111,9 @@ export interface WPropsDataTable extends WPropsCommon {
   url?: string
   min?: number
   max?: number
+  syncButton?: boolean
+  syncUrl?: string
+  syncButtonLabel?: string
 }
 
 export interface WPropsCard extends WPropsCommon {

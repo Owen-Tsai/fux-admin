@@ -19,6 +19,17 @@
       <TFormItem label="小尺寸" class="boolean-setter">
         <TSwitch v-model:value="props.pagination.small" />
       </TFormItem>
+      <TFormItem label="同步按钮" name="syncButton" class="boolean-setter">
+        <TSwitch v-model:value="props.syncButton" />
+      </TFormItem>
+      <template v-if="props.syncButton">
+        <TFormItem label="同步按钮文本" name="syncButtonText">
+          <TInput v-model:value="props.syncButtonLabel" clearable />
+        </TFormItem>
+        <TFormItem label="同步接口地址" name="syncUrl">
+          <TInput v-model:value="props.syncUrl" clearable />
+        </TFormItem>
+      </template>
     </template>
   </template>
   <template v-if="props.state.mode === 'form'">
