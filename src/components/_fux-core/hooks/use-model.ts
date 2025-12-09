@@ -11,7 +11,7 @@ export const useModel = (widget: FormWidget) => {
   const model = computed({
     get: () => {
       const ret = get(formData?.value, key)
-      if (!formData || !formData.value || !ret) {
+      if (!formData || !formData.value || ret === undefined || ret === null) {
         return widget.type === 'dateRangePicker' || widget.type === 'checkbox' ? [] : undefined
       }
       return ret
