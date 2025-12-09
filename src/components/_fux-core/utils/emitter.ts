@@ -25,6 +25,14 @@ export const eventKeys = {
    * 控件属性变化
    */
   WIDGET_PROP_CHANGE: 'widget:prop:change',
+  /**
+   * 显示分页控件的分页
+   */
+  WIDGET_PAGE_SHOW: 'widget:page:show',
+  /**
+   * 隐藏分页控件的分页
+   */
+  WIDGET_PAGE_HIDE: 'widget:page:hide',
 }
 
 export enum LifecyclePhases {

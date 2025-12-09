@@ -1,13 +1,14 @@
 <template>
   <template v-if="ctx && ctx.mode !== 'dev'">
     <TSteps :current="widget.props.state.current || 0">
-      <TStepItem
-        v-for="(step, i) in widget.props.children"
-        :key="i"
-        :title="step.title"
-        :value="i"
-        :content="step.desc"
-      />
+      <template v-for="(step, i) in widget.props.children" :key="i">
+        <TStepItem
+          v-if="visible[i] || !step.hide"
+          :title="step.title"
+          :value="i"
+          :content="step.desc"
+        />
+      </template>
     </TSteps>
     <div class="steps-container">
       <WidgetRenderer
@@ -41,6 +42,7 @@
 <script setup lang="ts">
 import { useRendererCtxInject } from '@fusionx/core/hooks'
 import WidgetRenderer from '../widget/index.vue'
+import useStepVisibility from '../tabs/use-step-visibility'
 import NestedWidgets from '@fusionx/core/form-designer/canvas/nested.vue'
 import type { WidgetMap } from '@fusionx/core/types'
 
@@ -51,4 +53,6 @@ const { widget } = defineProps<{
 const current = ref(0)
 
 const ctx = useRendererCtxInject()
+
+const { visible } = useStepVisibility(widget, current)
 </script>
