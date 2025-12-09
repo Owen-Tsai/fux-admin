@@ -1,5 +1,5 @@
 <template>
-  <TFormItem label="默认值" name="defaultValue" help="支持使用表达式">
+  <TFormItem label="默认值" name="defaultValue" help="默认值应为数字表达式">
     <TInput v-model:value="props.defaultValue" />
   </TFormItem>
   <TFormItem label="占位文字" name="placeholder">
