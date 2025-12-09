@@ -217,3 +217,10 @@
     }
   }
 }
+
+.fux-renderer.audit,
+.fux-renderer.archive {
+  .t-form__label {
+    font-weight: bold;
+  }
+}

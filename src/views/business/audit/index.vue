@@ -33,6 +33,7 @@
                 :app-schema="appSchema"
                 mode="audit"
                 :task-key="$route.query.taskKey as string"
+                class="fux-renderer audit"
               />
             </TCard>
 
