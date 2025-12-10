@@ -1,6 +1,6 @@
 <template>
-  <TFormItem label="默认值" name="defaultValue" help="多选时，使用回车增加多个值">
-    <TTagInput v-model:value="props.defaultValue" />
+  <TFormItem label="默认值" name="defaultValue" help="默认值应为数组表达式">
+    <TInput v-model:value="props.defaultValue" />
   </TFormItem>
   <TFormItem label="占位文字" name="placeholder">
     <TInput v-model:value="props.placeholder" />

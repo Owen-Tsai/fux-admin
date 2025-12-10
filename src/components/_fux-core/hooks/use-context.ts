@@ -7,23 +7,26 @@ import type {
   FuxDesignerCtx,
   FuxRendererCtx,
   FuxFlowBuilderCtx,
-  PlanIdCtx,
+  BusinessCtx,
 } from '@fusionx/core/types'
 
 const FUX_KEY_DESIGNER = Symbol('fux-designer')
 const FUX_KEY_RENDERER = Symbol('fux-renderer')
 const FUX_KEY_FLOW_BUILDER = Symbol('fux-workflow-builder')
 const FUX_KEY_NESTED_MODEL = Symbol('fux-nested-model')
-const FUX_KEY_PLAN_ID = Symbol('fux-plan-id')
+const BIZ_KEY = Symbol('business')
 
-export const usePlanIdCtxProvide = (planId: Ref<string>) => {
-  provide(FUX_KEY_PLAN_ID, {
+export const useBusinessCtxProvide = ({ planId, appId, applyId, taskKey }: BusinessCtx) => {
+  provide(BIZ_KEY, {
     planId,
+    appId,
+    applyId,
+    taskKey,
   })
 }
 
-export const usePlanIdCtxInject = () => {
-  return inject<PlanIdCtx | null>(FUX_KEY_PLAN_ID, null)
+export const useBusinessCtxInject = () => {
+  return inject<BusinessCtx | null>(BIZ_KEY, null)
 }
 
 export const useDesignerCtxProvide = (appSchema: Ref<AppSchema>) => {

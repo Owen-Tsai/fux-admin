@@ -117,7 +117,7 @@ export interface WPropsTextarea extends WPropsCommon {
  */
 export interface WPropsSelect extends WPropsCommon {
   allowClear?: boolean
-  defaultValue?: string | string[]
+  defaultValue?: string
   fieldNames?: string
   multiple?: boolean
   max?: number
@@ -135,7 +135,7 @@ export interface WPropsSelect extends WPropsCommon {
 
 export interface WPropsCascader extends WPropsCommon {
   allowClear?: boolean
-  defaultValue?: string | srting[]
+  defaultValue?: string
   fieldNames?: string
   filterable?: boolean
   filter?: string
@@ -165,14 +165,14 @@ export interface WPropsRadio extends WPropsCommon {
 }
 
 export interface WPropsCheckbox extends WPropsCommon {
-  defaultValue?: string[]
+  defaultValue?: string
   options: OptionOf<TdCheckboxGroupProps['options']>
   max?: number
 }
 
 export interface WPropsTreeSelect extends WPropsCommon {
   allowClear?: boolean
-  defaultValue?: string | string[]
+  defaultValue?: string
   fieldNames?: string
   options: JsonOption
   filterable?: boolean
@@ -189,7 +189,7 @@ export interface WPropsTreeSelect extends WPropsCommon {
 }
 
 export interface WPropsSlider extends WPropsCommon {
-  defaultValue?: number | [number, number]
+  defaultValue?: string
   max?: number
   min?: number
   range?: boolean
@@ -204,7 +204,7 @@ export interface WPropsSlider extends WPropsCommon {
 export interface WPropsRate extends WPropsCommon {
   allowClear?: boolean
   allowHalf?: boolean
-  defaultValue?: number
+  defaultValue?: string
   count?: number
   color?: string
   icon?: string
@@ -212,7 +212,7 @@ export interface WPropsRate extends WPropsCommon {
 }
 
 export interface WPropsSwitch extends WPropsCommon {
-  defaultValue?: boolean
+  defaultValue?: string
   customValue?: string
   /**
    * @deprecated use `customValue` instead
@@ -258,12 +258,12 @@ interface WPropsDatePickerCommon extends WPropsCommon {
 
 export interface WPropsDatePicker extends WPropsDatePickerCommon {
   multiple?: boolean
-  defaultValue?: string | string[]
+  defaultValue?: string
   placeholder?: string
 }
 
 export interface WPropsDateRangePicker extends WPropsDatePickerCommon {
-  defaultValue?: string[]
+  defaultValue?: string
   placeholder?: string
 }
 

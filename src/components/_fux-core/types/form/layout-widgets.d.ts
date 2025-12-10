@@ -26,6 +26,7 @@ export interface WPropsGrid extends WPropsCommon {
 export interface WPropsTabsPane {
   title?: string
   widgets: Widget[]
+  hide?: boolean
 }
 
 export interface WPropsTabs extends WPropsCommon {
@@ -49,6 +50,7 @@ export interface WPropsStep {
   title?: string
   desc?: string
   widgets: Widget[]
+  hide?: boolean
 }
 
 export interface WPropsSteps extends WPropsCommon {
@@ -111,6 +113,9 @@ export interface WPropsDataTable extends WPropsCommon {
   url?: string
   min?: number
   max?: number
+  syncButton?: boolean
+  syncUrl?: string
+  syncButtonLabel?: string
 }
 
 export interface WPropsCard extends WPropsCommon {

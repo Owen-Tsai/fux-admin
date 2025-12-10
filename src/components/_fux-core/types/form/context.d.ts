@@ -22,8 +22,11 @@ export interface FuxRendererCtx extends FuxCoreContext {
   fieldsInteractivity: ComputedRef<FieldInteractivity[]>
 }
 
-export interface PlanIdCtx {
+export interface BusinessCtx {
   planId: Ref<string>
+  appId: string
+  applyId: string
+  taskKey?: string
 }
 
 /**

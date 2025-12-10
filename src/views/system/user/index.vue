@@ -35,7 +35,7 @@ const parentElement = useParentElement(wrapper)
 const { height } = useElementSize(parentElement)
 
 const expanded = ref(false)
-const [commonStatus] = useDict('common_status')
+const [commonStatus, countyOpts] = useDict('common_status', 'APPLY_INAREA')
 
 const currentDeptName = ref('全部')
 
@@ -113,6 +113,13 @@ defineOptions({ name: 'SystemUser' })
                 placeholder="请选择账号状态"
               />
             </TFormItem>
+            <TFormItem v-show="expanded" label="区县" name="countyId" class="col">
+              <TSelect
+                v-model:value="query.countyId"
+                :options="countyOpts"
+                placeholder="请选择区县"
+              />
+            </TFormItem>
             <QueryActions v-model:expanded="expanded" class="col" />
           </TForm>
         </TCard>
@@ -145,6 +152,9 @@ defineOptions({ name: 'SystemUser' })
             :loading="pending"
             @page-change="onPageChange"
           >
+            <template #countyId="{ row }: TableScope<UserVO>">
+              {{ countyOpts.find(opt => opt.value === row.countyId)?.label || '' }}
+            </template>
             <template #status="{ row }: TableScope<UserVO>">
               <TSwitch
                 v-model:value="row.status"

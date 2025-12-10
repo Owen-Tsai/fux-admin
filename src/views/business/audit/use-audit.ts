@@ -76,10 +76,16 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
     }
   }
 
-  const onSubmit = async () => {
+  const onSubmit = async (additionalData?: Record<string, any>) => {
     // TODO: 提交审核结果时一并保存 fieldsInteractivity 允许编辑时的表单数据
     // 直接取出 FormRenderer 的 formData 提交
     loading.value = true
+    if (additionalData) {
+      state.value.fields = {
+        ...additionalData,
+        'com_apply:id': applyId,
+      }
+    }
     try {
       const res = await formRef.value?.validate()
       if (res === true) {

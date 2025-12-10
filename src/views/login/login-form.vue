@@ -43,7 +43,7 @@ import Captcha from './captcha.vue'
 import useUserStore from '@/stores/user'
 import { encrypt, decrypt } from '@/utils/encryption'
 import { localCache } from '@/utils/storage'
-import type { FormProps } from 'tdesign-vue-next'
+import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
 
 const rules: FormProps['rules'] = {
   username: [{ required: true, message: '请输入用户名' }],
@@ -57,6 +57,7 @@ const captchaEnabled = import.meta.env.VITE_APP_CAPTCHA === 'true'
 const loading = ref(false)
 const captcha = ref<InstanceType<typeof Captcha>>()
 const capcthaVisible = ref(false)
+const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
 
 const { currentRoute, push } = useRouter()
 
@@ -67,7 +68,10 @@ const formData = ref({
   memorize: false,
 })
 
-const onSubmit = () => {
+const onSubmit = async () => {
+  const res = await formRef.value?.validate()
+  if (res !== true) return
+
   if (captchaEnabled) {
     capcthaVisible.value = true
   } else {

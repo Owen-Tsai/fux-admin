@@ -1,6 +1,6 @@
 <template>
   <template v-if="widget.class === 'layout' && shouldShow">
-    <component :is="widgetToRender(widget.type)" :widget="widget" />
+    <component v-if="visible || ctx === null" :is="widgetToRender(widget.type)" :widget="widget" />
   </template>
   <template v-if="widget.class === 'form' && shouldShow">
     <TFormItem
@@ -17,7 +17,7 @@
     </TFormItem>
   </template>
   <template v-if="widget.class === 'special'">
-    <component :is="widgetToRender(widget.type)" :widget="widget" />
+    <component v-if="visible || ctx === null" :is="widgetToRender(widget.type)" :widget="widget" />
   </template>
 </template>
 

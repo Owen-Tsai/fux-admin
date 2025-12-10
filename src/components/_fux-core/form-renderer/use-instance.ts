@@ -94,6 +94,14 @@ const useRendererInstance = () => {
     }
   }
 
+  const showStep = (nameOrUid: string, index: number) => {
+    emitter.emit(eventKeys.WIDGET_PAGE_SHOW, { nameOrUid, index })
+  }
+
+  const hideStep = (nameOrUid: string, index: number) => {
+    emitter.emit(eventKeys.WIDGET_PAGE_HIDE, { nameOrUid, index })
+  }
+
   return {
     clearFormData,
     getAppSchema,
@@ -105,6 +113,8 @@ const useRendererInstance = () => {
     setWidgetOptions,
     setWidgetProps,
     setPaginatedWidgetDisabled,
+    showStep,
+    hideStep,
   }
 }
 
