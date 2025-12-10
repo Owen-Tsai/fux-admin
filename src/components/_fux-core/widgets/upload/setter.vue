@@ -26,10 +26,10 @@
   <TFormItem label="文件大小限制" name="sizeLimit">
     <TInputNumber v-model:value="props.sizeLimit" clearable theme="row" suffix="KB" />
   </TFormItem>
-  <TFormItem label="允许多选" name="multiple">
+  <TFormItem label="允许多选" name="multiple" class="boolean-setter">
     <TSwitch v-model:value="props.multiple" />
   </TFormItem>
-  <TFormItem v-show="props.multiple" label="最大上传数量" name="max">
+  <TFormItem v-if="props.multiple" label="最大上传数量" name="max">
     <TInputNumber v-model:value="props.max" clearable />
   </TFormItem>
   <TFormItem label="禁用" name="disabled" class="boolean-setter">
