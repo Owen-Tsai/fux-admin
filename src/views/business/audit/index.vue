@@ -25,7 +25,7 @@
         </div>
 
         <div class="flex gap-4 pb-4">
-          <div class="flex-1">
+          <div class="flex-1 min-w-0">
             <TCard title="申请信息">
               <FormRenderer
                 v-if="appSchema"
