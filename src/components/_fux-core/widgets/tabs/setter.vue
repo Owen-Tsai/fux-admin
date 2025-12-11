@@ -3,14 +3,26 @@
     <TSelect v-model:value="props.type" :options="typeOpts" />
   </TFormItem>
   <TFormItem label="标签页面板">
-    <div>
-      <div v-for="(col, i) in props.children" :key="i" class="flex items-center gap-2 mb-2">
-        <TInput v-model:value="col.title" class="flex-1 min-w-0" />
+    <div class="w-full">
+      <div
+        v-for="(col, i) in props.children"
+        :key="i"
+        class="flex items-center gap-2 mb-2 min-w-0 w-full"
+      >
+        <TInput v-model:value="col.title" class="flex-1 min-w-0 truncate">
+          <template #suffixIcon>
+            <Icon
+              :name="col.hide ? 'browse-off-filled' : 'browse-filled'"
+              class="cursor-pointer"
+              @click="toggleHide(i)"
+            />
+          </template>
+        </TInput>
         <TButton
           variant="text"
           theme="primary"
           shape="square"
-          class="flex-none"
+          class="flex-none min-w-0 shrink-0"
           @click="removePane(i)"
         >
           <template #icon>
@@ -54,6 +66,10 @@ const typeOpts = [
   { label: '线性', value: 'line' },
   { label: '卡片型', value: 'card' },
 ]
+
+const toggleHide = (idx: number) => {
+  props.value.children[idx].hide = !props.value.children[idx].hide
+}
 
 const addPane = () => {
   props.value.children.push({

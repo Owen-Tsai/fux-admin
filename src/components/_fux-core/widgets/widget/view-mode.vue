@@ -4,7 +4,6 @@
   </template>
   <template v-if="widget.class === 'form' && shouldShow">
     <TFormItem
-      :help="widget.props.field.extra"
       :label="widget.props.field.label"
       :name="widget.props.field.name || widget.uid"
       :label-align="widget.props.field.labelAlign"

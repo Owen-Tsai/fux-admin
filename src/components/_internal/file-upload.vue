@@ -69,19 +69,19 @@ const emit = defineEmits<{
 const uploadFn: UploadProps['requestMethod'] = async (files) => {
   emit('start')
 
-  try {
-    if (Array.isArray(files) && requestFn === undefined) {
-      console.error('多选模式下请指定上传函数')
-      throw new Error('上传失败')
-    }
+  const file = Array.isArray(files) ? files[0] : files
 
+  try {
     const res = requestFn
-      ? await requestFn({ file: files as UploadFile | UploadFile[], ...data })
-      : await uploadFile({ file: (files as UploadFile).raw!, clientId: storage, ...data })
+      ? await requestFn({ file: file as UploadFile, ...data })
+      : await uploadFile({ file: (file as UploadFile).raw!, clientId: storage, ...data })
 
     if (res.code === 0) {
-      if (Array.isArray(value.value)) {
-        value.value.push(res.data)
+      if (multiple) {
+        if (!value.value) value.value = []
+        nextTick(() => {
+          ;(value.value as string[]).push(res.data)
+        })
       } else {
         value.value = res.data
       }
