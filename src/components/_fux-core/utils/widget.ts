@@ -161,10 +161,13 @@ export const getFieldNames = (widgets: Widget[]) => {
   return ret
 }
 
-export const widgetManifest = import.meta.glob('../widgets/**/index.vue', {
-  eager: true,
-  import: 'default',
-})
+export const widgetManifest = import.meta.glob(
+  ['../widgets/**/index.vue', '!../widgets/widget/index.vue'],
+  {
+    eager: true,
+    import: 'default',
+  },
+)
 export const viewModeWidgetManifest = import.meta.glob('../widgets/**/view.vue', {
   eager: true,
   import: 'default',

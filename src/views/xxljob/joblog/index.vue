@@ -65,10 +65,10 @@
             <TButton theme="primary" variant="text" @click="showTriggerMsg(row)">查看</TButton>
           </template>
           <template #triggerTime="{ row }">
-            {{ dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ row.triggerTime ? dayjs(row.triggerTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
           </template>
           <template #handleTime="{ row }">
-            {{ dayjs(row.handleTime).format('YYYY-MM-DD HH:mm:ss') }}
+            {{ row.handleTime ? dayjs(row.handleTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
           </template>
           <template #handleCode="{ row }">
             <span :class="{'sucColor':row.handleCode===200,'failColor':row.handleCode===500}">
