@@ -1,8 +1,8 @@
 <template>
-  <template v-if="widget.class === 'layout' && shouldShow">
-    <component :is="viewModeWidgetToRender(widget.type)" :widget="widget" />
+  <template v-if="widget.class === 'layout' && shouldRender">
+    <component v-if="shouldRender" :is="viewModeWidgetToRender(widget.type)" :widget="widget" />
   </template>
-  <template v-if="widget.class === 'form' && shouldShow">
+  <template v-if="widget.class === 'form' && shouldRender">
     <TFormItem
       :label="widget.props.field.label"
       :name="widget.props.field.name || widget.uid"
@@ -20,7 +20,7 @@
       <component v-else :is="widgetToRender(widget.type)" :widget="widget" :model="fieldValue" />
     </TFormItem>
   </template>
-  <template v-if="widget.class === 'special'">
+  <template v-if="widget.class === 'special' && shouldRender">
     <component :is="viewModeWidgetToRender(widget.type)" :widget="widget" :model="fieldValue" />
   </template>
 </template>
@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import { viewModeWidgetToRender, widgetToRender } from '@fusionx/core/utils/widget'
 import { validation } from '@fusionx/core/utils'
+import useSignals from './use-signals'
 import { useRendererCtxInject } from '@fusionx/core/hooks/use-context'
 import type { Widget, FormWidget, FieldInteractivity } from '@fusionx/core/types'
 
@@ -54,13 +55,20 @@ const interactivity = computed<FieldInteractivity['config'] | undefined>(() => {
   return undefined
 })
 
-const shouldShow = computed(() => {
-  if (ctx?.mode === 'archive' || ctx?.mode === 'dev') return true
-  if (widget.value.props.hide) {
-    return interactivity.value && interactivity.value !== 'hidden'
-  }
+const { visible } = useSignals(widget)
 
-  return true
+/**
+ * 计算是否渲染该控件
+ * 1. 开发模式下始终渲染
+ * 2. 预览模式下根据 hide 属性判断是否渲染
+ * 3. 其他模式下，优先级判定次序：visible > interactivity > hide
+ */
+const shouldRender = computed(() => {
+  if (!ctx || ctx.mode === 'dev') return true
+  if (ctx.mode === 'preview') return widget.value.props.hide
+  if (visible.value !== undefined) return visible.value
+  if (interactivity.value !== undefined) return interactivity.value !== 'hidden'
+  return widget.value.props.hide !== true
 })
 
 const setInteractivity = (prop: 'readonly' | 'disabled', val: boolean) => {

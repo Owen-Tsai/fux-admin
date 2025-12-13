@@ -1,10 +1,9 @@
 <template>
-  <template v-if="widget.class === 'layout' && shouldShow">
-    <component v-if="visible || ctx === null" :is="widgetToRender(widget.type)" :widget="widget" />
+  <template v-if="widget.class === 'layout' && shouldRender">
+    <component :is="widgetToRender(widget.type)" :widget="widget" />
   </template>
-  <template v-if="widget.class === 'form' && shouldShow">
+  <template v-if="widget.class === 'form' && shouldRender">
     <TFormItem
-      v-if="visible || ctx === null"
       :help="widget.props.field.extra"
       :label="widget.props.field.label"
       :name="widget.props.field.name || widget.uid"
@@ -16,8 +15,8 @@
       <component :is="widgetToRender(widget.type)" :widget="widget" />
     </TFormItem>
   </template>
-  <template v-if="widget.class === 'special'">
-    <component v-if="visible || ctx === null" :is="widgetToRender(widget.type)" :widget="widget" />
+  <template v-if="widget.class === 'special' && shouldRender">
+    <component :is="widgetToRender(widget.type)" :widget="widget" />
   </template>
 </template>
 
@@ -47,17 +46,25 @@ const interactivity = computed<FieldInteractivity['config'] | undefined>(() => {
   return undefined
 })
 
-const shouldShow = computed(() => {
-  if (ctx?.mode === 'archive' || ctx?.mode === 'dev' || ctx === null) return true
+const { visible } = useSignals(widget)
 
-  return interactivity.value !== 'hidden'
+/**
+ * 计算是否渲染该控件
+ * 1. 开发模式下始终渲染
+ * 2. 预览模式下根据 hide 属性判断是否渲染
+ * 3. 其他模式下，优先级判定次序：visible > interactivity > hide
+ */
+const shouldRender = computed(() => {
+  if (!ctx || ctx.mode === 'dev') return true
+  if (ctx.mode === 'preview') return widget.value.props.hide
+  if (visible.value !== undefined) return visible.value
+  if (interactivity.value !== undefined) return interactivity.value !== 'hidden'
+  return widget.value.props.hide !== true
 })
 
 const setInteractivity = (prop: 'readonly' | 'disabled', val: boolean) => {
   ;(widget.value as FormWidget).props[prop] = val
 }
-
-const { visible } = useSignals(widget)
 
 watchDebounced(
   () => interactivity.value,
