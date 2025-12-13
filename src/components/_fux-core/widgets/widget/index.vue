@@ -52,13 +52,14 @@ const { visible } = useSignals(widget)
  * 计算是否渲染该控件
  * 1. 开发模式下始终渲染
  * 2. 预览模式下根据 hide 属性判断是否渲染
- * 3. 其他模式下，visible 的优先级始终高于 interactivity
+ * 3. 其他模式下，优先级判定次序：visible > interactivity > hide
  */
 const shouldRender = computed(() => {
   if (!ctx || ctx.mode === 'dev') return true
   if (ctx.mode === 'preview') return widget.value.props.hide
-
-  return visible.value !== undefined ? visible.value : interactivity.value !== 'hidden'
+  if (visible.value !== undefined) return visible.value
+  if (interactivity.value !== undefined) return interactivity.value !== 'hidden'
+  return widget.value.props.hide !== true
 })
 
 const setInteractivity = (prop: 'readonly' | 'disabled', val: boolean) => {
