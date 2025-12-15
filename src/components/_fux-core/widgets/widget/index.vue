@@ -56,7 +56,7 @@ const { visible } = useSignals(widget)
  */
 const shouldRender = computed(() => {
   if (!ctx || ctx.mode === 'dev') return true
-  if (ctx.mode === 'preview') return widget.value.props.hide
+  if (ctx.mode === 'preview') return !widget.value.props.hide
   if (visible.value !== undefined) return visible.value
   if (interactivity.value !== undefined) return interactivity.value !== 'hidden'
   return widget.value.props.hide !== true
