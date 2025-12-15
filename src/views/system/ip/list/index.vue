@@ -70,7 +70,7 @@ defineOptions({ name: 'SystemIPList' })
           <TTooltip content="导出">
             <TButton
               shape="square"
-              theme="primary"
+              theme="default"
               variant="text"
               :loading="exporting"
               @click="exportData()"
