@@ -1,43 +1,32 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { columns, useTable } from './use-table'
-import Form from './form.vue'
-import { exportIPList, type IPListEntryVO } from '@/api/system/ip/list'
+import Detail from './detail.vue'
+import { exportTraffic, deleteTraffic, type IPTrafficVO } from '@/api/system/ip/traffic'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
-const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
-const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
-
 const { permission } = usePermission()
-const [ipTypeOpts] = useDict('system_ip_list')
 
-const expanded = ref(false)
 const [exporting, toggleExporting] = useToggle(false)
 
-const {
-  query,
-  data,
-  pending,
-  isWhitelist,
-  execute,
-  pagination,
-  onPageChange,
-  onQueryChange,
-  onDelete,
-} = useTable(queryForm)
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
+const detailRef = useTemplateRef<InstanceType<typeof Detail>>('detailRef')
+
+const { query, data, pending, execute, pagination, onPageChange, onQueryChange } =
+  useTable(queryForm)
 
 const exportData = async () => {
   toggleExporting()
-  await exportIPList(query.value)
+  await exportTraffic(query.value)
   toggleExporting()
 }
 
-defineOptions({ name: 'SystemIPList' })
+defineOptions({ name: 'SystemIPTraffic' })
 </script>
 
 <template>
   <div class="view">
-    <TCard v-if="permission.has('system:ip-list:query')" class="query-form !mb-4">
+    <TCard v-if="permission.has('system:ip-traffic:query')" class="query-form !mb-4">
       <TForm
         ref="queryForm"
         :data="query"
@@ -47,17 +36,17 @@ defineOptions({ name: 'SystemIPList' })
         @submit="onQueryChange()"
         @reset="onQueryChange(true)"
       >
-        <TFormItem label="IP 地址" name="ipAddress" class="col">
+        <TFormItem label="异常 IP" name="ipAddress" class="col">
           <TInput v-model:value="query.ipAddress" placeholder="请输入异常 IP 地址" />
         </TFormItem>
-        <TFormItem label="添加时间" name="createTime" class="col">
-          <TDateRangePicker v-model:value="query.createTime" value-type="YYYY-MM-DD HH:mm:ss" />
+        <TFormItem label="流量统计时间" name="trafficTime" class="col">
+          <TDateRangePicker v-model:value="query.trafficTime" value-type="YYYY-MM-DD HH:mm:ss" />
         </TFormItem>
         <QueryActions :expanded="null" class="col" />
       </TForm>
     </TCard>
 
-    <TCard :title="isWhitelist ? 'IP 白名单' : 'IP 黑名单'">
+    <TCard title="IP 流量列表">
       <template #actions>
         <div class="flex items-center gap-2">
           <TTooltip content="重新载入">
@@ -91,21 +80,32 @@ defineOptions({ name: 'SystemIPList' })
         :loading="pending"
         @page-change="onPageChange"
       >
-        <template #listType="{ row }: TableScope<IPListEntryVO>">
-          <DictTag :dict-data="ipTypeOpts" :value="row.listType" />
+        <template #trafficTime="{ row }: TableScope<IPTrafficVO>">
+          {{ dayjs(row.trafficTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
-        <template #createTime="{ row }: TableScope<IPListEntryVO>">
-          {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+        <template #inboundTraffic="{ row }: TableScope<IPTrafficVO>">
+          {{ row.inboundTraffic }} MB
         </template>
-        <template #actions="{ row }: TableScope<IPListEntryVO>">
+        <template #outboundTraffic="{ row }: TableScope<IPTrafficVO>">
+          {{ row.outboundTraffic }} MB
+        </template>
+        <template #actions="{ row }: TableScope<IPTrafficVO>">
           <div class="flex items-center gap-2">
-            <TTooltip content="移除">
-              <TPopconfirm
-                content="确定要移除该 IP 地址吗？"
-                theme="danger"
-                @confirm="onDelete(row.id!)"
-              >
-                <TButton shape="square" theme="danger" variant="text">
+            <TTooltip content="查看详情">
+              <TButton shape="square" theme="primary" variant="text" @click="detailRef?.open(row)">
+                <template #icon>
+                  <Icon name="browse" />
+                </template>
+              </TButton>
+            </TTooltip>
+            <TTooltip content="删除">
+              <TPopconfirm content="确定要删除该 IP 流量吗？" theme="danger">
+                <TButton
+                  shape="square"
+                  theme="danger"
+                  variant="text"
+                  @click="deleteTraffic(row.id!)"
+                >
                   <template #icon>
                     <Icon name="delete" />
                   </template>
@@ -117,6 +117,6 @@ defineOptions({ name: 'SystemIPList' })
       </TTable>
     </TCard>
 
-    <Form ref="formRef" />
+    <Detail ref="detailRef" />
   </div>
 </template>

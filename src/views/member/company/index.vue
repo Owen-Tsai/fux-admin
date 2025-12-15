@@ -111,7 +111,7 @@ defineOptions({ name: 'MemberPersonal' })
               @click="onExport()"
             >
               <template #icon>
-                <Icon name="export" />
+                <Icon name="file-export" />
               </template>
             </TButton>
           </TTooltip>
