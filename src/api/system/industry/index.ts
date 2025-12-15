@@ -1,27 +1,26 @@
 import request from '@/utils/request'
 
-export type MajorVO = {
+export type IndustryVO = {
   id?: string
-  key?: string
   name?: string
-  pname?: string
-  code?: string
   pid?: string
+  pname?: string
   sort?: number
+  code?: string
 }
 
-export type MajorTreeVO = MajorVO[]
+export type IndustryTreeVO = IndustryVO[]
 
-const prefix = '/system/major'
+const prefix = '/system/trade'
 
-export const getMajorTree = () => {
-  return request.get<MajorTreeVO>({
+export const getIndustryTree = () => {
+  return request.get<IndustryTreeVO>({
     url: `${prefix}/tree-list-all`,
   })
 }
 
-export const getMajor = (id: string) => {
-  return request.get<MajorVO>({
+export const getIndustry = (id: string) => {
+  return request.get<IndustryVO>({
     url: `${prefix}/get`,
     params: {
       id: id,
@@ -29,14 +28,14 @@ export const getMajor = (id: string) => {
   })
 }
 
-export const addMajor = (data: MajorVO) => {
+export const addIndustry = (data: IndustryVO) => {
   return request.post<string>({
     url: `${prefix}/create`,
     data,
   })
 }
 
-export const deleteMajor = (id: string) => {
+export const deleteIndustry = (id: string) => {
   return request.delete({
     url: `${prefix}/delete`,
     params: {
@@ -45,7 +44,7 @@ export const deleteMajor = (id: string) => {
   })
 }
 
-export const updateMajor = (data: MajorVO) => {
+export const updateIndustry = (data: IndustryVO) => {
   return request.put({
     url: `${prefix}/update`,
     data,
