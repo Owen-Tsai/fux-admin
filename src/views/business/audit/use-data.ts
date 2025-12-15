@@ -38,7 +38,6 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
     submitTime.value = dayjs(taskInfo.submitTime).format('YYYY-MM-DD HH:mm:ss')
 
     nextTick(fillFormData)
-    loading.value = false
   }
 
   const fillFormData = () => {
@@ -52,11 +51,10 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
       })
     })
 
+    fuxRenderer.value?.setFormData(dataToFill)
+    loading.value = false
     nextTick(() => {
-      fuxRenderer.value?.setFormData(dataToFill)
-      nextTick(() => {
-        emitter.emit(LifecyclePhases.LOADED)
-      })
+      emitter.emit(LifecyclePhases.LOADED)
     })
   }
 

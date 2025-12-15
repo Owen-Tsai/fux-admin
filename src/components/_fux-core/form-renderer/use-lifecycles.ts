@@ -21,13 +21,13 @@ const useLifecycles = () => {
   if (lifecycle.loaded) {
     const func = functions?.[lifecycle.loaded]
     if (!func) return
-    emitter.on(LifecyclePhases.LOADED, safeEval(func.body!, evalContext))
+    emitter.on(LifecyclePhases.LOADED, () => safeEval(func.body!, evalContext))
   }
 
   if (lifecycle.beforeSubmit) {
     const func = functions?.[lifecycle.beforeSubmit]
     if (!func) return
-    emitter.on(LifecyclePhases.BEFORE_SUBMIT, safeEval(func.body!, evalContext))
+    emitter.on(LifecyclePhases.BEFORE_SUBMIT, () => safeEval(func.body!, evalContext))
   }
 }
 
