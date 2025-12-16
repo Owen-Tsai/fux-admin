@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import Form from './form.vue'
+import { getInfoTypeTree } from '@/api/information/type'
 import { columns, useTable } from './use-table'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
@@ -14,6 +15,10 @@ const expanded = ref(false)
 
 const [statusOpts, booleanOpts] = useDict('information_status', 'infra_boolean_string')
 
+const { data: infoTypeTree } = useRequest(getInfoTypeTree, {
+  immediate: true,
+})
+
 const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pending, query } =
   useTable(queryForm)
 
@@ -21,6 +26,8 @@ const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pendin
 //   const { href } = resolve({ path: `/app-design/${id}` })
 //   window.open(href, '_blank')
 // }
+
+defineOptions({ name: 'InformationList' })
 </script>
 
 <template>
@@ -39,7 +46,13 @@ const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pendin
           <TInput v-model:value="query.title" placeholder="请输入资讯标题" />
         </TFormItem>
         <TFormItem label="资讯类别" name="infoType" class="col">
-          <TSelect v-model:value="query.infoType" placeholder="请选择资讯类别" />
+          <TTreeSelect
+            v-model:value="query.infoType"
+            :data="infoTypeTree"
+            :keys="{ label: 'name', value: 'id' }"
+            placeholder="请选择资讯类别"
+            clearable
+          />
         </TFormItem>
         <TFormItem v-show="expanded" label="是否置顶" name="isPinned" class="col">
           <TSelect
@@ -115,6 +128,9 @@ const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pendin
         </template>
         <template #auditState="{ row }">
           <DictTag :dict-data="statusOpts" :value="row.auditState" />
+        </template>
+        <template #infoType="{ row }">
+          {{ infoTypeTree?.find((item) => item.id === row.infoType)?.name || '—' }}
         </template>
         <template #createTime="{ row }">
           {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}

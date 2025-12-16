@@ -1,9 +1,9 @@
-import { getInfoList, deleteInfo, type ListQueryParams } from '@/api/information/list'
+import { getInfoList, deleteInfo, type ListQueryParams } from '@/api/information'
 import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
   { title: '资讯标题', colKey: 'title' },
-  { title: '资讯类别', colKey: 'type', width: 120 },
+  { title: '资讯类别', colKey: 'infoType', width: 120 },
   { title: '创建人', colKey: 'creator', width: 120, ellipsis: true },
   { title: '状态', width: 120, colKey: 'auditState' },
   {

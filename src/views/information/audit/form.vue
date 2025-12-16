@@ -1,208 +1,103 @@
 <template>
-  <AModal
-    v-model:open="open"
-    title="咨询审核"
-    destroy-on-close
+  <TDialog
+    v-model:visible="visible"
+    header="资讯审核"
     :confirm-loading="loading"
-    :after-close="resetFields"
-    :body-style="{ overflowX: 'hidden', overflowY: 'auto' }"
-    wrap-class-name="fullscreen-modal"
-    width="100%"
+    mode="full-screen"
+    lazy
   >
-    <ASpin :spinning="loading">
-      <div class="modal-content-wrapper">
-        <AForm
-          ref="formRef"
-          :label-col="{ style: { width: '80px' } }"
-          :model="formData"
-          :rules="rules"
-          class="mt-4"
-        >
-          <ARow :gutter="24">
-            <ACol :span="12">
-              <AFormItem label="资讯标题" name="title">
-                <AInput v-model:value="formData.title" placeholder="请输入通知资讯的标题" />
-              </AFormItem>
-            </ACol>
-            <ACol :span="6">
-              <AFormItem label="资讯类型" name="infotype">
-                <ATreeSelect
-                  v-model:value="formData.infotype"
-                  show-search
-                  placeholder="请选择资讯分类"
-                  allow-clear
-                  tree-default-expand-all
-                  :tree-data="treeData"
-                  tree-node-filter-prop="label"
-                />
-              </AFormItem>
-            </ACol>
-            <ACol :span="6">
-              <AFormItem label="是否置顶" name="isTop">
-                <ASwitch
-                  v-model:checked="formData.isTop"
-                  :options="infraBooleanString"
-                  checked-children="是"
-                  un-checked-children="否"
-                />
-              </AFormItem>
-            </ACol>
-          </ARow>
-          <ARow :gutter="24">
-            <ACol :span="12">
-              <AFormItem label="链接地址" name="herfurl">
-                <AInput v-model:value="formData.herfurl" placeholder="请输入链接地址" />
-              </AFormItem>
-            </ACol>
-            <ACol :span="6">
-              <AFormItem label="发布时间" name="senddate">
-                <ADatePicker
-                  v-model:value="formData.senddate"
-                  value-format="x"
-                  show-time
-                  placeholder="发布时间"
-                />
-              </AFormItem>
-            </ACol>
-            <ACol :span="6">
-              <AFormItem label="是否首页" name="isHome">
-                <ASwitch
-                  v-model:checked="formData.isHome"
-                  :options="infraBooleanString"
-                  checked-children="是"
-                  un-checked-children="否"
-                />
-              </AFormItem>
-            </ACol>
-          </ARow>
-          <ARow>
-            <ACol :span="23">
-              <AFormItem label="资讯内容" name="content">
-                <EEditor type="document" v-model:value="formData.content" />
-              </AFormItem>
-            </ACol>
-          </ARow>
-          <ARow>
-            <ACol :span="24">
-              <AFormItem label="首页图片" name="imageinfo">
-                <FileUpload
-                  v-model:value="formData.imageinfo"
-                  :client-id="27"
-                  list-type="picture-card"
-                  :accept="['jpg', 'jpeg', 'png', 'gif']"
-                  :multiple="false"
-                  :limit="1"
-                  :size-limit="10240"
-                  disabled
-                />
-              </AFormItem>
-            </ACol>
-          </ARow>
-          <ARow>
-            <ACol :span="12">
-              <AFormItem label="附件" name="attachment">
-                <FileUpload
-                  v-model:value="formData.attachment"
-                  :client-id="28"
-                  list-type="text"
-                  :accept="['pdf', 'doc', 'docx', 'xls', 'xlsx']"
-                  :multiple="false"
-                  :limit="5"
-                  :size-limit="10240"
-                  disabled
-                />
-              </AFormItem>
-            </ACol>
-          </ARow>
-        </AForm>
-      </div>
-    </ASpin>
+    <TLoading :loading="loading">
+      <TDescriptions bordered :label-style="{ width: '140px' }">
+        <TDescriptionsItem label="资讯标题" :span="2">
+          <div class="flex items-center gap-2">
+            {{ info.title }}
+            <TTag v-if="info.isInHome" theme="primary" variant="light-outline">首页展示</TTag>
+            <TTag v-if="info.isPinned" theme="danger" variant="light-outline">置顶</TTag>
+          </div>
+        </TDescriptionsItem>
+        <TDescriptionsItem label="资讯类别">
+          {{ typeTree?.find((item) => item.id === info.infoType)?.name || '—' }}
+        </TDescriptionsItem>
+        <TDescriptionsItem label="发布时间">
+          {{ info.publishTime ? dayjs(info.publishTime).format('YYYY-MM-DD HH:mm:ss') : '—' }}
+        </TDescriptionsItem>
+        <TDescriptionsItem label="资讯图片">
+          <TImage :src="info.image" class="max-h-80" fit="cover" />
+        </TDescriptionsItem>
+        <TDescriptionsItem label="资讯附件">
+          <template v-if="info.attachment?.length">
+            <div class="flex flex-wrap gap-2">
+              <a v-for="(item, i) in info.attachment" :key="i" :href="item" target="_blank">{{
+                item
+              }}</a>
+            </div>
+          </template>
+          <span v-else>无附件</span>
+        </TDescriptionsItem>
+        <TDescriptionsItem label="资讯内容" :span="2">
+          <article v-html="info.content" />
+        </TDescriptionsItem>
+      </TDescriptions>
+    </TLoading>
+
     <template #footer>
-      <div class="flex items-center justify-end gap-2">
-        <AButton @click="open = false">取消</AButton>
-        <AButton danger @click="audit(2)" v-if="permission.has('system:info-audit:approve')"
-          >不通过</AButton
-        >
-        <AButton type="primary" @click="audit(1)" v-if="permission.has('system:info-audit:approve')"
-          >通过</AButton
-        >
-      </div>
+      <TSpace>
+        <TButton theme="default" :loading="loading" @click="visible = false">取消</TButton>
+        <TButton theme="default" :loading="loading" @click="setAuditState(2)">不通过</TButton>
+        <TButton theme="primary" :loading="loading" @click="setAuditState(1)">通过</TButton>
+      </TSpace>
     </template>
-  </AModal>
+  </TDialog>
 </template>
 
 <script lang="ts" setup>
-import useDict from '@/hooks/use-dict'
-import {
-  getInformationDetail,
-  getInfoTyoeTree,
-  auditInformation,
-  type InformationVO,
-} from '@/api/information/audit'
-import { message, type FormInstance, type FormProps } from 'ant-design-vue'
-import EEditor from '@/components/editor/index.vue'
-import { permission } from '@/hooks/use-permission'
-import FileUpload from '@/components/upload/index.vue'
+import dayjs from 'dayjs'
+import { updateInfoAuditState } from '@/api/information/audit'
+import type { InformationVO } from '@/api/information'
+import type { InfoTypeTreeVO } from '@/api/information/type'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
-const rules: FormProps['rules'] = {
-  title: [{ required: true, message: '请填写标题' }],
-  infotype: [{ required: true, message: '请选择资讯类别' }],
-  content: [{ required: true, message: '请填写资讯内容' }],
-}
+const { typeTree } = defineProps<{
+  typeTree?: InfoTypeTreeVO
+}>()
 
-const props = defineProps({
-  record: {
-    type: Object as PropType<InformationVO>,
-  },
-})
+const info = ref<InformationVO>({})
 
-const emit = defineEmits(['success', 'close'])
+const visible = ref(false)
+const message = useMessage()
 
-const formRef = ref<FormInstance>()
+const emit = defineEmits(['success'])
+const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
+
 const loading = ref(false)
-const open = ref(true)
-const formData = ref<InformationVO>({})
 
-const [infraBooleanString] = useDict('infra_boolean_string')
-
-const treeData = ref()
-
-getInfoTyoeTree().then((res) => {
-  treeData.value = res
-})
-
-const audit = async (status: number) => {
+const setAuditState = async (state: number) => {
+  loading.value = true
   try {
-    loading.value = true
-
-    await auditInformation({
-      id: formData.value.id,
-      auditstate: status,
-      review: '审核资讯',
-    })
-    message.success('审核成功')
-
-    open.value = false
-    emit('success')
+    const result = await formRef.value?.validate()
+    if (result === true) {
+      await updateInfoAuditState({
+        id: info.value.id,
+        auditState: state,
+        review: '审核意见',
+      })
+      message.success('保存成功')
+      emit('success')
+      visible.value = false
+    }
   } catch (e) {
-    console.log(e)
+    console.error(e)
   } finally {
     loading.value = false
   }
 }
 
-const resetFields = () => {
-  formRef.value?.resetFields()
-  emit('close')
+const open = (record: InformationVO) => {
+  info.value = record
+  visible.value = true
 }
 
-if (props.record?.id) {
-  loading.value = true
-  getInformationDetail(props.record.id).then((res) => {
-    formData.value = res
-    loading.value = false
-  })
-}
+defineExpose({ open })
 </script>
 
 <style lang="scss" scoped>

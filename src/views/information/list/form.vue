@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createInfo, updateInfo, getInfoDetail, type InformationVO } from '@/api/information/list'
+import { createInfo, updateInfo, getInfoDetail, type InformationVO } from '@/api/information'
 import { getInfoTypeTree } from '@/api/information/type'
 import { getDeptSimpleList } from '@/api/system/dept'
 import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
@@ -86,6 +86,7 @@ defineExpose({ open })
     :header="mode === 'create' ? '新增资讯' : '编辑资讯'"
     :confirm-loading="loading"
     mode="full-screen"
+    lazy
     @confirm="submit"
   >
     <TLoading :loading="loading">

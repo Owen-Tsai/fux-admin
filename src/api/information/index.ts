@@ -9,7 +9,7 @@ export type ListQueryParams = CommonQueryParams & {
 }
 
 export type InformationVO = {
-  id?: number
+  id?: string
   title?: string
   infoType?: string
   content?: string

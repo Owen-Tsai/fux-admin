@@ -28,7 +28,7 @@ const toggleTableExpanded = () => {
 const cardBody = useTemplateRef('cardBody')
 const { height } = useElementSize(cardBody, { height: 300, width: 0 })
 
-defineOptions({ name: 'SystemMenu' })
+defineOptions({ name: 'InformationTypeList' })
 </script>
 
 <template>
