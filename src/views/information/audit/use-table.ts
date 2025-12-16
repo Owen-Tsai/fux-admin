@@ -8,8 +8,8 @@ import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
   { colKey: 'title', title: '资讯标题', ellipsis: true },
-  { colKey: 'infoType', title: '资讯类型' },
-  { colKey: 'creator', title: '创建人' },
+  { colKey: 'infoType', title: '资讯类型', width: 140 },
+  { colKey: 'creator', title: '创建人', width: 140, ellipsis: true },
   { colKey: 'createTime', title: '创建时间', width: 200 },
   { colKey: 'auditState', title: '审核状态', width: 140 },
   { colKey: 'actions', title: '操作', width: 180 },
