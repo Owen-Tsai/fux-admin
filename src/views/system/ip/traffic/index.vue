@@ -2,13 +2,11 @@
 import dayjs from 'dayjs'
 import { columns, useTable } from './use-table'
 import Detail from './detail.vue'
-import { exportExcel, type IPManagementVO } from '@/api/system/ip'
+import { exportTraffic, deleteTraffic, type IPTrafficVO } from '@/api/system/ip/traffic'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
 const { permission } = usePermission()
-const [abnormalTypeOpts, handleingTypeStatus] = useDict('SYSTEM_ABNORMAL', 'SYSTEM_PROCESSING')
 
-const expanded = ref(false)
 const [exporting, toggleExporting] = useToggle(false)
 
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
@@ -19,16 +17,16 @@ const { query, data, pending, execute, pagination, onPageChange, onQueryChange }
 
 const exportData = async () => {
   toggleExporting()
-  await exportExcel(query.value)
+  await exportTraffic(query.value)
   toggleExporting()
 }
 
-defineOptions({ name: 'SystemIPManagement' })
+defineOptions({ name: 'SystemIPTraffic' })
 </script>
 
 <template>
   <div class="view">
-    <TCard v-if="permission.has('system:ip-management:query')" class="query-form !mb-4">
+    <TCard v-if="permission.has('system:ip-traffic:query')" class="query-form !mb-4">
       <TForm
         ref="queryForm"
         :data="query"
@@ -41,33 +39,14 @@ defineOptions({ name: 'SystemIPManagement' })
         <TFormItem label="异常 IP" name="ipAddress" class="col">
           <TInput v-model:value="query.ipAddress" placeholder="请输入异常 IP 地址" />
         </TFormItem>
-        <TFormItem label="异常类型" name="abnormalType" class="col">
-          <TSelect
-            v-model:value="query.abnormalType"
-            :options="abnormalTypeOpts"
-            placeholder="请选择异常类型"
-            clearable
-          />
+        <TFormItem label="流量统计时间" name="trafficTime" class="col">
+          <TDateRangePicker v-model:value="query.trafficTime" value-type="YYYY-MM-DD HH:mm:ss" />
         </TFormItem>
-        <TFormItem v-show="expanded" label="处理状态" name="handlingStatus" class="col">
-          <TSelect
-            v-model:value="query.handlingStatus"
-            :options="handleingTypeStatus"
-            placeholder="请选择处理状态"
-            clearable
-          />
-        </TFormItem>
-        <TFormItem v-show="expanded" label="访问资源" name="accessResource" class="col">
-          <TInput v-model:value="query.accessResource" placeholder="请输入访问资源" />
-        </TFormItem>
-        <TFormItem v-show="expanded" label="访问时间" name="accessTime" class="col">
-          <TDateRangePicker v-model:value="query.accessTime" value-type="YYYY-MM-DD HH:mm:ss" />
-        </TFormItem>
-        <QueryActions v-model:expanded="expanded" class="col" />
+        <QueryActions :expanded="null" class="col" />
       </TForm>
     </TCard>
 
-    <TCard title="异常 IP 列表">
+    <TCard title="IP 流量列表">
       <template #actions>
         <div class="flex items-center gap-2">
           <TTooltip content="重新载入">
@@ -101,18 +80,16 @@ defineOptions({ name: 'SystemIPManagement' })
         :loading="pending"
         @page-change="onPageChange"
       >
-        <template #abnormalType="{ row }: TableScope<IPManagementVO>">
-          <div class="flex items-center gap-2">
-            <DictTag :dict-data="abnormalTypeOpts" :value="row.abnormalType" />
-          </div>
+        <template #trafficTime="{ row }: TableScope<IPTrafficVO>">
+          {{ dayjs(row.trafficTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
-        <template #handlingStatus="{ row }: TableScope<IPManagementVO>">
-          <DictTag :dict-data="handleingTypeStatus" :value="row.handlingStatus" />
+        <template #inboundTraffic="{ row }: TableScope<IPTrafficVO>">
+          {{ row.inboundTraffic }} MB
         </template>
-        <template #accessTime="{ row }: TableScope<IPManagementVO>">
-          {{ dayjs(row.accessTime).format('YYYY-MM-DD HH:mm:ss') }}
+        <template #outboundTraffic="{ row }: TableScope<IPTrafficVO>">
+          {{ row.outboundTraffic }} MB
         </template>
-        <template #actions="{ row }: TableScope<IPManagementVO>">
+        <template #actions="{ row }: TableScope<IPTrafficVO>">
           <div class="flex items-center gap-2">
             <TTooltip content="查看详情">
               <TButton shape="square" theme="primary" variant="text" @click="detailRef?.open(row)">
@@ -121,11 +98,16 @@ defineOptions({ name: 'SystemIPManagement' })
                 </template>
               </TButton>
             </TTooltip>
-            <TTooltip content="禁止访问">
-              <TPopconfirm content="确定要禁止该 IP 地址访问系统吗？" theme="danger">
-                <TButton shape="square" theme="danger" variant="text">
+            <TTooltip content="删除">
+              <TPopconfirm content="确定要删除该 IP 流量吗？" theme="danger">
+                <TButton
+                  shape="square"
+                  theme="danger"
+                  variant="text"
+                  @click="deleteTraffic(row.id!)"
+                >
                   <template #icon>
-                    <Icon name="user-blocked" />
+                    <Icon name="delete" />
                   </template>
                 </TButton>
               </TPopconfirm>
