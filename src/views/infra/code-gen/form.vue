@@ -38,6 +38,7 @@ const submit = async () => {
 }
 
 const open = () => {
+  tableNames.value = []
   queryForm.value?.reset({ type: 'initial' })
   visible.value = true
 }
