@@ -17,6 +17,8 @@ export type AppVO = {
   processIds?: string
   userType?: string
   comopen?: number
+  canImport?: boolean
+  canExport?: boolean
 }
 
 export type ListQueryParams = {
