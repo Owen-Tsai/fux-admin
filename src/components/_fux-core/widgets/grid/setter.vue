@@ -41,7 +41,7 @@
     </div>
   </TFormItem>
   <TFormItem label="隐藏" name="hide" class="boolean-setter">
-    <TCheckbox v-model:value="props.hide" />
+    <TSwitch v-model:value="props.hide" />
   </TFormItem>
 </template>
 
