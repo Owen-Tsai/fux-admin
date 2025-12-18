@@ -49,6 +49,7 @@
         :keys="{ label: 'name', value: 'type' }"
         placeholder="请选择..."
         class="w-full"
+        filterable
       />
     </template>
     <template #example="{ row }: TableScope<ColumnVO>">
