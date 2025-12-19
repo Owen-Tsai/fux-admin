@@ -43,11 +43,16 @@ export default {
   },
   download: async (options: AxiosRequestConfig & { filename?: string }) => {
     LoadingPlugin(true)
-    const res = await request({ ...options, method: 'GET', responseType: 'blob' })
-    const blob = new Blob([res as unknown as ArrayBuffer])
-    saveAs(blob, options.filename)
-    LoadingPlugin(false)
-    return res
+    try {
+      const res = await request({ ...options, method: 'GET', responseType: 'blob' })
+      const blob = new Blob([res as unknown as ArrayBuffer])
+      saveAs(blob, options.filename)
+      return res
+    } catch (e) {
+      throw e
+    } finally {
+      LoadingPlugin(false)
+    }
   },
   upload: async <T = any>(options: AxiosRequestConfig) => {
     const res = await request({
