@@ -10,6 +10,7 @@
 <script setup lang="ts">
 import { getUploadList, type UploadList } from '@/api/business/attachment'
 import { useRendererCtxInject, useBusinessCtxInject } from '@fusionx/core/hooks'
+import request from '@/utils/request'
 import type { WidgetMap } from '@fusionx/core/types'
 import type { TableProps } from 'tdesign-vue-next'
 
@@ -21,6 +22,8 @@ const bizCtx = useBusinessCtxInject()
 const { planId, appId, applyId } = bizCtx || {}
 
 const rendererCtx = useRendererCtxInject()
+const logger = useLogger()
+const message = useMessage()
 
 const isProd = computed(
   () => rendererCtx && rendererCtx.mode !== 'dev' && rendererCtx.mode !== 'preview',
@@ -50,8 +53,23 @@ const load = async () => {
   loading.value = false
 }
 
-const exportTemplate = () => {
-  window.open(widget.props.action, '_blank')
+const exportTemplate = async () => {
+  loading.value = true
+  try {
+    await request.download({
+      url: widget.props.action,
+      params: {
+        appId,
+        planId: planId?.value,
+        applyId,
+      },
+    })
+  } catch (e) {
+    message.error('导出失败')
+    logger.error(import.meta.url, 'attachmentTable 导出模板失败', e)
+  } finally {
+    loading.value = false
+  }
 }
 
 load()
