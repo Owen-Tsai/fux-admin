@@ -25,13 +25,16 @@ const mode = ref<'create' | 'update'>('create')
 const formRef = ref<FormInstanceFunctions>()
 const isCustomLayout = ref(false)
 
-const formData = ref<MenuVO>({
+const defaultFormData = {
   alwaysShow: true,
   type: 1,
   status: 0,
   sort: 1,
   keepAlive: true,
   visible: true,
+}
+const formData = ref<MenuVO>({
+  ...defaultFormData,
 })
 
 const submit = async () => {
@@ -73,6 +76,9 @@ const loadData = async (id: number) => {
 
 const open = (type: 'create' | 'update', id?: number) => {
   formRef.value?.reset({ type: 'initial' })
+  formData.value = {
+    ...defaultFormData,
+  }
   mode.value = type
 
   if (type === 'create') {

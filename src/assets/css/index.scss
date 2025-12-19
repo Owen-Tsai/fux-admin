@@ -74,3 +74,7 @@ a.has-tag .t-tag {
 #nprogress .bar {
   background: var(--td-brand-color);
 }
+
+.t-upload__dragger .t-size-s {
+  display: none !important;
+}

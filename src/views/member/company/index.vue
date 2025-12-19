@@ -105,13 +105,13 @@ defineOptions({ name: 'MemberPersonal' })
             <TButton
               v-if="permission.has('member:talent-info:export')"
               shape="square"
-              theme="primary"
+              theme="default"
               variant="text"
               :loading="exporting"
               @click="onExport()"
             >
               <template #icon>
-                <Icon name="export" />
+                <Icon name="file-export" />
               </template>
             </TButton>
           </TTooltip>

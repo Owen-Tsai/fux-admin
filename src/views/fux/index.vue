@@ -28,7 +28,7 @@
           </TButton>
         </TTooltip>
         <TTooltip content="回到首页">
-          <TButton variant="text" shape="square" @click="$router.push('/')">
+          <TButton variant="text" shape="square" @click="$router.push('/index')">
             <template #icon>
               <Icon name="rollback" />
             </template>

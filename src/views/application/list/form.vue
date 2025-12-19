@@ -26,6 +26,8 @@ const loading = ref(false)
 const formData = ref<AppVO>({
   published: 0,
   comopen: 0,
+  canImport: false,
+  canExport: false,
 })
 
 const submit = async () => {
@@ -138,6 +140,18 @@ defineExpose({ open })
           <TCol :span="6">
             <TFormItem label="后台图标" name="iconBe" help="在管理端展示的图标">
               <FileUpload v-model:value="formData.iconBe" theme="image" />
+            </TFormItem>
+          </TCol>
+        </TRow>
+        <TRow>
+          <TCol :span="6">
+            <TFormItem label="允许导入" name="canImport">
+              <TSwitch v-model="formData.canImport" />
+            </TFormItem>
+          </TCol>
+          <TCol :span="6">
+            <TFormItem label="允许导出" name="canExport">
+              <TSwitch v-model="formData.canExport" />
             </TFormItem>
           </TCol>
         </TRow>

@@ -1,6 +1,6 @@
 <template>
   <template v-if="widget.class === 'layout' && shouldRender">
-    <component v-if="shouldRender" :is="viewModeWidgetToRender(widget.type)" :widget="widget" />
+    <component :is="viewModeWidgetToRender(widget.type)" :widget="widget" />
   </template>
   <template v-if="widget.class === 'form' && shouldRender">
     <TFormItem

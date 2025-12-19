@@ -1,48 +1,62 @@
 import useRequest from '@/hooks/use-request'
-import { getList, type ListQueryParams } from '@/api/information/audit'
-import type { FormInstance, TableProps } from 'ant-design-vue'
-import type { TablePaginationConfig } from 'ant-design-vue/es/table/interface'
+import {
+  getInfoAuditList,
+  updateInfoAuditState,
+  type ListQueryParams,
+} from '@/api/information/audit'
+import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { key: 'title', title: '资讯标题', dataIndex: 'title', width: 720 },
-  { key: 'creator', title: '创建人', dataIndex: 'creator', width: 100 },
-  { key: 'createTime', title: '创建时间', dataIndex: 'createTime', width: 180 },
-  { key: 'auditstate', title: '审核状态', dataIndex: 'auditstate', width: 100 },
-  { key: 'actions', title: '操作', dataIndex: 'actions', width: 100 },
+  { colKey: 'title', title: '资讯标题', ellipsis: true },
+  { colKey: 'infoType', title: '资讯类型', width: 140 },
+  { colKey: 'creator', title: '创建人', width: 140, ellipsis: true },
+  { colKey: 'createTime', title: '创建时间', width: 200 },
+  { colKey: 'auditState', title: '审核状态', width: 140 },
+  { colKey: 'actions', title: '操作', width: 180 },
 ]
 
-export const useTable = (filterFormRef: Ref<FormInstance | null>) => {
-  const queryParams = ref<ListQueryParams>({})
+export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const message = useMessage()
 
-  const { data, pending, execute } = useRequest(() => getList(queryParams.value), {
+  const query = ref<ListQueryParams>({
+    createTime: [],
+    pageNo: 1,
+    pageSize: 10,
+  })
+
+  const { data, pending, execute } = useRequest(() => getInfoAuditList(query.value), {
     immediate: true,
   })
 
-  const pagination = computed<TablePaginationConfig>(() => ({
-    pageSize: queryParams.value.pageSize,
-    current: queryParams.value.pageNo,
+  const pagination = computed<TableProps['pagination']>(() => ({
+    pageSize: query.value.pageSize,
+    current: query.value.pageNo,
     total: data.value?.total,
-    showQuickJumper: true,
-    showSizeChanger: true,
-    showTotal(total, range) {
-      return `第 ${range[0]}~${range[1]} 项 / 共 ${total} 项`
-    },
   }))
 
-  const onChange = ({ current, pageSize }: TablePaginationConfig) => {
-    queryParams.value.pageNo = current
-    queryParams.value.pageSize = pageSize
+  const onPageChange: TableProps['onPageChange'] = ({ current, pageSize }) => {
+    query.value.pageNo = current
+    query.value.pageSize = pageSize
+
     execute()
   }
 
-  const onFilter = () => {
-    queryParams.value.pageNo = 1
+  const onQueryChange = (reset?: boolean) => {
+    query.value.pageNo = 1
+    if (reset) {
+      formRef.value?.reset()
+    }
     execute()
   }
 
-  const onFilterReset = () => {
-    filterFormRef.value?.resetFields()
-    queryParams.value.pageNo = 1
+  const onAudit = async (id: string, auditState: number, review?: string) => {
+    pending.value = true
+    await updateInfoAuditState({
+      id,
+      auditState,
+      review,
+    })
+    message.success('审核成功')
     execute()
   }
 
@@ -51,9 +65,9 @@ export const useTable = (filterFormRef: Ref<FormInstance | null>) => {
     pending,
     execute,
     pagination,
-    queryParams,
-    onFilter,
-    onFilterReset,
-    onChange,
+    query,
+    onPageChange,
+    onQueryChange,
+    onAudit,
   }
 }

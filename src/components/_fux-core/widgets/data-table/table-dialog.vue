@@ -96,6 +96,7 @@ defineExpose({ onAdd, onEdit, onView })
     v-model:visible="visible"
     :header="dialogTitle"
     :width="widget.props.dialogWidth"
+    :confirm-loading="loading"
     @confirm="onSubmit"
   >
     <div class="w-full">

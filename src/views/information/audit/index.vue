@@ -1,112 +1,119 @@
 <template>
   <div class="view">
-    <ARow :gutter="24">
-      <ACol :span="24">
-        <ACard v-if="permission.has('system:info-audit:query')" class="mb-4">
-          <AForm ref="filterFormRef" :model="queryParams" class="dense-form">
-            <ARow :gutter="24">
-              <ACol :span="24" :lg="8">
-                <AFormItem label="标题" name="title">
-                  <AInput v-model:value="queryParams.title" allow-clear placeholder="请输入标题" />
-                </AFormItem>
-              </ACol>
-              <ACol :span="24" :lg="8">
-                <AFormItem label="资讯分类" name="infotype">
-                  <ATreeSelect
-                    v-model:value="queryParams.infotype"
-                    show-search
-                    placeholder="请选择资讯分类"
-                    allow-clear
-                    tree-default-expand-all
-                    :tree-data="treeData"
-                    tree-node-filter-prop="label"
-                  />
-                </AFormItem>
-              </ACol>
-              <ACol :span="24" :lg="8">
-                <AFlex justify="end" align="center" :gap="16">
-                  <AButton html-type="reset" @click="onFilterReset">重置</AButton>
-                  <AButton html-type="submit" type="primary" @click="onFilter">查询</AButton>
-                </AFlex>
-              </ACol>
-            </ARow>
-          </AForm>
-        </ACard>
-      </ACol>
+    <TCard v-if="permission.has('system:info-audit:query')" class="query-form !mb-4">
+      <TForm
+        ref="queryForm"
+        :data="query"
+        layout="inline"
+        class="flex flex-wrap gap-y-4 w-full"
+        label-width="100px"
+        @submit="onQueryChange()"
+        @reset="onQueryChange(true)"
+      >
+        <TFormItem label="资讯标题" name="title" class="col">
+          <TInput v-model:value="query.title" placeholder="请输入资讯标题" />
+        </TFormItem>
+        <TFormItem label="资讯类别" name="infoType" class="col">
+          <TTreeSelect
+            v-model:value="query.infoType"
+            :data="treeData"
+            :keys="{ label: 'name', value: 'id' }"
+            placeholder="请选择资讯类别"
+            clearable
+          />
+        </TFormItem>
+        <QueryActions :expanded="null" class="col" />
+      </TForm>
+    </TCard>
 
-      <ACol :span="24">
-        <ACard title="待审核资讯" class="flex-1">
-          <template #extra>
-            <AFlex :gap="8">
-              <ATooltip title="重新载入">
-                <AButton type="text" :loading="pending" @click="execute">
-                  <template #icon>
-                    <ReloadOutlined />
-                  </template>
-                </AButton>
-              </ATooltip>
-            </AFlex>
-          </template>
+    <TCard title="资讯列表">
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <TTooltip content="重新载入">
+            <TButton shape="square" variant="text" :loading="pending" @click="execute()">
+              <template #icon>
+                <Icon name="refresh" />
+              </template>
+            </TButton>
+          </TTooltip>
+        </div>
+      </template>
 
-          <ATable
-            :data-source="data?.list"
-            :columns="columns"
-            row-key="id"
-            :loading="pending"
-            :pagination="pagination"
-          >
-            <template #bodyCell="scope: TableScope<InformationVO>">
-              <template v-if="scope?.column.key === 'title'">
-                {{ scope.text.length > 46 ? scope.text.substring(0, 45) + '...' : scope.text }}
-              </template>
-              <template v-if="scope?.column.key === 'createTime'">
-                {{ dayjs(scope.text).format('YYYY-MM-DD HH:mm') }}
-              </template>
-              <template v-if="scope?.column.key === 'auditstate'">
-                <DictTag :dict-object="informationStatus" :value="scope.text" />
-              </template>
-              <template v-if="scope?.column.key === 'actions'">
-                <AFlex :gap="16">
-                  <ATypographyLink
-                    v-if="permission.has('system:info-audit:approve')"
-                    @click="onAudit(scope.record)"
-                  >
-                    <EditOutlined />
-                    审核
-                  </ATypographyLink>
-                </AFlex>
-              </template>
-            </template>
-          </ATable>
-        </ACard>
-      </ACol>
-    </ARow>
-    <FormModal v-if="visible" :record="entry" @success="execute" @close="visible = false" />
+      <TTable
+        :data="data?.list"
+        row-key="id"
+        :columns="columns"
+        :pagination="pagination"
+        :loading="pending"
+        @page-change="onPageChange"
+      >
+        <!-- <template #infoType="{ row }">
+          <DictTag :dict-data="typeOpts" :value="row.type" />
+        </template> -->
+        <template #title="{ row }">
+          <div class="w-full flex items-center gap-1">
+            <div class="truncate">
+              {{ row.title }}
+            </div>
+            <TTag v-if="row.isPinned" theme="danger" variant="light-outline" class="flex-none"
+              >置顶</TTag
+            >
+            <TTag v-if="row.isInHome" theme="primary" variant="light-outline" class="flex-none"
+              >首页显示</TTag
+            >
+          </div>
+        </template>
+        <template #infoType="{ row }">
+          {{ treeData?.find((item) => item.id === row.infoType)?.name || '—' }}
+        </template>
+        <template #createTime="{ row }">
+          {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template #updateTime="{ row }">
+          {{ dayjs(row.updateTime).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template #actions="{ row }">
+          <div class="flex items-center gap-2">
+            <TTooltip content="审核">
+              <TButton
+                shape="square"
+                theme="primary"
+                variant="text"
+                :disabled="permission.hasNone('system:info-audit:approve')"
+                @click="formRef?.open(row)"
+              >
+                <template #icon>
+                  <Icon name="edit-2" />
+                </template>
+              </TButton>
+            </TTooltip>
+          </div>
+        </template>
+      </TTable>
+    </TCard>
+
+    <Form ref="formRef" :type-tree="treeData" @success="execute" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import dayjs from 'dayjs'
-import useDict from '@/hooks/use-dict'
-import FormModal from './form.vue'
-import { permission } from '@/hooks/use-permission'
-import { getInfoTyoeTree, type InformationVO } from '@/api/information/audit'
+import Form from './form.vue'
+import { getInfoTypeTree } from '@/api/information/type'
 import { useTable, columns } from './use-table'
-import useActions from './use-actions'
+import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
-const filterFormRef = ref()
+const { permission } = usePermission()
+const formRef = useTemplateRef('formRef')
+const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 
-const treeData = ref()
+// const [informationStatus] = useDict('information_status')
 
-const [informationStatus] = useDict('information_status')
+const { data, execute, pending, pagination, onPageChange, onQueryChange, query } =
+  useTable(queryForm)
 
-const { data, execute, pending, queryParams, onFilter, onFilterReset, pagination } =
-  useTable(filterFormRef)
-
-const { entry, visible, onAudit } = useActions()
-
-getInfoTyoeTree().then((res) => {
-  treeData.value = res
+const { data: treeData } = useRequest(getInfoTypeTree, {
+  immediate: true,
 })
 
 defineOptions({ name: 'InformationList' })

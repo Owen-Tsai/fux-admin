@@ -128,12 +128,14 @@ watch(
 
     if (Array.isArray(val)) {
       if (val.length > 0) {
-        fileList.value = val.map((item) => ({
-          url: item,
-        }))
+        val.reduce((prev, cur) => {
+          const item = { url: cur }
+          prev.push(draggable ? { ...item, status: 'success', name: cur } : item)
+          return prev
+        }, fileList.value)
       }
     } else {
-      fileList.value = [{ url: val }]
+      fileList.value = [draggable ? { url: val, status: 'success', name: val } : { url: val }]
     }
   },
   { immediate: true },

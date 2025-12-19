@@ -1,35 +1,31 @@
-import { getInfoList, deleteInfo, type ListQueryParams } from '@/api/information'
+import { getList, deleteIPListEntry, type ListQueryParams } from '@/api/system/ip/list'
 import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { title: '资讯标题', colKey: 'title' },
-  { title: '资讯类别', colKey: 'infoType', width: 120 },
-  { title: '创建人', colKey: 'creator', width: 120, ellipsis: true },
-  { title: '状态', width: 120, colKey: 'auditState' },
+  { title: 'IP 地址', colKey: 'ipAddress' },
+  { title: 'IP 类型', colKey: 'listType', width: 140 },
+  { title: '描述', width: 200, colKey: 'description', ellipsis: true },
   {
     title: '创建时间',
-    width: 180,
+    minWidth: 180,
     colKey: 'createTime',
-  },
-  {
-    title: '更新时间',
-    width: 180,
-    colKey: 'updateTime',
   },
   { title: '操作', width: 100, colKey: 'actions' },
 ]
 
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const route = useRoute()
+  const { path } = route
+  const isWhitelist = path.includes('white-list')
+
   const query = ref<ListQueryParams>({
     createTime: [],
-    publishTime: [],
     pageNo: 1,
     pageSize: 10,
+    listType: isWhitelist,
   })
 
-  const message = useMessage()
-
-  const { data, execute, pending } = useRequest(() => getInfoList(query.value), {
+  const { data, execute, pending } = useRequest(() => getList({ ...query.value }), {
     immediate: true,
   })
 
@@ -55,9 +51,7 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   }
 
   const onDelete = async (id: string) => {
-    pending.value = true
-    await deleteInfo(id)
-    message.success('删除成功')
+    await deleteIPListEntry(id)
     execute()
   }
 
@@ -66,6 +60,7 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     pending,
     query,
     pagination,
+    isWhitelist,
     onPageChange,
     onQueryChange,
     execute,

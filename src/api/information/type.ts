@@ -18,11 +18,11 @@ export type InfoTypeVO = {
   updateTime?: string
 }
 
-export type InfoTypeTreeVO = InfoTypeVO &
-  {
+export type InfoTypeTreeVO = Array<
+  InfoTypeVO & {
     children?: InfoTypeTreeVO[]
-  }[]
-
+  }
+>
 const prefix = '/information/type'
 
 export const getInfoTypeTree = (params?: TreeQueryParams) => {

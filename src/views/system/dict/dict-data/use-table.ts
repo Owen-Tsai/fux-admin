@@ -5,14 +5,15 @@ import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 export const columns: TableProps['columns'] = [
   { title: '字典编码', width: 90, colKey: 'id' },
   { title: '字典标签', colKey: 'label' },
-  { title: '字典键值', width: 90, colKey: 'value' },
+  { title: '字典键值', colKey: 'value' },
   { title: '字典状态', width: 90, colKey: 'status' },
   { title: '颜色类型', width: 140, colKey: 'colorType' },
-  { title: 'CSS Class', colKey: 'cssClass' },
+  { title: 'CSS Class', width: 140, colKey: 'cssClass' },
   { title: '备注', width: 140, colKey: 'remark' },
   {
     title: '创建时间',
     minWidth: 100,
+    width: 140,
     colKey: 'createTime',
   },
   { title: '操作', width: 100, colKey: 'actions' },
