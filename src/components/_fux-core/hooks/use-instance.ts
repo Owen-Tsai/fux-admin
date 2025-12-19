@@ -6,7 +6,7 @@ import { emitter, eventKeys } from '@fusionx/core/utils'
  * 返回表单渲染器 formRenderer 实例的方法供外部调用
  * 包括保存数据、设置表单的值、改变组件的属性等
  */
-const useRendererInstance = () => {
+export const useInstanceMethods = () => {
   const { appSchema, $state, formData } = useRendererCtxInject()!
 
   /**
@@ -117,5 +117,3 @@ const useRendererInstance = () => {
     hideStep,
   }
 }
-
-export default useRendererInstance

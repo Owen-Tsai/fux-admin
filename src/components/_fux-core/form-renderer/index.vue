@@ -35,9 +35,7 @@
 import WidgetRenderer from '../widgets/widget/index.vue'
 import ViewModeWidgetRenderer from '../widgets/widget/view-mode.vue'
 import highlightCode from '@/utils/highlighter'
-import useAPI from './use-api'
-import useInstance from './use-instance'
-import useLifecycles from './use-lifecycles'
+import { useInstanceMethods, useAPI, useLifecycles } from '../hooks'
 import { useRendererCtxProvide } from '@fusionx/core/hooks'
 import type { FormInstanceFunctions, FormValidateParams } from 'tdesign-vue-next'
 import type { AppSchema, FuxRendererMode, FieldInteractivity } from '@fusionx/core/types'
@@ -96,7 +94,7 @@ const highlighted = computedAsync(async () => {
   return await highlightCode(JSON.stringify(formData.value, null, 2), 'json')
 })
 
-const instanceMethods = useInstance()
+const instanceMethods = useInstanceMethods()
 useAPI()
 
 const validateForm = (params?: FormValidateParams) => {

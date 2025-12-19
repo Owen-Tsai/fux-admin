@@ -1,8 +1,8 @@
 import { useRendererCtxInject } from '@fusionx/core/hooks'
 import { emitter, LifecyclePhases, safeEval } from '@fusionx/core/utils'
-import useInstanceMethods from '../form-renderer/use-instance'
+import { useInstanceMethods, useLimitedRequest } from '.'
 
-const useLifecycles = () => {
+export const useLifecycles = () => {
   const { appSchema, mode, formData, $state } = useRendererCtxInject()!
 
   if (mode === 'dev' || mode === 'preview') return
@@ -10,12 +10,19 @@ const useLifecycles = () => {
   if (!appSchema.value.form.lifecycle) return
   const { lifecycle, function: functions } = appSchema.value.form
 
+  const $message = useMessage()
+  const $dialog = useDialog()
+  const $request = useLimitedRequest()
+
   const evalContext = {
     $func: useInstanceMethods(),
     $values: formData.value,
     $schema: appSchema.value,
     $state: $state.value,
     $mode: mode,
+    $request,
+    $message,
+    $dialog,
   }
 
   if (lifecycle.loaded) {
@@ -30,5 +37,3 @@ const useLifecycles = () => {
     emitter.on(LifecyclePhases.BEFORE_SUBMIT, () => safeEval(func.body!, evalContext))
   }
 }
-
-export default useLifecycles

@@ -6,7 +6,7 @@ import { useRendererCtxInject } from '@fusionx/core/hooks'
 /**
  * 执行 appSchema 中定义的 API，将结果赋予 state 中对应的字段
  */
-const useAPI = () => {
+export const useAPI = () => {
   const rendererCtx = useRendererCtxInject()
 
   if (!rendererCtx) {
@@ -35,5 +35,3 @@ const useAPI = () => {
     })
   }
 }
-
-export default useAPI
