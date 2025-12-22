@@ -84,11 +84,6 @@ export const generateRoutes = (menuVO: MenuVO[]): RouteRecordRaw[] => {
           }
         }
 
-        // route params
-        if (rawEntry.params) {
-          entry.query = JSON.parse(rawEntry.params)
-        }
-
         if (hasChildren) {
           // do not process menu entries that already been marked as processed
           entry.children = traverse(

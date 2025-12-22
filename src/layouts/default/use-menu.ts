@@ -1,4 +1,5 @@
 import { manifest } from 'tdesign-icons-vue-next'
+import qs from 'qs'
 import type { MenuVO } from '@/api/system/menu'
 
 export type MenuItem = {
@@ -16,6 +17,8 @@ const useMenu = () => {
   const activeKey = ref<string>()
   const expandedKeys = ref<string[]>([])
   const { push, currentRoute } = useRouter()
+
+  const logger = useLogger()
 
   const generateMenu = (menuVO: MenuVO[], parentPath = ''): MenuItem[] => {
     const ret: MenuItem[] = []
@@ -45,6 +48,15 @@ const useMenu = () => {
 
         if (route.customLayout) {
           item.key = origin + item.key
+        }
+        if (route.params) {
+          // route params
+          try {
+            const params = JSON.parse(route.params)
+            item.key += `?${qs.stringify(params)}`
+          } catch (e) {
+            logger.error(import.meta.url, '菜单管理 -> 路由参数并非一个合法的 JSON：', route.params)
+          }
         }
       }
 
