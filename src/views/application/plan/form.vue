@@ -21,9 +21,12 @@ const emit = defineEmits(['success'])
 const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
 
 const loading = ref(false)
-const formData = ref<PlanVO>({
+const defaultData: PlanVO = {
   daily: false,
-})
+  startTime: undefined,
+  endTime: undefined,
+}
+const formData = ref<PlanVO>({ ...defaultData })
 
 const rules: FormProps['rules'] = {
   appId: [{ required: true, message: '请选择所属应用' }],
@@ -64,7 +67,7 @@ const loadData = async (id: string) => {
 
 const open = (id?: string) => {
   formRef.value?.reset({ type: 'initial' })
-  formData.value.id = undefined
+  formData.value = { ...defaultData }
   mode.value = 'create'
 
   if (id) {
