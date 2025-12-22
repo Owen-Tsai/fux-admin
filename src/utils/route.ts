@@ -3,102 +3,139 @@ import type { RouteRecordRaw } from 'vue-router'
 import type { MenuVO } from '@/api/system/menu'
 
 const modules = import.meta.glob('../views/**/*.vue')
-const layoutModules = import.meta.glob('../layouts/**/*.vue')
+const layoutModules = import.meta.glob('../layouts/**/index.vue')
 
-const loadComponentFrom = (path: string, folder: 'views' | 'layouts') => {
-  const map = folder === 'layouts' ? layoutModules : modules
-
+const loadComponent = (path: string) => {
   const [filename] =
-    Object.entries(map).find(([filename]) => {
-      const file = filename.split(`${folder}/`)[1].split('.vue')[0]
-      return file === path
+    Object.entries(modules).find(([file]) => {
+      const fileWithoutExt = file.split(`views/`)[1].split('.vue')[0]
+      return fileWithoutExt === path
     }) || []
 
-  return filename ? () => map[filename]() : undefined
+  return filename ? () => modules[filename]() : undefined
+}
+
+const loadLayout = (name: string) => {
+  const [layoutName] =
+    Object.entries(layoutModules).find(([file]) => {
+      const folderName = file.split('/')[2]
+      return folderName === name
+    }) || []
+
+  return layoutName ? () => layoutModules[layoutName]() : undefined
 }
 
 /**
- * Generate `RouteRecordRaw[]` based on menuVO
+ * 基于MenuVO数组生成Vue Router路由数组
  */
 export const generateRoutes = (menuVO: MenuVO[]): RouteRecordRaw[] => {
   const ret: RouteRecordRaw[] = []
 
-  const traverse = (menus: MenuVO[], parentPath = '') => {
+  /**
+   * 递归处理菜单项，生成路由记录
+   * @param menus 菜单列表
+   * @param parentPath 父级路径
+   * @param parentHasCustomLayout 父级是否有自定义布局
+   */
+  const traverse = (
+    menus: MenuVO[],
+    parentPath = '',
+    parentHasCustomLayout = false,
+  ): RouteRecordRaw[] => {
     const res: RouteRecordRaw[] = []
+
     menus.forEach((rawEntry) => {
-      rawEntry.children?.forEach((e) => (e.skipProcess = false))
-      // internet addresses start with `http` should noe be processed by router
-      if (!rawEntry.path?.includes('http')) {
-        const hasChildren = rawEntry.children && rawEntry.children.length > 0
+      // 2. 跳过外链（以http开头）
+      if (rawEntry.path?.startsWith('http')) {
+        return
+      }
 
-        // fill meta fields
-        const meta = {
-          id: rawEntry.id,
-          parentId: rawEntry.parentId,
-          icon: rawEntry.icon,
-          customLayout: rawEntry.customLayout,
-          keepAlive: !!rawEntry.keepAlive,
-          title: rawEntry.name || rawEntry.componentName || '',
-          visible: rawEntry.visible,
-        }
+      // 填充meta字段
+      const meta = {
+        id: rawEntry.id,
+        parentId: rawEntry.parentId,
+        icon: rawEntry.icon,
+        customLayout: rawEntry.customLayout,
+        keepAlive: !!rawEntry.keepAlive,
+        title: rawEntry.name || rawEntry.componentName || '',
+        visible: rawEntry.visible,
+      }
 
-        const entry: any = {
-          name: rawEntry.componentName,
-          path: rawEntry.path,
-          meta,
-        }
-
+      // 3. 处理目录（type为1）
+      if (rawEntry.type === 1) {
+        // 6. 目录有自定义布局：作为父级路由
         if (rawEntry.customLayout) {
-          if (rawEntry.type === 2) {
-            // if route with customLayout is a menu
-            // construct a parent route record containing this route
-            const parentRecord: any = {
-              path: `${parentPath}/${rawEntry.path}`,
-              name: rawEntry.componentName,
-              redirect: '',
-              component: loadComponentFrom(rawEntry.customLayout, 'layouts'),
-              children: [
-                {
-                  path: '',
-                  name: rawEntry.componentName + 'Child',
-                  component: loadComponentFrom(rawEntry.component!, 'views'),
-                  meta,
-                },
-              ],
-            }
-
-            ret.push(parentRecord as RouteRecordRaw)
-            // mark as processed, so it won't be processed again in recursion
-            rawEntry.skipProcess = true
-            return
-          } else {
-            // if route with customLayout is a directory,
-            entry.component = loadComponentFrom(rawEntry.customLayout!, 'layouts')
+          const parentRecord: RouteRecordRaw = {
+            path: parentPath ? `${parentPath}/${rawEntry.path}` : rawEntry.path!,
+            name: rawEntry.componentName,
+            component: loadLayout(rawEntry.customLayout),
+            meta,
+            children: rawEntry.children ? traverse(rawEntry.children, rawEntry.path!, true) : [],
           }
+
+          res.push(parentRecord)
         } else {
-          // normal layout
-          if (rawEntry.parentId === 0 && rawEntry.type !== 2) {
-            entry.component = DefaultLayout
+          // 4. 顶层目录（parentId为0）使用DefaultLayout
+          if (rawEntry.parentId === 0) {
+            const directoryRecord: RouteRecordRaw = {
+              path: rawEntry.path!,
+              name: rawEntry.componentName,
+              component: DefaultLayout,
+              meta,
+              children: rawEntry.children ? traverse(rawEntry.children, rawEntry.path!, false) : [],
+            }
+            res.push(directoryRecord)
           } else {
-            entry.component = loadComponentFrom(rawEntry.component!, 'views')
+            // 普通目录，递归处理子项
+            if (rawEntry.children && rawEntry.children.length > 0) {
+              res.push(
+                ...traverse(
+                  rawEntry.children,
+                  parentPath ? `${parentPath}/${rawEntry.path}` : rawEntry.path!,
+                  parentHasCustomLayout,
+                ),
+              )
+            }
           }
         }
-
-        if (hasChildren) {
-          // do not process menu entries that already been marked as processed
-          entry.children = traverse(
-            rawEntry.children!.filter((e) => e.skipProcess !== true),
-            rawEntry.path,
-          )
+      }
+      // 5. 处理菜单（type为2）
+      else if (rawEntry.type === 2) {
+        // 7. 菜单有自定义布局且不是自定义布局目录的子项
+        if (rawEntry.customLayout && !parentHasCustomLayout) {
+          const parentRecord: RouteRecordRaw = {
+            path: parentPath ? `${parentPath}/${rawEntry.path}` : rawEntry.path!,
+            name: rawEntry.componentName,
+            redirect: { name: `${rawEntry.componentName}Child` },
+            component: loadLayout(rawEntry.customLayout!),
+            meta,
+            children: [
+              {
+                path: '',
+                name: `${rawEntry.componentName}Child`,
+                component: loadComponent(rawEntry.component!),
+                meta,
+              } as RouteRecordRaw,
+            ],
+          }
+          res.push(parentRecord)
+        } else {
+          // 普通菜单
+          const menuRecord: RouteRecordRaw = {
+            path: parentPath ? `${parentPath}/${rawEntry.path}` : rawEntry.path!,
+            name: rawEntry.componentName,
+            component: loadComponent(rawEntry.component!),
+            meta,
+          } as RouteRecordRaw
+          res.push(menuRecord)
         }
-
-        res.push(entry)
       }
     })
 
     return res
   }
 
+  // 1. 处理传入的数组
   ret.push(...traverse(menuVO))
   return ret
 }
