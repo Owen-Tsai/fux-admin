@@ -9,7 +9,7 @@ export type PlanVO = {
   daily?: boolean
   appId?: string
   flow?: string
-  attachmentTypes?: string[]
+  fjfl?: string[]
   appName?: string
 }
 
