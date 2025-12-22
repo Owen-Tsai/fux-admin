@@ -64,11 +64,6 @@ const commonRoutes: RouteRecordRaw[] = [
           keepAlive: false,
         },
       },
-      {
-        path: '/__demo/editor',
-        name: 'EditorDemo',
-        component: () => import('@/views/__demo/editor.vue'),
-      },
     ],
   },
   {
