@@ -49,6 +49,9 @@
       <TSwitch v-model:value="props.form.colon" />
     </TFormItem>
   </template>
+  <TFormItem label="数量上限" name="max">
+    <TInputNumber v-model:value="props.max" />
+  </TFormItem>
   <TableColumnSetter ref="columnSetterRef" v-model:props="props" />
 </template>
 
