@@ -70,6 +70,10 @@ const onSubmit = async () => {
 }
 
 const onAdd = () => {
+  if (widget.props.max && widget.props.max > 0 && data.value.length >= widget.props.max) {
+    message.error(`最多只能添加 ${widget.props.max} 条记录`)
+    return
+  }
   mode.value = 'create'
   visible.value = true
 }
