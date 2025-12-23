@@ -11,9 +11,12 @@ import type { ChannelListLiteVO } from '@/api/system/sms/channel'
 const loading = ref(false)
 const visible = ref(false)
 
+const route = useRoute()
+
 const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
 const formData = ref<TemplateVO>({
   status: 0,
+  sourceType: route.query?.sourceType as string || '0',
 })
 
 const mode = ref<'create' | 'update'>('create')

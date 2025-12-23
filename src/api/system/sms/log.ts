@@ -26,6 +26,7 @@ export type LogVO = {
   templateType?: number
   userId?: number
   userType?: number
+  templateSourceType?: string
 }
 
 export type ListQueryParams = CommonQueryParams & {
@@ -36,6 +37,7 @@ export type ListQueryParams = CommonQueryParams & {
   sendTime?: string[]
   receiveStatus?: number
   receiveTime?: string[]
+  templateSourceType?: string
 }
 
 export const getList = (params?: ListQueryParams) => {
