@@ -127,6 +127,14 @@ export const generateRoutes = (menuVO: MenuVO[]): RouteRecordRaw[] => {
             component: loadComponent(rawEntry.component!),
             meta,
           } as RouteRecordRaw
+          // 若菜单存在子项，递归处理子项
+          if (rawEntry.children && rawEntry.children.length > 0) {
+            menuRecord.children = traverse(
+              rawEntry.children,
+              parentPath ? `${parentPath}/${rawEntry.path}` : rawEntry.path!,
+              parentHasCustomLayout,
+            )
+          }
           res.push(menuRecord)
         }
       }
