@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import type { ProfileVO } from '@/api/member/personal'
 
 const { profile } = defineProps<{
-  profile: ProfileVO
+  profile?: ProfileVO
 }>()
 
 const [politicalOpts, eduLevelOpts, eduTypeOpts, degreeOpts, sexOpts] = useDict(
@@ -18,55 +18,55 @@ const [politicalOpts, eduLevelOpts, eduTypeOpts, degreeOpts, sexOpts] = useDict(
 <template>
   <TDescriptions bordered>
     <TDescriptionsItem label="姓名" name="name">
-      {{ profile.name }}
+      {{ profile?.name }}
     </TDescriptionsItem>
     <TDescriptionsItem label="证件号码" name="idcard">
-      {{ profile.idcard }}
+      {{ profile?.idcard }}
     </TDescriptionsItem>
     <TDescriptionsItem label="手机号" name="mobile">
-      {{ profile.mobile }}
+      {{ profile?.mobile }}
     </TDescriptionsItem>
     <TDescriptionsItem label="性别" name="sex">
-      <DictTag :dict-data="sexOpts" :value="profile.sex" />
+      <DictTag :dict-data="sexOpts" :value="profile?.sex" />
     </TDescriptionsItem>
     <TDescriptionsItem label="出生日期" name="birthday">
-      {{ dayjs(profile.birthday).format('YYYY-MM-DD') }}
+      {{ dayjs(profile?.birthday).format('YYYY-MM-DD') }}
     </TDescriptionsItem>
     <TDescriptionsItem label="工作单位" name="companyid">
-      {{ profile.companyName }}
+      {{ profile?.companyName }}
     </TDescriptionsItem>
     <TDescriptionsItem label="政治面貌" name="politicalstatus">
-      <DictTag :dict-data="politicalOpts" :value="profile.politicalstatus" />
+      <DictTag :dict-data="politicalOpts" :value="profile?.politicalstatus" />
     </TDescriptionsItem>
     <TDescriptionsItem label="邮箱" name="email">
-      {{ profile.email }}
+      {{ profile?.email }}
     </TDescriptionsItem>
     <TDescriptionsItem label="居住地址" name="address">
-      {{ profile.address }}
+      {{ profile?.address }}
     </TDescriptionsItem>
     <TDescriptionsItem label="邮政编码" name="postcode">
-      {{ profile.postcode }}
+      {{ profile?.postcode }}
     </TDescriptionsItem>
     <TDescriptionsItem label="毕业院校" name="eduschool">
-      {{ profile.eduschool }}
+      {{ profile?.eduschool }}
     </TDescriptionsItem>
     <TDescriptionsItem label="毕业时间" name="edudate">
-      {{ profile.edudate ? dayjs(profile.edudate).format('YYYY-MM-DD') : '' }}
+      {{ profile?.edudate ? dayjs(profile?.edudate).format('YYYY-MM-DD') : '' }}
     </TDescriptionsItem>
     <TDescriptionsItem label="最高学历" name="diploma">
-      <DictTag :dict-data="eduLevelOpts" :value="profile.diploma" />
+      <DictTag :dict-data="eduLevelOpts" :value="profile?.diploma" />
     </TDescriptionsItem>
     <TDescriptionsItem label="学历类型" name="diplomatype">
-      <DictTag :dict-data="eduTypeOpts" :value="profile.diplomatype" />
+      <DictTag :dict-data="eduTypeOpts" :value="profile?.diplomatype" />
     </TDescriptionsItem>
     <TDescriptionsItem label="学位" name="degree">
-      <DictTag :dict-data="degreeOpts" :value="profile.degree" />
+      <DictTag :dict-data="degreeOpts" :value="profile?.degree" />
     </TDescriptionsItem>
     <TDescriptionsItem label="第一专业" name="firstmajor">
-      {{ profile.firstmajor }}
+      {{ profile?.firstmajor }}
     </TDescriptionsItem>
     <TDescriptionsItem label="个人简介" name="selfeval" class="col-span-2">
-      {{ profile.selfeval }}
+      {{ profile?.selfeval }}
     </TDescriptionsItem>
   </TDescriptions>
 </template>

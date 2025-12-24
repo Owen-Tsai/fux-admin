@@ -63,6 +63,8 @@ export type ProfileVO = {
 
 export type ListQueryParams = CommonQueryParams & {
   name?: string // 单位名称
+  contact?: string // 联系人
+  username?: string // 用户名
   creditrate?: string // 统一社会信用代码
   institutionType?: number // 机构类型
   unitType?: number // 单位类型

@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { columns, useTable } from './use-table'
-// import Detail from './detail/index.vue'
-import { exportExcel, type ProfileVO } from '@/api/member/personal'
+import Detail from './detail.vue'
+import { exportExcel, type ProfileVO } from '@/api/member/company'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
-// const dialogRef = useTemplateRef<InstanceType<typeof Detail>>('dialogRef')
+const dialogRef = useTemplateRef('dialogRef')
 
 const { permission } = usePermission()
 const exporting = ref(false)
 
-const [sexOpts, degreeOpts, diplomaOpts, diplomaTypeOpts, politicOpts] = useDict(
-  'user_sex',
-  'user_degree',
-  'rc_education_level',
-  'rc_education_type',
-  'rc_politic',
+const [YES_NO, ORG_TYPE, TEC_FIELD, COMPANY_NATURE, SCALE_SIZE] = useDict(
+  'yes_no',
+  'org_type',
+  'tec_field',
+  'company_nature',
+  'scale_size',
 )
 
 const { data, pending, execute, query, onQueryChange, pagination, onPageChange, onSetEnable } =
@@ -48,49 +48,31 @@ defineOptions({ name: 'MemberPersonal' })
         @submit="onQueryChange()"
         @reset="onQueryChange(true)"
       >
-        <TFormItem label="人才名称" name="name" class="col">
-          <TInput v-model:value="query.name" placeholder="请输入人才名称" clearable />
+        <TFormItem label="单位名称" name="name" class="col">
+          <TInput v-model:value="query.name" placeholder="请输入单位名称" clearable />
         </TFormItem>
-        <TFormItem label="单位名称" name="companyName" class="col">
-          <TInput v-model:value="query.companyName" placeholder="请输入单位名称" clearable />
+        <TFormItem label="用户名" name="username" class="col">
+          <TInput v-model:value="query.username" placeholder="请输入用户名" clearable />
         </TFormItem>
-        <TFormItem v-show="expanded" label="性别" name="sex" class="col">
+        <TFormItem v-show="expanded" label="统一社会信用代码" name="creditrate" class="col">
+          <TInput v-model:value="query.creditrate" clearable />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="联系人" name="contact" class="col">
+          <TInput v-model:value="query.contact" clearable />
+        </TFormItem>
+        <TFormItem v-show="expanded" label="单位性质" name="unitnature" class="col">
           <TSelect
-            v-model:value="query.sex"
-            :options="sexOpts"
-            placeholder="请选择性别"
+            v-model:value="query.unitnature"
+            :options="COMPANY_NATURE"
+            placeholder="请选择单位性质"
             clearable
           />
         </TFormItem>
-        <TFormItem v-show="expanded" label="学历" name="diploma" class="col">
+        <TFormItem v-show="expanded" label="机构类型" name="institutionType" class="col">
           <TSelect
-            v-model:value="query.diploma"
-            :options="diplomaOpts"
-            placeholder="请选择学历"
-            clearable
-          />
-        </TFormItem>
-        <TFormItem v-show="expanded" label="学历类型" name="diplomaType" class="col">
-          <TSelect
-            v-model:value="query.diplomatype"
-            :options="diplomaTypeOpts"
-            placeholder="请选择学历类型"
-            clearable
-          />
-        </TFormItem>
-        <TFormItem v-show="expanded" label="学位" name="degree" class="col">
-          <TSelect
-            v-model:value="query.degree"
-            :options="degreeOpts"
-            placeholder="请选择学位"
-            clearable
-          />
-        </TFormItem>
-        <TFormItem v-show="expanded" label="政治面貌" name="politicalstatus" class="col">
-          <TSelect
-            v-model:value="query.politicalstatus"
-            :options="politicOpts"
-            placeholder="请选择政治面貌"
+            v-model:value="query.institutionType"
+            :options="ORG_TYPE"
+            placeholder="请选择机构类型"
             clearable
           />
         </TFormItem>
@@ -133,36 +115,24 @@ defineOptions({ name: 'MemberPersonal' })
         :loading="pending"
         @page-change="onPageChange"
       >
-        <template #age="{ row }: TableScope<ProfileVO>">
-          {{ dayjs().diff(dayjs(row.birthday), 'year') }}
+        <template #institutionType="{ row }">
+          <DictTag :dict-data="ORG_TYPE" :value="row.institutionType" />
         </template>
-        <template #sex="{ row }: TableScope<ProfileVO>">
-          <DictTag :dict-data="sexOpts" :value="row.sex" />
+        <template #unitnature="{ row }">
+          <DictTag :dict-data="COMPANY_NATURE" :value="row.unitnature" />
         </template>
-        <template #degree="{ row }: TableScope<ProfileVO>">
-          <DictTag :dict-data="degreeOpts" :value="row.degree" />
+        <template #scale="{ row }">
+          <DictTag :dict-data="SCALE_SIZE" :value="row.scale" />
         </template>
-        <template #diploma="{ row }: TableScope<ProfileVO>">
-          <DictTag :dict-data="diplomaOpts" :value="row.diploma" />
+        <template #unitSize="{ row }">
+          <DictTag :dict-data="SCALE_SIZE" :value="row.unitSize" />
         </template>
-        <template #diplomaType="{ row }: TableScope<ProfileVO>">
-          <DictTag :dict-data="diplomaTypeOpts" :value="row.diplomatype" />
-        </template>
-        <template #politicalStatus="{ row }: TableScope<ProfileVO>">
-          <DictTag :dict-data="politicOpts" :value="row.politicalstatus" />
-        </template>
-        <template #regdate="{ row }: TableScope<ProfileVO>">
-          {{ row.regdate ? dayjs(row.regdate).format('YYYY-MM-DD HH:mm') : '' }}
-        </template>
-        <template #isEnabled="{ row }: TableScope<ProfileVO>">
+        <template #isenable="{ row }">
           <TSwitch
             v-model:value="row.isenable"
             :label="['允许', '禁止']"
             @change="(v) => onSetEnable(row.id!, v as boolean)"
           />
-        </template>
-        <template #createTime="{ row }">
-          {{ dayjs(row.createTime).format('YYYY-MM-DD') }}
         </template>
         <template #actions="{ row }">
           <div class="flex gap-2">
@@ -170,13 +140,6 @@ defineOptions({ name: 'MemberPersonal' })
               <TButton shape="square" theme="primary" variant="text" @click="dialogRef?.open(row)">
                 <template #icon>
                   <Icon name="browse" />
-                </template>
-              </TButton>
-            </TTooltip>
-            <TTooltip content="人才画像">
-              <TButton shape="square" theme="primary" variant="text">
-                <template #icon>
-                  <Icon name="accessibility" />
                 </template>
               </TButton>
             </TTooltip>
