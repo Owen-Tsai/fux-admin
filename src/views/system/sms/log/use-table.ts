@@ -13,11 +13,14 @@ export const columns: TableProps['columns'] = [
   { colKey: 'actions', title: '操作', fixed: 'right', width: 80 },
 ]
 
+
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const route = useRoute()
   const query = ref<ListQueryParams>({
     pageNo: 1,
     pageSize: 10,
     sendTime: [],
+    templateSourceType: route.query?.templateSourceType as string,
   })
 
   const { data, pending, execute } = useRequest(() => getList(query.value), {

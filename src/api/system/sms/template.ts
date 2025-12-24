@@ -14,6 +14,7 @@ export type TemplateVO = {
   remark?: string
   status?: number
   type?: number
+  sourceType?: string
 }
 
 export type ListQueryParams = CommonQueryParams & {
@@ -22,6 +23,15 @@ export type ListQueryParams = CommonQueryParams & {
   code?: string
   status?: number
   channelId?: number
+  sourceType?: string
+}
+
+export type SendTestSmsParams = {
+  templateCode: string // 模板编码
+  mobile: string // 手机号
+  templateParams: {
+    [key: string]: string
+  }
 }
 
 const prefix = '/system/sms-template'
@@ -57,4 +67,11 @@ export const updateTemplate = (data: TemplateVO) => {
 
 export const deleteTemplate = (id: number) => {
   return request.delete({ url: `${prefix}/get?id=${id}` })
+}
+
+export const sendTestSms = (data: SendTestSmsParams) => {
+  return request.post({
+    url: `${prefix}/send-sms`,
+    data
+  })
 }

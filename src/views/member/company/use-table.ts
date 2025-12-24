@@ -1,20 +1,23 @@
-import { getList, setEnabled, type ListQueryParams } from '@/api/member/personal'
+import { getList, setEnabled, type ListQueryParams } from '@/api/member/company'
 import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
-  { colKey: 'name', title: '单位名称', width: 160, ellipsis: true, fixed: 'left' },
-  { colKey: 'creditrate', title: '统一信用代码', width: 180, ellipsis: true },
-  { colKey: 'unitNature', title: '单位性质', width: 120 },
-  { colKey: 'scale', title: '单位规模', width: 120 },
-  { colKey: 'regFund', title: '注册资金', width: 120 },
-  { colKey: '' },
+  { colKey: 'name', title: '单位名称', width: 180, ellipsis: true, fixed: 'left' },
+  { colKey: 'username', title: '用户名', width: 120, ellipsis: true },
+  { colKey: 'creditrate', title: '统一信用代码', width: 200, ellipsis: true },
+  { colKey: 'unitnature', title: '单位性质', width: 140 },
+  { colKey: 'unitSize', title: '单位规模', width: 140 },
+  { colKey: 'institutionType', title: '机构类型', width: 160 },
+  { colKey: 'legalrepresent', title: '法定代表人', width: 120 },
+  { colKey: 'contact', title: '联系人', width: 120 },
+  { colKey: 'isenable', title: '允许登录', width: 120 },
+  { colKey: 'actions', title: '操作', width: 80, fixed: 'right' },
 ]
 
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   const query = ref<ListQueryParams>({
     pageNo: 1,
     pageSize: 10,
-    birthday: [],
   })
 
   const message = useMessage()

@@ -1,12 +1,18 @@
 <template>
   <TTable
+    row-key="id"
     :columns="columns"
     :data="model"
     :loading="pending"
     :header-affixed-top="tableAffixProps"
     horizontal-scroll-affixed-bottom
     class="!mt-4"
+    drag-sort="row-handler"
+    @drag-sort="onDragSort"
   >
+    <!--<template #drag="{ row }: TableScope<ColumnVO>" class="cursor-move">-->
+    <!--  <span> <MoveIcon /> </span>-->
+    <!--</template>-->
     <template #columnComment="{ row }: TableScope<ColumnVO>">
       <TInput v-model:value="row.columnComment" placeholder="如：姓名" />
     </template>
@@ -62,8 +68,10 @@
 import { getSimpleDictTypeList } from '@/api/system/dict/type'
 import type { ColumnVO, ConfigDetailVO } from '@/api/infra/code-gen'
 import type { TableProps } from 'tdesign-vue-next'
+import { MoveIcon } from 'tdesign-icons-vue-next';
 
 const columns: TableProps['columns'] = [
+  { title: '排序', colKey: 'drag', width: 46, cell: (h) => h(MoveIcon)},
   { title: '字段名称', colKey: 'columnName', fixed: 'left' },
   { title: '字段描述', colKey: 'columnComment', width: 160 },
   { title: '存储类型', colKey: 'dataType', minWidth: 120 },
@@ -120,4 +128,12 @@ const { data: dictTypes, pending } = useRequest(getSimpleDictTypeList, { immedia
 const tableAffixProps = computed<TableProps['headerAffixedTop']>(() => ({
   container: '#fux-app-scroll-container',
 }))
+const onDragSort: TableProps['onDragSort'] = (params) => {
+  model.value = params.newData.map((item, index) => {
+    return {
+      ...item,
+      ordinalPosition: index,
+    }
+  })
+};
 </script>

@@ -10,20 +10,23 @@ const [titleLevels, professionalFields] = useDict('personal_title_level', 'tec_f
 </script>
 
 <template>
-  <div v-for="item in data" :key="item.id">
-    <TDescriptions bordered :label-style="{ width: '140px' }">
-      <TDescriptionsItem label="职称名称">{{ item.titleName }}</TDescriptionsItem>
-      <TDescriptionsItem label="职称等级">
-        <DictTag :dict-data="titleLevels" :value="item.titleLevel" />
-      </TDescriptionsItem>
-      <TDescriptionsItem label="专业领域">
-        <DictTag :dict-data="professionalFields" :value="item.professionalField" />
-      </TDescriptionsItem>
-      <TDescriptionsItem label="资格名称">{{ item.qualificationName }}</TDescriptionsItem>
-      <TDescriptionsItem label="证书编号">{{ item.certificateNo }}</TDescriptionsItem>
-      <TDescriptionsItem label="获得时间">
-        {{ dayjs(item.obtainDate).format('YYYY-MM-DD') }}
-      </TDescriptionsItem>
-    </TDescriptions>
-  </div>
+  <template v-if="data && data.length > 0">
+    <div v-for="item in data" :key="item.id" class="my-4">
+      <TDescriptions bordered :label-style="{ width: '140px' }">
+        <TDescriptionsItem label="职称名称">{{ item.titleName }}</TDescriptionsItem>
+        <TDescriptionsItem label="职称等级">
+          <DictTag :dict-data="titleLevels" :value="item.titleLevel" />
+        </TDescriptionsItem>
+        <TDescriptionsItem label="专业领域">
+          <DictTag :dict-data="professionalFields" :value="item.professionalField" />
+        </TDescriptionsItem>
+        <TDescriptionsItem label="资格名称">{{ item.qualificationName }}</TDescriptionsItem>
+        <TDescriptionsItem label="证书编号">{{ item.certificateNo }}</TDescriptionsItem>
+        <TDescriptionsItem label="获得时间">
+          {{ dayjs(item.obtainDate).format('YYYY-MM-DD') }}
+        </TDescriptionsItem>
+      </TDescriptions>
+    </div>
+  </template>
+  <TEmpty class="!my-4" v-else />
 </template>
