@@ -5,6 +5,7 @@ import { columns, useTable } from './use-table'
 import Form from './form.vue'
 import { getSimpleChannelList } from '@/api/system/sms/channel'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
+import TestSendForm from "./test-send-form.vue";
 
 const { permission } = usePermission()
 const [statusOpts, smsTypeOpts, smsChannelOpts] = useDict(
@@ -17,13 +18,16 @@ const expanded = ref(false)
 
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
+const testSendFormRef = useTemplateRef<InstanceType<typeof TestSendForm>>('testSendFormRef')
+
+const route = useRoute()
+const sourceType = route.query?.sourceType || ''
 
 const { data: channelList } = useRequest(getSimpleChannelList, {
   immediate: true,
 })
 
-const { query, data, pending, execute, pagination, onPageChange, onQueryChange, onDelete } =
-  useTable(queryForm)
+const { query, data, pending, execute, pagination, onPageChange, onQueryChange, onDelete } = useTable(queryForm)
 
 defineOptions({ name: 'SystemSmsTemplate' })
 </script>
@@ -153,10 +157,24 @@ defineOptions({ name: 'SystemSmsTemplate' })
                 </TButton>
               </TPopconfirm>
             </TTooltip>
+            <TDropdown>
+              <TButton shape="square" theme="primary" variant="text">
+                <template #icon>
+                  <Icon name="unfold-more" />
+                </template>
+              </TButton>
+              <TDropdownMenu>
+                <TDropdownItem @click="testSendFormRef?.open(row)">
+                  发送测试
+                </TDropdownItem>
+              </TDropdownMenu>
+            </TDropdown>
           </div>
         </template>
       </TTable>
     </TCard>
     <Form ref="formRef" :channel-list="channelList" @success="execute()" />
+    <!-- 发送测试短信 -->
+    <TestSendForm ref="testSendFormRef" @success="execute" />
   </div>
 </template>

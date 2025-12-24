@@ -14,10 +14,14 @@ export const columns: TableProps['columns'] = [
 
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   const message = useMessage()
+  const route = useRoute()
+
+  const sourceType = route.query?.sourceType || ""
 
   const query = ref<ListQueryParams>({
     pageNo: 1,
     pageSize: 10,
+    sourceType: sourceType as string,
     createTime: [],
   })
 
