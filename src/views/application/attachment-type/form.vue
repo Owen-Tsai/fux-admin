@@ -28,7 +28,7 @@ const rules: FormProps['rules'] = {
   moduleName: [{ required: true, message: '请输入附件类型编码' }],
   allowedFileTypes: [
     { required: true, message: '请输入允许上传的文件类型' },
-    { min: 1, message: '请输入允许上传的文件类型' },
+    { validator: (v: string[]) => v.length > 0, message: '请输入允许上传的文件类型' },
   ],
   isLib: [{ required: true, message: '请选择是否从附件库中选取' }],
 }
