@@ -59,7 +59,7 @@
                   </TCol>
                   <TCol :span="6">
                     <TFormItem
-                      v-if="state.conclusion === 'RETURN'"
+                      v-if="state.conclusion === 3"
                       label="退回到"
                       name="rtnToTaskKey"
                     >
