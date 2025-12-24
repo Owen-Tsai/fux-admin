@@ -33,7 +33,7 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
   }
 
   const state = ref<{
-    conclusion?: number
+    conclusion?: string
     reason?: string
     rtnToTaskKey?: string
     fields?: Record<string, any>
@@ -90,13 +90,13 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
       const res = await formRef.value?.validate()
       if (res === true) {
         switch (state.value.conclusion) {
-          case 1:
+          case '1':
             await onApprove()
             break
-          case 2:
+          case '2':
             await onReject()
             break
-          case 3:
+          case '3':
             await onReturn()
             break
         }
