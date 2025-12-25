@@ -49,7 +49,7 @@ const load = async () => {
   if (!isProd.value) return
   if (!appId || !planId?.value || !applyId) return
   loading.value = true
-  uploadList.value = await getUploadList(appId, planId.value, applyId)
+  uploadList.value = await getUploadList(appId, planId.value, applyId.value)
   loading.value = false
 }
 

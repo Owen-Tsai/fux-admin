@@ -11,7 +11,7 @@ import type { AppSchema } from '@fusionx/core/types'
 const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => {
   const { params, query } = useRoute()
   const appId = params.appId as string
-  const applyId = query.applyId as string
+  const applyId = ref<string>((query.applyId as string) || '')
   const taskId = query.taskId as string
   const processId = query.processInstanceId as string
 
@@ -27,7 +27,7 @@ const useData = (fuxRenderer: Ref<InstanceType<typeof FormRenderer> | null>) => 
   useBusinessCtxProvide({ appId, planId, applyId })
 
   const loadApplyDetail = async () => {
-    const res = await getApplyDetail(appId, applyId)
+    const res = await getApplyDetail(appId, applyId.value)
     const taskInfo = await getTaskInfo(processId, taskId)
     appSchema.value = JSON.parse(res.schema)
     formData.value = res.data
