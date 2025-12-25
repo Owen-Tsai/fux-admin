@@ -90,13 +90,13 @@ const useAudit = (formRef: Ref<FormInstanceFunctions | null>) => {
       const res = await formRef.value?.validate()
       if (res === true) {
         switch (state.value.conclusion) {
-          case '1':
+          case 'APPROVE':
             await onApprove()
             break
-          case '2':
+          case 'REJECT':
             await onReject()
             break
-          case '3':
+          case 'RETURN':
             await onReturn()
             break
         }
