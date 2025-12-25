@@ -86,7 +86,7 @@ defineOptions({ name: 'SystemIPManagement' })
               @click="exportData()"
             >
               <template #icon>
-                <Icon name="file-export" />
+                <Icon name="download" />
               </template>
             </TButton>
           </TTooltip>

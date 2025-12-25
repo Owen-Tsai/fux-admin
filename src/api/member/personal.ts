@@ -121,12 +121,12 @@ export const getDetail = (id: string) => {
   })
 }
 
-export const setEnabled = (id: string, isEnabled: boolean) => {
+export const setEnabled = (id: string, status: number) => {
   return request.put({
     url: `${prefix}/update-talent-status`,
     data: {
       id,
-      isenable: isEnabled,
+      status,
     },
   })
 }

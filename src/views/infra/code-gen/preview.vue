@@ -6,6 +6,7 @@
     class="code-gen-preview-modal"
   >
     <template #footer>
+      <TButton variant="outline" @click="copyCode">复制代码</TButton>
       <TButton @click="visible = false">关闭</TButton>
     </template>
 
@@ -46,6 +47,7 @@ import highlight from '@/utils/highlighter'
 import { last } from 'lodash-es'
 
 const visible = defineModel<boolean>('visible')
+const message = useMessage()
 
 type FileNode = {
   value: string
@@ -168,6 +170,21 @@ const loadData = async (id: number) => {
 const open = (id: number) => {
   visible.value = true
   loadData(id)
+}
+
+/** 复制 **/
+const copyCode = async () => {
+  const entry = data.value?.find((e) => e.filePath === actived.value[0])
+  if (!entry) return ''
+  const { copy, copied, isSupported } = useClipboard({ source: entry.code })
+  if (!isSupported) {
+    message.error('复制失败')
+    return
+  }
+  await copy()
+  if (unref(copied)) {
+    message.success('复制成功')
+  }
 }
 
 defineExpose({ open })
