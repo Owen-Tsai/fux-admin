@@ -158,7 +158,8 @@ defineOptions({ name: 'MemberPersonal' })
           <TSwitch
             v-model:value="row.isenable"
             :label="['允许', '禁止']"
-            @change="(v) => onSetEnable(row.id!, v as boolean)"
+            :custom-value="[0, 1]"
+            @change="(v) => onSetEnable(row.id!, v as number)"
           />
         </template>
         <template #createTime="{ row }">
