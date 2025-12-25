@@ -5,6 +5,7 @@ import { useTable, columns } from './use-table'
 import Form from './form.vue'
 import { type DeptVO } from '@/api/system/dept'
 import type { FormInstanceFunctions, EnhancedTableInstanceFunctions } from 'tdesign-vue-next'
+import { getUnitSimpleList } from '@/api/system/unit'
 
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
@@ -13,8 +14,8 @@ const tableRef = useTemplateRef<EnhancedTableInstanceFunctions>('tableRef')
 const [statusOpts] = useDict('common_status')
 
 const { permission } = usePermission()
-const { query, onQueryChange, data, execute, onDelete, userList, pending } = useTable(queryForm)
-
+const { query, onQueryChange, data, execute, onDelete, userList, pending,unitTreeList,regionList } = useTable(queryForm)
+const { data: unitList } = useRequest(getUnitSimpleList, { immediate: true })
 const [tableExpanded, toggle] = useToggle(true)
 
 const toggleTableExpanded = () => {
@@ -92,6 +93,9 @@ defineOptions({ name: 'SystemDept' })
         :loading="pending"
         :key="pending + ''"
       >
+        <template #unitId="{ row }: TableScope<DeptVO>">
+          {{ unitList?.find((item) => item.id === row.unitId)?.name }}
+        </template>
         <template #leaderUserId="{ row }: TableScope<DeptVO>">
           {{ userList?.find((e) => e.id === row.leaderUserId)?.nickname }}
         </template>
@@ -128,6 +132,6 @@ defineOptions({ name: 'SystemDept' })
       </TEnhancedTable>
     </TCard>
 
-    <Form ref="formRef" :tree-data="data" :user-data="userList" @success="execute()" />
+    <Form ref="formRef" :tree-data="data" :user-data="userList" :unit-data="unitTreeList" :region-data="regionList" @success="execute()" />
   </div>
 </template>

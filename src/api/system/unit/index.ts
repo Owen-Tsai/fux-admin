@@ -74,3 +74,9 @@ export const exportUnit = (params?: ListQueryParams) => {
     })
 }
 
+export const getUnitSimpleList = () => {
+  return request.get<Pick<UnitVO, 'id' | 'name' | 'shortName'>[]>({
+    url: `${prefix}/list-all-simple`,
+  })
+}
+

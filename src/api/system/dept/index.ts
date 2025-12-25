@@ -26,8 +26,14 @@ export type DeptVO = {
   provinceName?: string
   cityName?: string
   countyName?: string
+  unitId?: number
 }
 
+export type RegionTreeNode = {
+  key: number
+  title: string
+  children?: RegionTreeNode[]
+}
 export type TreeQueryParams = {
   name?: string
   status?: number
@@ -35,6 +41,7 @@ export type TreeQueryParams = {
 }
 
 const prefix = '/system/dept'
+const regionPrefix = '/system/area'
 
 // 部门接口
 export const getDeptTree = (params?: TreeQueryParams) => {
@@ -85,7 +92,10 @@ export const getTopRegions = () => {
 
 export const getChildrenRegions = (parentId: string) => {
   return request.get<RegionTreeNode[]>({
-    url: `${regionPrefix}/children/${parentId}`,
+    params: {
+      pid: parentId
+    },
+    url: `${regionPrefix}/tree-list-all-int`,
   })
 }
 

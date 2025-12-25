@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormInstanceFunctions, TreeSelectProps, FormProps } from 'tdesign-vue-next'
+import type { FormInstanceFunctions, TreeSelectProps, FormProps,CascaderProps } from 'tdesign-vue-next'
 import { getDeptDetail, createDept, updateDept, type DeptVO } from '@/api/system/dept'
 import useDict from '@/hooks/use-dict'
 import type { SimpleUserListVO } from '@/api/system/user'
@@ -10,13 +10,16 @@ const message = useMessage()
 const [commonStatus] = useDict('common_status')
 
 const rules = ref<FormProps['rules']>({
+  unitId: [{ required: true, message: '请选择所属单位' }],
   name: [{ required: true, message: '请输入部门名称' }],
   // 可根据需要添加地区验证规则
 })
 
-const { treeData, userData } = defineProps<{
+const { treeData, userData,unitData,regionData } = defineProps<{
   treeData?: TreeSelectProps['data']
   userData?: SimpleUserListVO
+  unitData?: TreeSelectProps['data']
+  regionData?: CascaderProps['options']
 }>()
 
 const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
@@ -95,6 +98,7 @@ const open = async (id?: number) => {
       sort: 0,
       status: 0,
       region: [],
+      unitId: undefined,
     }
   }
 
@@ -114,6 +118,18 @@ defineExpose({ open })
   >
     <TLoading :loading="loading">
       <TForm ref="formRef" :data="formData" :rules="rules" :label-width="88">
+        <TFormItem
+          v-show="formData.unitId !== 0 || mode === 'create'"
+          label="所属单位"
+          name="unitId"
+        >
+          <TTreeSelect
+            v-model:value="formData.unitId"
+            filterable
+            :keys="{ label: 'name', value: 'id' }"
+            :data="unitData"
+          />
+        </TFormItem>
         <TFormItem
           v-show="formData.parentId !== 0 || mode === 'create'"
           label="上级部门"
@@ -136,6 +152,15 @@ defineExpose({ open })
             :keys="{ label: 'nickname', value: 'id' }"
             placeholder="请输入用户名称进行过滤"
             filterable
+          />
+        </TFormItem>
+        <TFormItem label="所属区域">
+          <TCascader
+            v-model:value="formData.region"
+            :options="regionData"
+            value-type="full"
+            :keys="{ label: 'name', value: 'code' }"
+            placeholder="请选择所属区域"
           />
         </TFormItem>
         <TFormItem label="联系电话" name="phone">

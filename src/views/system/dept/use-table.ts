@@ -1,9 +1,11 @@
 import type { TableProps, FormInstanceFunctions } from 'tdesign-vue-next'
-import { getDeptTree, deleteDept, type TreeQueryParams } from '@/api/system/dept'
+import { getDeptTree, deleteDept,getChildrenRegions, type TreeQueryParams } from '@/api/system/dept'
 import { getSimpleUserList } from '@/api/system/user'
+import { getUnitTree } from '@/api/system/unit'
 
 export const columns: TableProps['columns'] = [
   { colKey: 'name', title: '部门名称' },
+  { colKey: 'unitId', title: '所属单位' },
   { colKey: 'leaderUserId', title: '负责人' },
   { colKey: 'sort', title: '排序' },
   { colKey: 'status', title: '状态' },
@@ -26,6 +28,12 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     immediate: true,
   })
 
+  const { data: unitTreeList, execute: getUnit } = useRequest(getUnitTree, {
+    immediate: true,
+  })
+  const { data: regionList, execute: getRegions } = useRequest(()=> getChildrenRegions('1'), {
+    immediate: true,
+  })
   const onQueryChange = (reset?: boolean) => {
     if (reset) {
       formRef.value?.reset({ type: 'initial' })
@@ -49,5 +57,7 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     onDelete,
     userList,
     getUserList,
+    unitTreeList,
+    regionList,
   }
 }
