@@ -48,10 +48,10 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     execute()
   }
 
-  const onSetEnable = async (id: string, enabled: boolean) => {
+  const onSetEnable = async (id: string, status: number) => {
     pending.value = true
     try {
-      await setEnabled(id, enabled)
+      await setEnabled(id, status)
       message.success('操作成功')
       execute()
     } catch (error) {

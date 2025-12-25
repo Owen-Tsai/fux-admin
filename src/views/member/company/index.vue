@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
 import { columns, useTable } from './use-table'
 import Detail from './detail.vue'
-import { exportExcel, type ProfileVO } from '@/api/member/company'
+import { exportExcel } from '@/api/member/company'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
 const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
@@ -11,13 +10,7 @@ const dialogRef = useTemplateRef('dialogRef')
 const { permission } = usePermission()
 const exporting = ref(false)
 
-const [YES_NO, ORG_TYPE, TEC_FIELD, COMPANY_NATURE, SCALE_SIZE] = useDict(
-  'yes_no',
-  'org_type',
-  'tec_field',
-  'company_nature',
-  'scale_size',
-)
+const [ORG_TYPE, COMPANY_NATURE, SCALE_SIZE] = useDict('org_type', 'company_nature', 'scale_size')
 
 const { data, pending, execute, query, onQueryChange, pagination, onPageChange, onSetEnable } =
   useTable(queryForm)
@@ -93,7 +86,7 @@ defineOptions({ name: 'MemberPersonal' })
               @click="onExport()"
             >
               <template #icon>
-                <Icon name="file-export" />
+                <Icon name="download" />
               </template>
             </TButton>
           </TTooltip>
@@ -131,7 +124,8 @@ defineOptions({ name: 'MemberPersonal' })
           <TSwitch
             v-model:value="row.isenable"
             :label="['允许', '禁止']"
-            @change="(v) => onSetEnable(row.id!, v as boolean)"
+            :custom-value="[0, 1]"
+            @change="(v) => onSetEnable(row.id!, v as number)"
           />
         </template>
         <template #actions="{ row }">

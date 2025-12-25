@@ -91,12 +91,12 @@ export const getDetail = (id: string) => {
   })
 }
 
-export const setEnabled = (id: string, isEnabled: boolean) => {
+export const setEnabled = (id: string, status: number) => {
   return request.put({
     url: `${prefix}/update-unit-status`,
     data: {
       id,
-      status: isEnabled,
+      status,
     },
   })
 }
