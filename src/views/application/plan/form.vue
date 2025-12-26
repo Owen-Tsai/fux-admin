@@ -110,9 +110,9 @@ defineExpose({ open })
           filterable
         />
       </TFormItem>
-      <TFormItem label="所需附件" name="fjfl" help="可在附件管理中设置附件类别">
+      <TFormItem label="所需附件" name="attachmentTypeIds" help="可在附件管理中设置附件类别">
         <TSelect
-          v-model:value="formData.fjfl"
+          v-model:value="formData.attachmentTypeIds"
           multiple
           :options="attachmentTypes"
           :keys="{ label: 'name', value: 'id' }"
