@@ -1,7 +1,7 @@
 import type { DictDataEntry } from '@/api/system/dict/data'
 
 export default defineStore('dict', () => {
-  const dictCache = ref<Map<string, DictDataEntry[]>>()
+  const dictCache = ref<Map<string, DictDataEntry[]>>(new Map())
 
   const getDict = (type: string) => {
     return dictCache.value?.get(type)
