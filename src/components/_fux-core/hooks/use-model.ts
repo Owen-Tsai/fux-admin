@@ -3,6 +3,8 @@ import { get, set } from 'lodash-es'
 import { emitter, eventKeys, parseExpression } from '@fusionx/core/utils'
 import type { FormWidget } from '../types'
 
+const isArrayString = (str: string) => str.startsWith('[') && str.endsWith(']')
+
 export const useModel = (widget: FormWidget) => {
   const nestedModelCtx = useFuxNestedModelCtxInject()
   const ctx = useRendererCtxInject()
@@ -15,10 +17,20 @@ export const useModel = (widget: FormWidget) => {
       if (!formData || !formData.value || ret === undefined || ret === null) {
         return widget.type === 'dateRangePicker' || widget.type === 'checkbox' ? [] : undefined
       }
+      if (typeof ret === 'string' && isArrayString(ret)) {
+        try {
+          return JSON.parse(ret)
+        } catch {
+          return ret
+        }
+      }
       return ret
     },
     set: (val) => {
       if (!formData?.value) return
+      if (Array.isArray(val)) {
+        val = JSON.stringify(val)
+      }
       set(formData.value, key, val)
     },
   })

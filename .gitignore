@@ -31,4 +31,4 @@ coverage
 auto-imports.d.ts
 components.d.ts
 
-__demo/*
+**/__demo

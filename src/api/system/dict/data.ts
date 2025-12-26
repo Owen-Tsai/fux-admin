@@ -15,7 +15,7 @@ export type DictDataItemVO = {
 }
 
 export type DictDataEntry = Omit<DictDataItemVO, 'value'> & {
-  value: number | string
+  value: number | string | boolean
 }
 
 export type DictDataVO = Array<DictDataItemVO>

@@ -53,6 +53,13 @@
         :keys="{ label: 'name', value: 'type' }"
         placeholder="请选择字典类型"
       />
+      <TSelect
+        v-model:value="options.valueType"
+        :options="valueTypeOpts"
+        clearable
+        placeholder="将字典的值转换为..."
+        class="mt-4"
+      />
     </template>
 
     <template v-if="options.type === 'expression'">
@@ -86,6 +93,12 @@ const optionOpts = [
   { label: '静态', value: 'static' },
   { label: '字典', value: 'dict' },
   { label: '表达式', value: 'expression' },
+]
+
+const valueTypeOpts = [
+  { label: '字符串', value: 'string' },
+  { label: '数字', value: 'number' },
+  { label: '布尔值', value: 'boolean' },
 ]
 
 const ctx = useDesignerCtxInject()
