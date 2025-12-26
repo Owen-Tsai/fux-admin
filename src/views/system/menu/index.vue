@@ -110,6 +110,7 @@ defineOptions({ name: 'SystemMenu' })
             :loading="pending"
             :height="height"
             :scroll="{ type: 'virtual' }"
+            :hover="true"
           >
             <template #type="{ row }: TableScope<MenuVO>">
               <TTag theme="primary" variant="light-outline">
