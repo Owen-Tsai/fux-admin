@@ -28,7 +28,9 @@ export type OptionSourceEnum = 'static' | 'dict' | 'expression'
 
 export type OptionOf<T, OST = OptionSourceEnum> = OST extends 'static'
   ? { type?: 'static'; value?: T }
-  : { type?: 'expression' | 'dict'; value?: string }
+  : OST extends 'dict'
+    ? { type?: 'dict'; value?: string; valueType?: 'number' | 'string' | 'boolean' }
+    : { type?: 'expression'; value?: string }
 
 export type JsonOption = {
   type?: 'static' | 'expression'

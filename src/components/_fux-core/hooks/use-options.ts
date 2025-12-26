@@ -39,7 +39,18 @@ export const useRecordOptions = <
     }
   } else if (optionsProp?.type === 'dict') {
     if (optionsProp.value && ctx && ctx.mode !== 'dev') {
-      dictData.value = useDict(optionsProp.value)[0]
+      if (optionsProp.valueType) {
+        dictData.value = useDict(
+          {
+            [`${optionsProp.value}`]: {
+              valueType: optionsProp.valueType,
+            },
+          },
+          optionsProp.value,
+        )[0]
+      } else {
+        dictData.value = useDict(optionsProp.value)[0]
+      }
     }
   } else if (optionsProp?.type === 'expression') {
     if (optionsProp.value && ctx && ctx.mode !== 'dev') {
