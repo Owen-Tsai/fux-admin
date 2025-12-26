@@ -1,26 +1,26 @@
 import type { DictDataEntry } from '@/api/system/dict/data'
 
 export default defineStore('dict', () => {
-  const dict = ref<Map<string, DictDataEntry[]>>(new Map())
+  const dictCache = ref<Map<string, DictDataEntry[]>>()
 
   const getDict = (type: string) => {
-    return dict.value?.get(type)
+    return dictCache.value?.get(type)
   }
 
   const setDict = (type: string, entries: DictDataEntry[]) => {
-    dict.value?.set(type, entries)
+    dictCache.value?.set(type, entries)
   }
 
   const deleteDict = (type: string) => {
-    dict.value?.delete(type)
+    dictCache.value?.delete(type)
   }
 
   const clearDict = () => {
-    dict.value?.clear()
+    dictCache.value?.clear()
   }
 
   return {
-    dict,
+    dictCache,
     getDict,
     setDict,
     deleteDict,
