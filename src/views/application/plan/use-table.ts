@@ -26,7 +26,7 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
     endTime: [],
     pageNo: 1,
     pageSize: 10,
-    appId: route.query?.appId as string || "",
+    appId: route.query?.appId as string || route.query?.appId as string || "",
   })
 
   const message = useMessage()
