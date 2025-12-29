@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import {
   getAttachmentTypeDetail,
   createAttachmentType,
@@ -8,8 +9,10 @@ import {
 import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
 
 const message = useMessage()
+const route = useRoute()
+const routeAppId = ref<string>(route.query?.appId as string || '')
 
-const [attachmentLibTypeOpts] = useDict('attach_lib_type')
+const [ attachmentLibTypeOpts ] = useDict('attach_lib_type')
 
 const mode = ref<'create' | 'update'>('create')
 const visible = ref(false)
@@ -18,11 +21,13 @@ const emit = defineEmits(['success'])
 const formRef = useTemplateRef<FormInstanceFunctions>('formRef')
 
 const loading = ref(false)
-const formData = ref<AttachmentTypeVO>({
+const defaultData: AttachmentTypeVO = {
   required: false,
   isLib: false,
   allowedFileTypes: [],
-})
+  appId: routeAppId.value,
+}
+const formData = ref<AttachmentTypeVO>({ ...defaultData })
 
 const rules: FormProps['rules'] = {
   name: [{ required: true, message: '请输入附件类型名称' }],
@@ -63,6 +68,7 @@ const loadData = async (id: string) => {
 
 const open = (id?: string) => {
   formRef.value?.reset({ type: 'initial' })
+  formData.value = { ...defaultData }
   formData.value.id = undefined
   formData.value.createTime = undefined
   mode.value = 'create'
@@ -71,7 +77,6 @@ const open = (id?: string) => {
     loadData(id)
     mode.value = 'update'
   }
-
   visible.value = true
 }
 
@@ -81,6 +86,70 @@ const onIsLibChange = (v: boolean) => {
   }
 }
 
+
+interface CustomOptionInfo {
+  group?: string;
+  divider?: boolean;
+  label?: string;
+  value?: string;
+  children?: CustomOptionInfo[];
+}
+
+const canSelectTypeSuffix = ref<CustomOptionInfo[]>( [
+  {
+    group: "图片",
+    children: [
+      { label: 'jpeg', value: 'jpeg' },
+      { label: 'png', value: 'png' },
+    ],
+  },
+  {
+    group: '文档',
+    children: [
+      { label: 'doc', value: 'doc' },
+      { label: 'docx', value: 'docx' },
+      { label: 'xls', value: 'xls' },
+      { label: 'xlsx', value: 'xlsx' },
+      { label: 'ppt', value: 'ppt' },
+      { label: 'pptx', value: 'pptx' },
+      { label: 'txt', value: 'txt' }
+    ],
+  },
+  {
+    group: '压缩文件',
+    divider: true,
+    children: [
+      { label: 'zip', value: 'zip' },
+      { label: 'rar', value: 'rar' }
+    ]
+  },
+  {
+    group: '其他类型',
+    divider: true,
+    children: [
+    ]
+  }
+])
+const editOrCreate = ref('create');
+const newOption = ref('');
+
+const onAdd = () => {
+  editOrCreate.value = 'edit';
+};
+const onAddConfirm = () => {
+  canSelectTypeSuffix.value.push({ label: newOption.value, value: newOption.value });
+  newOption.value = '';
+  editOrCreate.value = 'create';
+};
+const onAddCancel = () => {
+  editOrCreate.value = 'create';
+};
+const createOptions = (val: string) => {
+  canSelectTypeSuffix.value.push({
+    label: `${val}`,
+    value: val,
+  });
+};
 defineExpose({ open })
 </script>
 
@@ -101,11 +170,24 @@ defineExpose({ open })
       <TFormItem
         label="允许的文件类型"
         name="allowedFileTypes"
-        help="输入文件后缀，按下 Enter 键可添加多个"
+        help="支持手动文件后缀"
       >
-        <TTagInput v-model:value="formData.allowedFileTypes" placeholder="如：pdf" />
+        <t-select v-model="formData.allowedFileTypes" :options="canSelectTypeSuffix" placeholder="请选择文件类型" clearable multiple>
+          <!--<t-option v-for="item in canSelectTypeSuffix" :key="item.value" :value="item.value" :label="item.label"></t-option>-->
+          <!-- 自定义底部内容 -->
+          <template #panelBottomContent>
+            <div class="select-panel-footer">
+              <t-button v-if="editOrCreate === 'create'" theme="primary" variant="text" block @click="onAdd">新增选项</t-button>
+              <div v-else>
+                <t-input v-model="newOption" autofocus></t-input>
+                <t-button size="small" style="margin-top: 8px" @click="onAddConfirm"> 确认 </t-button>
+                <t-button theme="default" size="small" style="margin-top: 8px; margin-left: 8px" @click="onAddCancel"> 取消 </t-button>
+              </div>
+            </div>
+          </template>
+        </t-select>
       </TFormItem>
-      <TFormItem label="最大文件大小" name="maxFileSize">
+      <TFormItem label="文件大小" name="maxFileSize">
         <TInputNumber v-model:value="formData.maxFileSize" :min="0" suffix="MB" />
       </TFormItem>
       <TFormItem label="是否必需" name="required">

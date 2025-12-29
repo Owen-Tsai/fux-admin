@@ -11,6 +11,7 @@ export type PlanVO = {
   flow?: string
   attachmentTypeIds?: string[]
   appName?: string
+  sourceType?: string
 }
 
 export type ListQueryParams = {
@@ -19,6 +20,7 @@ export type ListQueryParams = {
   startTime?: string[]
   endTime?: string[]
   daily?: boolean
+  sourceType?: string
 } & CommonQueryParams
 
 const url = '/system/apply-plan'

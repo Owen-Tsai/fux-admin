@@ -14,8 +14,7 @@ const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
 const { permission } = usePermission()
 const expanded = ref(false)
 
-const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pending, query } =
-  useTable(queryForm)
+const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pending, query } = useTable(queryForm)
 
 const { data: appList } = useRequest(getApplicationSimpleList, { immediate: true })
 

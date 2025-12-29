@@ -10,11 +10,15 @@ export type AttachmentTypeVO = {
   isLib?: boolean
   libType?: string
   createTime?: string
+  sourceType?: string
+  appId?: string
 }
 
 export type ListQueryParams = {
   name?: string
   moduleName?: string
+  sourceType?: string
+  appId?: string
 } & CommonQueryParams
 
 const prefix = '/attach/type'
@@ -71,5 +75,14 @@ export const getAttachmentTypeDetail = async (id: string) => {
 export const getAttachmentTypeSimpleList = () => {
   return request.get<AttachmentTypeVO[]>({
     url: `${prefix}/list-all-simple`,
+  })
+}
+
+export const getCanSelectAttachTypeListByAppId = (appId: string) => {
+  return request.get<AttachmentTypeVO[]>({
+    url: `${prefix}/get_can_select_attach_type_by_app_id`,
+    params: {
+      appId,
+    },
   })
 }

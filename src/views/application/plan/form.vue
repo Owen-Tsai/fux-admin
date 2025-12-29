@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { getPlanDetail, createPlan, updatePlan, type PlanVO } from '@/api/app/plan'
-import { getAttachmentTypeSimpleList } from '@/api/app/attachment'
 import type { AppVO } from '@/api/app/app'
 import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
+import {getCanSelectAttachTypeListByAppId} from "@/api/app/attachment.ts";
+
+const route = useRoute()
+const routeAppId = ref<string>(route.query?.appId as string || '')
 
 const { appList } = defineProps<{
   appList?: AppVO[]
 }>()
 
-const { data: attachmentTypes, pending } = useRequest(getAttachmentTypeSimpleList, {
+const { data: attachmentTypes, pending } = useRequest(() => getCanSelectAttachTypeListByAppId(routeAppId.value), {
   immediate: true,
 })
 
@@ -25,6 +28,7 @@ const defaultData: PlanVO = {
   daily: false,
   startTime: undefined,
   endTime: undefined,
+  appId: routeAppId.value,
 }
 const formData = ref<PlanVO>({ ...defaultData })
 
@@ -108,6 +112,7 @@ defineExpose({ open })
           :options="appList"
           :keys="{ label: 'name', value: 'id' }"
           filterable
+          :disabled="routeAppId !== ''"
         />
       </TFormItem>
       <TFormItem label="所需附件" name="attachmentTypeIds" help="可在附件管理中设置附件类别">

@@ -4,7 +4,7 @@ import type { FormInstanceFunctions, TableProps } from 'tdesign-vue-next'
 
 export const columns: TableProps['columns'] = [
   { title: '计划名称', colKey: 'item', ellipsis: true },
-  { title: '所属应用', colKey: 'appId', ellipsis: true },
+  { title: '关联应用', colKey: 'appId', ellipsis: true },
   {
     title: '开始时间',
     width: 180,
@@ -19,11 +19,14 @@ export const columns: TableProps['columns'] = [
 ]
 
 export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
+  const route = useRoute()
+
   const query = ref<ListQueryParams>({
     createTime: [],
     endTime: [],
     pageNo: 1,
     pageSize: 10,
+    appId: route.query?.appId as string || "",
   })
 
   const message = useMessage()

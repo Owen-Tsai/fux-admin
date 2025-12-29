@@ -9,16 +9,16 @@ const queryForm = useTemplateRef<FormInstanceFunctions>('queryForm')
 const formRef = useTemplateRef<InstanceType<typeof Form>>('formRef')
 
 const { permission } = usePermission()
+const routeAppId = useRoute().query?.appId || ''
 
-const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pending, query } =
-  useTable(queryForm)
+const { data, execute, onDelete, onPageChange, onQueryChange, pagination, pending, query } = useTable(queryForm)
 
 defineOptions({ name: 'AttachmentType' })
 </script>
 
 <template>
   <div class="view">
-    <TCard v-if="permission.has('app:attachment-type:query')" class="query-form !mb-4">
+    <TCard v-if="permission.has('attachtype:attach-type:query')" class="query-form !mb-4">
       <TForm
         ref="queryForm"
         :data="query"
@@ -42,7 +42,7 @@ defineOptions({ name: 'AttachmentType' })
       <template #actions>
         <div class="flex items-center gap-2">
           <TButton
-            v-if="permission.has('app:attachment-type:create')"
+            v-if="permission.has('attachtype:attach-type:create')"
             theme="primary"
             @click="formRef?.open()"
           >
@@ -69,6 +69,9 @@ defineOptions({ name: 'AttachmentType' })
         :loading="pending"
         @page-change="onPageChange"
       >
+        <template #name="{ row }">
+          {{ row.name }}
+        </template>
         <template #maxFileSize="{ row }">{{ row.maxFileSize / 1024 / 1024 }} MB</template>
         <template #required="{ row }">
           <TTag v-if="row.required" theme="danger" variant="light-outline">必需</TTag>
@@ -84,17 +87,14 @@ defineOptions({ name: 'AttachmentType' })
             </TTooltip>
           </div>
         </template>
-        <template #createTime="{ row }">
-          {{ dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') }}
-        </template>
         <template #actions="{ row }">
           <div class="flex items-center gap-2">
-            <TTooltip content="编辑">
+            <TTooltip :content="row.appId ? '编辑' : '公共附件不允许编辑'" >
               <TButton
                 shape="square"
                 theme="primary"
                 variant="text"
-                :disabled="permission.hasNone('app:attachment-type:update')"
+                :disabled="permission.hasNone('attachtype:attach-type:update') || !row.appId"
                 @click="formRef?.open(row.id)"
               >
                 <template #icon>
@@ -102,7 +102,7 @@ defineOptions({ name: 'AttachmentType' })
                 </template>
               </TButton>
             </TTooltip>
-            <TTooltip content="删除">
+            <TTooltip :content="row.appId ? '删除' : '公共附件不允许删除'">
               <TPopconfirm
                 content="确定删除吗？该操作无法撤销"
                 theme="danger"
@@ -112,7 +112,7 @@ defineOptions({ name: 'AttachmentType' })
                   shape="square"
                   theme="danger"
                   variant="text"
-                  :disabled="permission.hasNone('app:attachment-type:delete')"
+                  :disabled="permission.hasNone('attachtype:attach-type:delete') || !row.appId"
                 >
                   <template #icon>
                     <Icon name="delete" />
