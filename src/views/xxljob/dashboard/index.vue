@@ -13,7 +13,7 @@
           <div class="chart-wrapper">
             <div class="flex-center">
               <t-radio-group v-model="selectRadio" variant="default-filled">
-                <t-radio-button value="pieChart" @Click="selectRadio = 'pieChart'">饼图</t-radio-button>
+                <t-radio-button value="pieChart" @Click="selectRadio = 'pieChart'">饼状图</t-radio-button>
                 <t-radio-button value="barChart" @Click="selectRadio = 'barChart'">柱状图</t-radio-button>
               </t-radio-group>
             </div>
