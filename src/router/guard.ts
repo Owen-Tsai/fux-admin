@@ -29,7 +29,7 @@ router.beforeEach((to, from, next) => {
           .then(() => {
             reloginHint.show = false
             userStore.routes?.forEach((record) => {
-              if (!record.path.includes('http')) {
+              if (!record.path.includes('http') && record.path !== '/business') {
                 if (
                   (!record.children || record.children?.length === 0) &&
                   record.meta?.parentId === 0 &&

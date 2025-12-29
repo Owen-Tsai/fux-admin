@@ -47,38 +47,45 @@ const commonRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        path: '/business/:appId/audit',
-        name: 'BusinessAuditList',
-        component: () => import('@/views/business/list/index.vue'),
-        meta: {
-          title: '待审核列表',
-          keepAlive: false,
-        },
-      },
-      {
-        path: '/business/:appId/audit/detail',
-        name: 'BusinessAuditDetail',
-        component: () => import('@/views/business/audit/index.vue'),
-        meta: {
-          title: '申报信息详情',
-          keepAlive: false,
-        },
-      },
-      {
-        path: '/business/:appId/plan',
-        name: 'BusinessPlanList',
-        component: () => import('@/views/application/plan/index.vue'),
-        meta: {
-          title: '申报计划列表',
-        },
-      },
-      {
-        path: '/business/:appId/attach',
-        name: 'BusinessAttachList',
-        component: () => import('@/views/application/attachment-type/index.vue'),
-        meta: {
-          title: '申报附件类型列表',
-        },
+        path: '/business',
+        name: 'BusinessRoot',
+        redirect: 'BusinessList',
+        children: [
+          {
+            path: ':appId/audit',
+            name: 'BusinessAuditList',
+            component: () => import('@/views/business/list/index.vue'),
+            meta: {
+              title: '待审核列表',
+              keepAlive: false,
+            },
+          },
+          {
+            path: ':appId/audit/detail',
+            name: 'BusinessAuditDetail',
+            component: () => import('@/views/business/audit/index.vue'),
+            meta: {
+              title: '申报信息详情',
+              keepAlive: false,
+            },
+          },
+          {
+            path: ':appId/plan',
+            name: 'BusinessPlanList',
+            component: () => import('@/views/application/plan/index.vue'),
+            meta: {
+              title: '申报计划列表',
+            },
+          },
+          {
+            path: ':appId/attach',
+            name: 'BusinessAttachList',
+            component: () => import('@/views/application/attachment-type/index.vue'),
+            meta: {
+              title: '申报附件类型列表',
+            },
+          },
+        ],
       },
       // {
       //   path: '/demo',
