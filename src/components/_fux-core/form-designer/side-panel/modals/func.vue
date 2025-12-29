@@ -30,7 +30,7 @@
               <TInput v-model="funcConfig[actived].name" />
             </TFormItem>
           </TForm>
-          <CodeEditor v-model="funcConfig[actived].body" :height="160" />
+          <CodeEditor v-model="funcConfig[actived].body" :height="240" />
         </template>
         <TEmpty
           v-else
@@ -58,12 +58,14 @@
 
 <script setup lang="ts">
 import { useDesignerCtxInject } from '@fusionx/core/hooks'
-import { generateId } from '@fusionx/core/utils'
+import { generateId, safeClone } from '@fusionx/core/utils'
+import type { FunctionConfig } from '@fusionx/core/types'
 
 const message = useMessage()
 
 const { appSchema } = useDesignerCtxInject()!
-const funcConfig = ref(appSchema.value.form.function || {})
+const funcConfig = ref<Record<string, FunctionConfig>>({})
+funcConfig.value = safeClone(appSchema.value.form.function) || {}
 
 const actived = ref<string>()
 
@@ -71,11 +73,10 @@ const visible = ref(false)
 
 const open = () => {
   visible.value = true
-  funcConfig.value = appSchema.value.form.function || {}
 }
 
 const save = () => {
-  appSchema.value.form.function = funcConfig.value
+  appSchema.value.form.function = safeClone(funcConfig.value)
   message.success('保存成功')
   visible.value = false
 }
