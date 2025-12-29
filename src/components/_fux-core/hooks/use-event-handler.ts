@@ -1,5 +1,5 @@
 import { safeEval } from '@fusionx/core/utils'
-import { useRendererCtxInject, useInstanceMethods, useLimitedRequest } from '.'
+import { useRendererCtxInject, useEvalContext } from '.'
 
 export const useEventHandlers = (eventMap?: Record<string, string>) => {
   const ctx = useRendererCtxInject()
@@ -7,22 +7,8 @@ export const useEventHandlers = (eventMap?: Record<string, string>) => {
     return
   }
 
-  const $message = useMessage()
-  const $dialog = useDialog()
-  const $request = useLimitedRequest()
-
-  const { $state, appSchema, formData, mode } = ctx
-
-  const evalContext = {
-    $func: useInstanceMethods(),
-    $values: formData.value,
-    $schema: appSchema.value,
-    $state: $state.value,
-    $mode: mode,
-    $request,
-    $message,
-    $dialog,
-  }
+  const { appSchema } = ctx
+  const evalContext = useEvalContext()
 
   const handler = (event: string) => {
     if (!eventMap) return

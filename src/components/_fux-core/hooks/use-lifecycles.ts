@@ -1,29 +1,16 @@
 import { useRendererCtxInject } from '@fusionx/core/hooks'
 import { emitter, LifecyclePhases, safeEval } from '@fusionx/core/utils'
-import { useInstanceMethods, useLimitedRequest } from '.'
+import { useEvalContext } from '.'
 
 export const useLifecycles = () => {
-  const { appSchema, mode, formData, $state } = useRendererCtxInject()!
+  const { appSchema, mode } = useRendererCtxInject()!
 
   if (mode === 'dev' || mode === 'preview') return
 
   if (!appSchema.value.form.lifecycle) return
   const { lifecycle, function: functions } = appSchema.value.form
 
-  const $message = useMessage()
-  const $dialog = useDialog()
-  const $request = useLimitedRequest()
-
-  const evalContext = {
-    $func: useInstanceMethods(),
-    $values: formData.value,
-    $schema: appSchema.value,
-    $state: $state.value,
-    $mode: mode,
-    $request,
-    $message,
-    $dialog,
-  }
+  const evalContext = useEvalContext()
 
   if (lifecycle.loaded) {
     const func = functions?.[lifecycle.loaded]
