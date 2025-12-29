@@ -1,5 +1,5 @@
 <template>
-  <TDialog v-model:visible="visible" header="API" width="800px">
+  <TDialog v-model:visible="visible" header="API" :close-on-overlay-click="false" width="800px">
     <div class="flex gap-6 items-start pr-1">
       <div class="w-1/4 min-w-0 max-h-400px">
         <Scrollbar>
@@ -35,8 +35,15 @@
             <TFormItem label="请求方法" name="method">
               <TRadioGroup v-model="apiConfig[actived].method" :options="methodOptions" />
             </TFormItem>
-            <TFormItem label="请求地址" name="url">
-              <TInput v-model="apiConfig[actived].url" />
+            <TFormItem
+              label="请求地址"
+              name="url"
+              help="从请求前缀开始填写，不要包含协议、主机名、端口号"
+            >
+              <TInput
+                v-model="apiConfig[actived].url"
+                placeholder="例：/personal-api/some-action/some-method"
+              />
             </TFormItem>
             <TFormItem label="请求参数" name="params">
               <CodeEditor v-model="apiConfig[actived].params" :height="160" />
@@ -69,13 +76,15 @@
 
 <script setup lang="ts">
 import { useDesignerCtxInject } from '@fusionx/core/hooks'
-import { generateId } from '@fusionx/core/utils'
+import { generateId, safeClone } from '@fusionx/core/utils'
+import type { APIConfig } from '@fusionx/core/types'
 import type { FormRules } from 'tdesign-vue-next'
 
 const message = useMessage()
 
 const { appSchema } = useDesignerCtxInject()!
-const apiConfig = ref(appSchema.value.form.api || {})
+const apiConfig = ref<Record<string, APIConfig>>({})
+apiConfig.value = appSchema.value.form.api ? safeClone(appSchema.value.form.api) : {}
 
 const actived = ref<string>()
 
@@ -101,7 +110,7 @@ const open = () => {
 }
 
 const save = () => {
-  appSchema.value.form.api = apiConfig.value
+  appSchema.value.form.api = safeClone(apiConfig.value)
   message.success('保存成功')
   visible.value = false
 }
