@@ -64,6 +64,30 @@ const commonRoutes: RouteRecordRaw[] = [
           keepAlive: false,
         },
       },
+      {
+        path: '/business/:appId/plan',
+        name: 'BusinessPlanList',
+        component: () => import('@/views/application/plan/index.vue'),
+        meta: {
+          title: '申报计划列表',
+        },
+      },
+      {
+        path: '/business/:appId/attach',
+        name: 'BusinessAttachList',
+        component: () => import('@/views/application/attachment-type/index.vue'),
+        meta: {
+          title: '申报附件类型列表',
+        },
+      },
+      // {
+      //   path: '/demo',
+      //   name: 'Demo',
+      //   component: () => import('@/views/__demo/index.vue'),
+      //   meta: {
+      //     title: '测试页面',
+      //   },
+      // },
     ],
   },
   {
