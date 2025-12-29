@@ -35,17 +35,17 @@ const initChart = () => {
 
   chart = echarts.init(chartRef.value, 'macarons')
   setOptions(props.chartData)
-
 }
 
 const setOptions = (data: PieChartData) => {
   if (!chart) return
 
   chart.setOption({
-    title: {
-      text: '成功比例图',
-      left: 'center'
-    },
+    // title: {
+    //   text: '成功比例图',
+    //   left: 'center',
+    //   top: '20' // 20
+    // },
     tooltip: {
       trigger: 'item',
       formatter: '{a} <br/>{b} : {c} ({d}%)'

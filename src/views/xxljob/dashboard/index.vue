@@ -11,7 +11,16 @@
         </TCol>
         <TCol :span="4">
           <div class="chart-wrapper">
-            <pie-chart :chart-data="pieCharData"/>
+            <div class="flex-center">
+              <t-radio-group v-model="selectRadio" variant="default-filled">
+                <t-radio-button value="pieChart" @Click="selectRadio = 'pieChart'">饼图</t-radio-button>
+                <t-radio-button value="barChart" @Click="selectRadio = 'barChart'">柱状图</t-radio-button>
+              </t-radio-group>
+            </div>
+            <div>
+              <pie-chart :chart-data="pieCharData" v-if="selectRadio === 'pieChart'"/>
+              <bar-chart :chart-data="pieCharData" v-if="selectRadio === 'barChart'"/>
+            </div>
           </div>
         </TCol>
       </TRow>
@@ -30,6 +39,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import PanelGroup from './components/PanelGroup.vue'
 import LineChart from './components/LineChart.vue'
 import PieChart from './components/PieChart.vue'
+import BarChart from "./components/BarChart.vue";
 import {getDashboardChartInfo, getDashBoardPanelInfo} from "@/api/xxljob/joblog";
 
 const panelGroupData = ref<{
@@ -65,6 +75,7 @@ const pieCharData = ref<{
 })
 
 const timeRange = ref([dayjs().subtract(6, 'day').startOf('day').toDate(), dayjs().endOf('day').toDate()]);
+const selectRadio = ref('pieChart')
 
 onMounted(() => {
   doGetDashBoardInfo()
@@ -92,14 +103,19 @@ const doGetDashBoardChartInfo = () => {
       triggerCountRunningTotal, triggerCountSucTotal, triggerCountFailTotal,
       triggerDayList, triggerDayCountRunningList, triggerDayCountFailList, triggerDayCountSucList
     } = res
-    lineChartData.value.lineCharDates = triggerDayList
-    lineChartData.value.successData = triggerDayCountSucList
-    lineChartData.value.failData = triggerDayCountFailList
-    lineChartData.value.runningData = triggerDayCountRunningList
 
-    pieCharData.value.jobRunning = triggerCountRunningTotal
-    pieCharData.value.jobSuccess = triggerCountSucTotal
-    pieCharData.value.jobFail = triggerCountFailTotal
+    lineChartData.value = {
+      successData: triggerDayCountSucList,
+      failData: triggerDayCountFailList,
+      runningData: triggerDayCountRunningList,
+      lineCharDates: triggerDayList
+    }
+
+    pieCharData.value = {
+      jobRunning: triggerCountRunningTotal,
+      jobSuccess: triggerCountSucTotal,
+      jobFail: triggerCountFailTotal
+    }
   })
 }
 

@@ -54,8 +54,8 @@ const setOptions = (data: ChartData) => {
       }
     },
     grid: {
-      left: 10,
-      right: 10,
+      left: 30,
+      right: 40,
       bottom: 20,
       top: 30,
       containLabel: true
