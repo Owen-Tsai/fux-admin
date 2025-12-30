@@ -10,7 +10,7 @@ import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
 
 const message = useMessage()
 const route = useRoute()
-const routeAppId = ref<string>(route.query?.appId as string || '')
+const routeAppId = ref<string>(route.query?.appId as string || route.query?.appId as string || '')
 
 const [ attachmentLibTypeOpts ] = useDict('attach_lib_type')
 

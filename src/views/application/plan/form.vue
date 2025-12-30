@@ -5,7 +5,7 @@ import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
 import {getCanSelectAttachTypeListByAppId} from "@/api/app/attachment.ts";
 
 const route = useRoute()
-const routeAppId = ref<string>(route.query?.appId as string || '')
+const routeAppId = ref<string>(route.params?.appId as string || route.query?.appId as string || '')
 
 const { appList } = defineProps<{
   appList?: AppVO[]

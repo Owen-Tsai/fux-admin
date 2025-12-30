@@ -22,7 +22,7 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   const query = ref<ListQueryParams>({
     pageNo: 1,
     pageSize: 10,
-    appId: route.query?.appId as string || '',
+    appId: route.query?.appId as string || route.query?.appId as string || '',
   })
 
   const { data, execute, pending } = useRequest(() => getAttachmentTypesList(query.value), {

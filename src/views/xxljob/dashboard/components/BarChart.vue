@@ -7,12 +7,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
-import 'echarts/theme/macarons' // 引入主题
+import 'echarts/theme/macarons'
 
-const chartRef = ref(null)
-let chart = null
+interface BarChartData {
+  jobSuccess: number
+  jobFail: number
+  jobRunning: number
+}
+
+const props = withDefaults(
+  defineProps<{
+    className?: string
+    width?: string
+    height?: string
+    chartData: BarChartData
+  }>(),
+  {
+    className: 'chart',
+    width: '100%',
+    height: '300px'
+  }
+)
+
+const chartRef = ref<HTMLDivElement | null>(null)
+let chart: echarts.ECharts | null = null
 
 const animationDuration = 6000
 
@@ -20,7 +40,12 @@ const initChart = () => {
   if (!chartRef.value) return
 
   chart = echarts.init(chartRef.value, 'macarons')
+  setOptions(props.chartData)
+}
+const setOptions = (data: BarChartData) => {
+  if (!chart) return
 
+  console.log("initData============", data)
   chart.setOption({
     tooltip: {
       trigger: 'axis',
@@ -29,58 +54,41 @@ const initChart = () => {
       }
     },
     grid: {
-      top: 10,
-      left: '2%',
-      right: '2%',
-      bottom: '3%',
+      top: 70,
+      left: '15%',
+      right: '15%',
+      bottom: 0,
       containLabel: true
     },
     xAxis: [{
       type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    axisTick: {
-      alignWithLabel: true
-    }
-  }],
-  yAxis: [{
-    type: 'value',
-    axisTick: {
-      show: false
-    }
-  }],
+      data: ['成功', '失败', '进行中'],
+    }],
+    yAxis: [{
+      type: 'value'
+    }],
     series: [
-    {
-      name: 'pageA',
-      type: 'bar',
-      stack: 'vistors',
-      barWidth: '60%',
-      data: [79, 52, 200, 334, 390, 330, 220],
-      animationDuration
-    },
-    {
-      name: 'pageB',
-      type: 'bar',
-      stack: 'vistors',
-      barWidth: '60%',
-      data: [80, 52, 200, 334, 390, 330, 220],
-      animationDuration
-    },
-    {
-      name: 'pageC',
-      type: 'bar',
-      stack: 'vistors',
-      barWidth: '60%',
-      data: [30, 52, 200, 334, 390, 330, 220],
-      animationDuration
-    }
-  ]
-})
+      {
+        type: 'bar',
+        barWidth: '30%',
+        data: [ data.jobSuccess || 0, data.jobFail || 0, data.jobRunning || 0]
+      }
+    ]
+  }, true)
 }
+
+watch(
+() => props.chartData,
+  (newData) => {
+    console.log("newData============", newData)
+      setOptions(newData)
+  },
+  { deep: true }
+)
 
 onMounted(() => {
   initChart()
 })
-
 onBeforeUnmount(() => {
   if (chart) {
     chart.dispose()
