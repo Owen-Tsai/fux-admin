@@ -28,7 +28,9 @@ export const useTable = (formRef: Ref<FormInstanceFunctions | null>) => {
   }
 
   const onDelete = async (id: number) => {
+    pending.value = true
     await deleteMenu(id)
+    pending.value = false
     message.success('删除成功')
     execute()
   }
