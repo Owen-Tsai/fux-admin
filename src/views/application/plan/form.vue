@@ -2,18 +2,24 @@
 import { getPlanDetail, createPlan, updatePlan, type PlanVO } from '@/api/app/plan'
 import type { AppVO } from '@/api/app/app'
 import type { FormInstanceFunctions, FormProps } from 'tdesign-vue-next'
-import {getCanSelectAttachTypeListByAppId} from "@/api/app/attachment.ts";
+import { getCanSelectAttachTypeListByAppId } from '@/api/app/attachment.ts'
 
 const route = useRoute()
-const routeAppId = ref<string>(route.params?.appId as string || route.query?.appId as string || '')
+const routeAppId = ref<string>(
+  (route.params?.appId as string) || (route.query?.appId as string) || '',
+)
 
 const { appList } = defineProps<{
   appList?: AppVO[]
 }>()
 
-const { data: attachmentTypes, pending } = useRequest(() => getCanSelectAttachTypeListByAppId(routeAppId.value), {
-  immediate: true,
-})
+const { data: attachmentTypes, pending } = useRequest(
+  () => getCanSelectAttachTypeListByAppId(routeAppId.value),
+  {
+    immediate: true,
+    initialData: [],
+  },
+)
 
 const message = useMessage()
 
@@ -65,7 +71,10 @@ const submit = async () => {
 const loadData = async (id: string) => {
   loading.value = true
   const res = await getPlanDetail(id)
-  formData.value = res
+  formData.value = {
+    ...res,
+    attachmentTypeIds: res.attachmentTypeIds || [],
+  }
   loading.value = false
 }
 

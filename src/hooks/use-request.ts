@@ -16,11 +16,13 @@ export type UseRequestOptions<T> = {
   onSuccess?: (data: T) => void
   onError?: (err: unknown) => void
   onFinish?: () => void
+  /** initial data */
+  initialData?: T
 }
 
 const useRequest = <T>(service: () => Promise<T>, options?: UseRequestOptions<T>) => {
   const pending = ref(false)
-  const data = ref<T | undefined>(undefined) as Ref<T | undefined>
+  const data = ref<T | undefined>(options?.initialData) as Ref<T | undefined>
   const error = ref<unknown | null>(null) as Ref<unknown | null>
 
   options = options || {}
