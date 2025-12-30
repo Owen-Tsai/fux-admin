@@ -77,6 +77,13 @@
                   </template>
                 </TButton>
               </TTooltip>
+              <TTooltip content="导出">
+                <TButton theme="primary" variant="text" shape="square" @click="exportExcel()">
+                  <template #icon>
+                    <Icon name="download" />
+                  </template>
+                </TButton>
+              </TTooltip>
             </div>
           </template>
 
@@ -124,6 +131,7 @@
 import dayjs from 'dayjs'
 import useAppInfo from './use-info'
 import { useTable, columns } from './use-table'
+import { exportComApplyExcel } from '@/api/business/list'
 import type { AuditEntryVO } from '@/api/business'
 import type { FormInstanceFunctions } from 'tdesign-vue-next'
 
@@ -141,4 +149,10 @@ const { app, loadingAppInfo } = useAppInfo()
 const [auditProcessOpts] = useDict('app_audit_process')
 
 const isArchive = computed(() => route.query.taskDefKey === 'All')
+
+const exportExcel = async () => {
+  await exportComApplyExcel('信息库.xlsx', {
+    appId: app.value?.id,
+  })
+}
 </script>
