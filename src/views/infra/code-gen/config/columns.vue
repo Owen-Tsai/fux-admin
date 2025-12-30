@@ -92,7 +92,7 @@ const javaTypeOpts = [
   { value: 'Long' },
   { value: 'String' },
   { value: 'Integer' },
-  { value: 'Douoble' },
+  { value: 'Double' },
   { value: 'BigDecimal' },
   { value: 'LocalDateTime' },
   { value: 'Boolean' },
